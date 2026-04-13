@@ -1,0 +1,86 @@
+{
+  "claude-opus-4-6": {
+    "inputPerMillion": 15.0,
+    "outputPerMillion": 75.0,
+    "cacheReadPerMillion": 1.5,
+    "cacheWritePerMillion": 18.75
+  },
+  "claude-sonnet-4-6": {
+    "inputPerMillion": 3.0,
+    "outputPerMillion": 15.0,
+    "cacheReadPerMillion": 0.3,
+    "cacheWritePerMillion": 3.75
+  },
+  "claude-sonnet-4-5-20250929": {
+    "inputPerMillion": 3.0,
+    "outputPerMillion": 15.0,
+    "cacheReadPerMillion": 0.3,
+    "cacheWritePerMillion": 3.75
+  },
+  "claude-haiku-4-5-20251001": {
+    "inputPerMillion": 0.8,
+    "outputPerMillion": 4.0,
+    "cacheReadPerMillion": 0.08,
+    "cacheWritePerMillion": 1.0
+  },
+  "gpt-4.1": {
+    "inputPerMillion": 2.0,
+    "outputPerMillion": 8.0,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 2.0
+  },
+  "gpt-4.1-mini": {
+    "inputPerMillion": 0.4,
+    "outputPerMillion": 1.6,
+    "cacheReadPerMillion": 0.1,
+    "cacheWritePerMillion": 0.4
+  },
+  "gpt-4.1-nano": {
+    "inputPerMillion": 0.1,
+    "outputPerMillion": 0.4,
+    "cacheReadPerMillion": 0.025,
+    "cacheWritePerMillion": 0.1
+  },
+  "gpt-5.4": {
+    "inputPerMillion": 2.0,
+    "outputPerMillion": 8.0,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 2.0
+  },
+  "gpt-5.3-codex": {
+    "inputPerMillion": 2.0,
+    "outputPerMillion": 8.0,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 2.0
+  },
+  "o3": {
+    "inputPerMillion": 2.0,
+    "outputPerMillion": 8.0,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 2.0
+  },
+  "o4-mini": {
+    "inputPerMillion": 1.1,
+    "outputPerMillion": 4.4,
+    "cacheReadPerMillion": 0.275,
+    "cacheWritePerMillion": 1.1
+  },
+  "gemini-2.5-pro": {
+    "inputPerMillion": 1.25,
+    "outputPerMillion": 10.0,
+    "cacheReadPerMillion": 0.315,
+    "cacheWritePerMillion": 1.25
+  },
+  "gemini-2.5-flash": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.6,
+    "cacheReadPerMillion": 0.0375,
+    "cacheWritePerMillion": 0.15
+  },
+  "google/gemini-3.1-pro-preview": {
+    "inputPerMillion": 1.25,
+    "outputPerMillion": 10.0,
+    "cacheReadPerMillion": 0.315,
+    "cacheWritePerMillion": 1.25
+  }
+}
