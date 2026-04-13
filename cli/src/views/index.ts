@@ -1,3 +1,8 @@
 export { Dashboard } from '../components/Dashboard.js'
 export { HelpView } from '../components/HelpView.js'
+export { SessionList } from '../components/SessionList.js'
+export { RepoView } from '../components/RepoView.js'
+export { TimelineView } from '../components/TimelineView.js'
+export { ModelView } from '../components/ModelView.js'
+export { BudgetView } from '../components/BudgetView.js'
 export type { ViewName } from '../components/CommandInput.js'
