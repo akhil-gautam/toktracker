@@ -1,0 +1,13 @@
+{
+  "sessionId": "gem-sess-001",
+  "projectHash": "abc123",
+  "startTime": "2026-04-13T08:00:00.000Z",
+  "lastUpdated": "2026-04-13T08:10:00.000Z",
+  "messages": [
+    {"id": "msg-001", "timestamp": "2026-04-13T08:00:05.000Z", "type": "user", "content": [{"text": "Explain the authentication flow in this codebase. I need to understand how JWT tokens are issued and validated."}]},
+    {"id": "msg-002", "timestamp": "2026-04-13T08:00:30.000Z", "type": "assistant", "content": [{"text": "The authentication flow works as follows:\n\n1. User logs in via GitHub OAuth\n2. Server validates the OAuth callback and creates a JWT\n3. JWT contains user_id and exp claims\n4. Client stores JWT and sends it in Authorization header\n5. Server validates JWT on each request using the shared secret\n\nThe key files are:\n- lib/json_web_token.rb for encoding/decoding\n- app/controllers/concerns/authenticatable.rb for the before_action\n- config/initializers/omniauth.rb for GitHub OAuth setup"}]},
+    {"id": "msg-003", "timestamp": "2026-04-13T08:02:00.000Z", "type": "user", "content": [{"text": "Show me the JWT validation code"}]},
+    {"id": "msg-004", "timestamp": "2026-04-13T08:02:20.000Z", "type": "assistant", "content": [{"text": "Here is the JWT validation:\n\ndef decode(token)\n  decoded = JWT.decode(token, SECRET, true, algorithm: 'HS256')\n  HashWithIndifferentAccess.new(decoded[0])\nrescue JWT::DecodeError => e\n  raise AuthenticationError, e.message\nend\n\nThe authenticate! before_action extracts the token from the Authorization header and calls this method."}]}
+  ],
+  "kind": "main"
+}
