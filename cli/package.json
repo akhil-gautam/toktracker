@@ -1,0 +1,40 @@
+{
+  "name": "tokscale",
+  "version": "0.1.0",
+  "description": "AI coding tool spend tracker",
+  "type": "module",
+  "bin": {
+    "tokscale": "./bin/tokscale.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ink": "^5.2.0",
+    "ink-big-text": "^2.0.0",
+    "ink-gradient": "^3.0.0",
+    "ink-spinner": "^5.0.0",
+    "react": "^18.3.1",
+    "chalk": "^5.4.0",
+    "chokidar": "^4.0.0",
+    "better-sqlite3": "^11.8.0",
+    "glob": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/better-sqlite3": "^7.6.0",
+    "typescript": "^5.7.0",
+    "tsup": "^8.4.0",
+    "vitest": "^3.0.0",
+    "ink-testing-library": "^4.0.0",
+    "@types/node": "^22.0.0"
+  }
+}
