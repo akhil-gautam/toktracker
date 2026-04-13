@@ -64,6 +64,19 @@ export function formatTokens(tokens: number): string {
   return `${tokens}`
 }
 
+export const SPARKLINE_CHARS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█']
+
+export function sparkline(values: number[]): string {
+  if (values.length === 0) return ''
+  const max = Math.max(...values, 1)
+  const min = Math.min(...values)
+  const range = max - min || 1
+  return values.map(v => {
+    const idx = Math.round(((v - min) / range) * (SPARKLINE_CHARS.length - 1))
+    return SPARKLINE_CHARS[idx]
+  }).join('')
+}
+
 export function getModelColor(model: string): string {
   if (MODEL_COLORS[model]) return MODEL_COLORS[model]
   let hash = 0

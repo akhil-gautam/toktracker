@@ -79,4 +79,71 @@ export class SessionStore {
   getRecentSessions(limit: number = 20): Session[] {
     return Array.from(this.sessions.values()).sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime()).slice(0, limit)
   }
+
+  getActiveTools(): string[] {
+    const tools = new Set<string>()
+    for (const s of this.sessions.values()) {
+      if (isToday(s.startedAt)) tools.add(s.tool)
+    }
+    return Array.from(tools)
+  }
+
+  getTopRepo(): RepoStats | undefined {
+    const todayRepos = new Map<string, RepoStats>()
+    for (const s of this.sessions.values()) {
+      if (!isToday(s.startedAt) || !s.gitRepo) continue
+      const e = todayRepos.get(s.gitRepo)
+      if (e) { e.costMillicents += s.costMillicents; e.sessionCount++ }
+      else todayRepos.set(s.gitRepo, { repo: s.gitRepo, costMillicents: s.costMillicents, sessionCount: 1, models: [s.model] })
+    }
+    return Array.from(todayRepos.values()).sort((a, b) => b.costMillicents - a.costMillicents)[0]
+  }
+
+  getModelTrends(): Record<string, number[]> {
+    const trends: Record<string, number[]> = {}
+    const models = new Set<string>()
+    for (const s of this.sessions.values()) models.add(s.model)
+    for (const model of models) {
+      const daily: number[] = []
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i)
+        const key = dateKey(d)
+        let cost = 0
+        for (const s of this.sessions.values()) {
+          if (s.model === model && dateKey(s.startedAt) === key) cost += s.costMillicents
+        }
+        daily.push(cost)
+      }
+      trends[model] = daily
+    }
+    return trends
+  }
+
+  getDailyStats(days: number): DayStats[] {
+    const dayMap = new Map<string, DayStats>()
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i); const key = dateKey(d)
+      dayMap.set(key, { date: key, costMillicents: 0, inputTokens: 0, outputTokens: 0, sessionCount: 0 })
+    }
+    const start = daysAgo(days - 1)
+    for (const s of this.sessions.values()) {
+      if (s.startedAt >= start) {
+        const day = dayMap.get(dateKey(s.startedAt))
+        if (day) { day.costMillicents += s.costMillicents; day.inputTokens += s.inputTokens; day.outputTokens += s.outputTokens; day.sessionCount++ }
+      }
+    }
+    return Array.from(dayMap.values())
+  }
+
+  getWeekOverWeekDelta(): number {
+    const thisWeekStart = daysAgo(6)
+    const lastWeekStart = daysAgo(13)
+    let thisWeek = 0, lastWeek = 0
+    for (const s of this.sessions.values()) {
+      if (s.startedAt >= thisWeekStart) thisWeek += s.costMillicents
+      else if (s.startedAt >= lastWeekStart) lastWeek += s.costMillicents
+    }
+    if (lastWeek === 0) return thisWeek > 0 ? 100 : 0
+    return Math.round(((thisWeek - lastWeek) / lastWeek) * 100)
+  }
 }
