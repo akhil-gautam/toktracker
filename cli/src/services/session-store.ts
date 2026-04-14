@@ -46,7 +46,6 @@ export class SessionStore {
   getModelStats(): ModelStats[] {
     const map = new Map<string, ModelStats>()
     for (const s of this.sessions.values()) {
-      if (!isToday(s.startedAt)) continue
       const e = map.get(s.model)
       if (e) { e.costMillicents += s.costMillicents; e.inputTokens += s.inputTokens; e.outputTokens += s.outputTokens; e.sessionCount++ }
       else map.set(s.model, { model: s.model, costMillicents: s.costMillicents, inputTokens: s.inputTokens, outputTokens: s.outputTokens, sessionCount: 1 })
@@ -57,7 +56,6 @@ export class SessionStore {
   getToolStats(): ToolStats[] {
     const map = new Map<string, ToolStats>()
     for (const s of this.sessions.values()) {
-      if (!isToday(s.startedAt)) continue
       const e = map.get(s.tool)
       if (e) { e.costMillicents += s.costMillicents; e.sessionCount++ }
       else map.set(s.tool, { tool: s.tool, costMillicents: s.costMillicents, sessionCount: 1 })
@@ -133,6 +131,34 @@ export class SessionStore {
       }
     }
     return Array.from(dayMap.values())
+  }
+
+  getAllTimeTotal(): number {
+    let total = 0
+    for (const s of this.sessions.values()) total += s.costMillicents
+    return total
+  }
+
+  getAllTimeSessions(): number {
+    return this.sessions.size
+  }
+
+  getDateRange(): { earliest: Date; latest: Date } | null {
+    let earliest: Date | null = null
+    let latest: Date | null = null
+    for (const s of this.sessions.values()) {
+      if (!earliest || s.startedAt < earliest) earliest = s.startedAt
+      if (!latest || s.startedAt > latest) latest = s.startedAt
+    }
+    if (!earliest || !latest) return null
+    return { earliest, latest }
+  }
+
+  getAllDailyStats(): DayStats[] {
+    const range = this.getDateRange()
+    if (!range) return this.getDailyStats(7)
+    const diffDays = Math.ceil((range.latest.getTime() - range.earliest.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    return this.getDailyStats(Math.max(diffDays, 7))
   }
 
   getWeekOverWeekDelta(): number {

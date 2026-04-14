@@ -35,7 +35,7 @@ function DayRow({ date, cost, maxCost, isToday, isPeak }: {
 interface DailyTabProps { store: SessionStore }
 
 export function DailyTab({ store }: DailyTabProps) {
-  const days = store.getDailyStats(7)
+  const days = store.getAllDailyStats()
   const totalCost = days.reduce((s, d) => s + d.costMillicents, 0)
   const maxCost = Math.max(...days.map(d => d.costMillicents), 1)
   const peakDate = days.reduce((max, d) => d.costMillicents > max.costMillicents ? d : max, days[0])?.date

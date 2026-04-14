@@ -21,6 +21,9 @@ export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
   const weekStats = store.getWeekStats()
   const weekCosts = weekStats.map(d => d.costMillicents)
 
+  const allTimeTotal = store.getAllTimeTotal()
+  const allTimeSessions = store.getAllTimeSessions()
+
   const todayCost = useAnimatedCost(today.costMillicents)
   const topBudget = budgetResults.length > 0 ? budgetResults.sort((a, b) => b.pct - a.pct)[0] : null
 
@@ -42,14 +45,14 @@ export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
       {/* Info cards - 2x2 grid */}
       <Box marginBottom={1} gap={1}>
         <InfoCard>
+          <Text color="#FF7043" bold>{formatCost(allTimeTotal)}</Text>
+          <Text color="gray"> all time</Text>
+          <Text color="gray" dimColor>{allTimeSessions} sessions across {activeTools.length} tools</Text>
+        </InfoCard>
+        <InfoCard>
           <Text color="#64B5F6" bold>{formatCost(weekTotal)}</Text>
           <Text color="gray"> this week</Text>
           <Text color={deltaColor}>{deltaStr} from last week</Text>
-        </InfoCard>
-        <InfoCard>
-          <Text color="#E8A838" bold>{activeTools.length} tools</Text>
-          <Text color="gray"> active</Text>
-          <Text color="gray" dimColor>{activeTools.map(t => TOOL_LABELS[t] ?? t).join(', ')}</Text>
         </InfoCard>
       </Box>
       <Box gap={1}>
