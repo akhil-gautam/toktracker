@@ -54,7 +54,7 @@ export function ModelsTab({ store }: ModelsTabProps) {
         String(stat.sessionCount),
       ],
       color: getModelColor(stat.model),
-      expandedContent: detail ? <ModelDetail detail={detail} /> : <Text color="gray">No detail available</Text>,
+      expandedContent: detail ? <ModelDetail detail={detail} accentColor={getModelColor(stat.model)} /> : <Text color="gray">No detail available</Text>,
     }
   })
 

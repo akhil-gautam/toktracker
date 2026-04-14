@@ -7,6 +7,7 @@ import type { ModelDetailStats } from '../types.js'
 
 interface ModelDetailProps {
   detail: ModelDetailStats
+  accentColor?: string
 }
 
 const COL_WIDTH = 14
@@ -22,10 +23,11 @@ function MetricCol({ label, value, color }: { label: string; value: string; colo
   )
 }
 
-function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+function SectionHeader({ title, subtitle, accentColor }: { title: string; subtitle?: string; accentColor: string }) {
   return (
     <Box>
-      <Text color="cyan" bold>{title}</Text>
+      <Text color={accentColor}>{'\u25CF '}</Text>
+      <Text color="white" bold>{title.toUpperCase()}</Text>
       {subtitle && <Text color="gray" dimColor>  {subtitle}</Text>}
     </Box>
   )
@@ -35,7 +37,7 @@ function pct(num: number, total: number): number {
   return total > 0 ? (num / total) * 100 : 0
 }
 
-export function ModelDetail({ detail }: ModelDetailProps) {
+export function ModelDetail({ detail, accentColor = '#7C6FE0' }: ModelDetailProps) {
   const totalInput = detail.inputTokens + detail.cacheReadTokens
   const cacheHitRate = pct(detail.cacheReadTokens, totalInput)
   const reasoningRate = pct(detail.reasoningTokens, detail.outputTokens)
@@ -47,11 +49,13 @@ export function ModelDetail({ detail }: ModelDetailProps) {
   const toolMaxCost = meaningfulTools[0]?.costMillicents ?? 1
 
   const leftCol = (
-    <Box flexDirection="column" width="50%" paddingRight={2}>
-      <SectionHeader title="30-day trend" subtitle="cost per day (USD)" />
-      <LineChart values={detail.dailyTrend} height={6} color="#4CAF50" />
+    <Box flexDirection="column" width="50%" paddingRight={1}>
+      <SectionHeader title="30-day trend" subtitle="cost per day (USD)" accentColor={accentColor} />
+      <LineChart values={detail.dailyTrend} height={6} color={accentColor} />
 
-      <Box marginTop={1}><SectionHeader title="Token breakdown" /></Box>
+      <Box marginTop={1}>
+        <SectionHeader title="Token breakdown" accentColor={accentColor} />
+      </Box>
       <Box flexWrap="wrap">
         <MetricCol label="Input" value={formatTokens(detail.inputTokens)} color="#64B5F6" />
         <MetricCol label="Output" value={formatTokens(detail.outputTokens)} color="#4CAF50" />
@@ -68,7 +72,7 @@ export function ModelDetail({ detail }: ModelDetailProps) {
       </Box>
 
       <Box marginTop={1}>
-        <SectionHeader title="Context window" subtitle={`${formatTokens(detail.contextWindow)} per request`} />
+        <SectionHeader title="Context window" subtitle={`${formatTokens(detail.contextWindow)} per request`} accentColor={accentColor} />
       </Box>
       <Box>
         <Text color="gray">Avg  </Text>
@@ -87,7 +91,9 @@ export function ModelDetail({ detail }: ModelDetailProps) {
 
       {(cacheHitRate > 0 || reasoningRate > 0) && (
         <>
-          <Box marginTop={1}><SectionHeader title="Efficiency" /></Box>
+          <Box marginTop={1}>
+            <SectionHeader title="Efficiency" accentColor={accentColor} />
+          </Box>
           {cacheHitRate > 0 && (
             <Box>
               <Text color="gray">Cache hit rate   </Text>
@@ -110,10 +116,10 @@ export function ModelDetail({ detail }: ModelDetailProps) {
   )
 
   const rightCol = (
-    <Box flexDirection="column" width="50%" paddingLeft={2}>
+    <Box flexDirection="column" width="50%" paddingLeft={1}>
       {detail.toolUses.length > 0 && (
         <>
-          <SectionHeader title="Tool usage" subtitle="Claude Code invocations" />
+          <SectionHeader title="Tool usage" subtitle="Claude Code invocations" accentColor={accentColor} />
           <StackedBarWithLegend
             slices={detail.toolUses.slice(0, 8).map((t, i) => ({
               label: t.name,
@@ -126,7 +132,9 @@ export function ModelDetail({ detail }: ModelDetailProps) {
 
       {meaningfulTools.length > 0 && (
         <>
-          <Box marginTop={1}><SectionHeader title="CLI client distribution" /></Box>
+          <Box marginTop={1}>
+            <SectionHeader title="CLI client" accentColor={accentColor} />
+          </Box>
           {meaningfulTools.map(t => {
             const barW = 16
             const fill = Math.round((t.costMillicents / toolMaxCost) * barW)
@@ -146,7 +154,9 @@ export function ModelDetail({ detail }: ModelDetailProps) {
 
       {detail.repos.length > 0 && (
         <>
-          <Box marginTop={1}><SectionHeader title="Top repos" /></Box>
+          <Box marginTop={1}>
+            <SectionHeader title="Top repos" accentColor={accentColor} />
+          </Box>
           {detail.repos.slice(0, 5).map(r => {
             const barW = 14
             const fill = Math.round((r.costMillicents / maxRepoCost) * barW)
@@ -166,9 +176,29 @@ export function ModelDetail({ detail }: ModelDetailProps) {
   )
 
   return (
-    <Box marginTop={1} marginBottom={1}>
-      {leftCol}
-      {rightCol}
+    <Box marginTop={1} marginBottom={1}
+      borderStyle="single"
+      borderTop={false}
+      borderRight={false}
+      borderBottom={false}
+      borderLeft
+      borderColor={accentColor}
+      paddingLeft={2}
+      paddingRight={1}
+    >
+      <Box flexDirection="row" width="100%">
+        {leftCol}
+        <Box
+          borderStyle="single"
+          borderTop={false}
+          borderBottom={false}
+          borderRight={false}
+          borderLeft
+          borderColor="#2a3040"
+          marginX={1}
+        />
+        {rightCol}
+      </Box>
     </Box>
   )
 }
