@@ -23,12 +23,17 @@ const PARSERS: ParserDef[] = [
   { name: 'gemini_cli', globPattern: path.join(HOME, '.gemini', 'tmp', '*', 'chats', '*.json'), parse: parseGeminiCli },
 ]
 
-export async function loadAllSessions(stateManager: StateManager): Promise<Session[]> {
+/**
+ * Load all sessions from all parsers.
+ * fullScan=true (default): parse from beginning of every file — shows all-time data.
+ * fullScan=false: parse only new data since last cursor — for incremental watch mode.
+ */
+export async function loadAllSessions(stateManager: StateManager, fullScan: boolean = true): Promise<Session[]> {
   const allSessions: Session[] = []
   for (const parser of PARSERS) {
     const files = await glob(parser.globPattern)
     for (const filePath of files) {
-      const cursor = stateManager.getCursor(filePath)
+      const cursor = fullScan ? 0 : stateManager.getCursor(filePath)
       try {
         const result = await parser.parse(filePath, cursor)
         stateManager.setCursor(filePath, result.newOffset)
