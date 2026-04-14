@@ -8,6 +8,7 @@ interface ClaudeCodeLine {
   gitBranch?: string
   message?: {
     model?: string
+    content?: Array<{ type?: string; name?: string }>
     usage?: {
       input_tokens?: number
       cache_creation_input_tokens?: number
@@ -57,6 +58,17 @@ export async function parseClaudeCode(filePath: string, fromOffset: number): Pro
     const cacheWriteTokens = usage.cache_creation_input_tokens ?? 0
     const model = parsed.message.model ?? 'unknown'
 
+    // Extract tool_use calls from message content
+    let toolUses: Record<string, number> | undefined
+    if (Array.isArray(parsed.message.content)) {
+      for (const part of parsed.message.content) {
+        if (part?.type === 'tool_use' && part.name) {
+          if (!toolUses) toolUses = {}
+          toolUses[part.name] = (toolUses[part.name] ?? 0) + 1
+        }
+      }
+    }
+
     sessions.push({
       id: `cc-${filePath.length}-${lineIdx++}-${parsed.uuid ?? parsed.timestamp ?? lineStart}`,
       tool: 'claude_code',
@@ -73,6 +85,7 @@ export async function parseClaudeCode(filePath: string, fromOffset: number): Pro
       cwd: parsed.cwd,
       gitBranch: parsed.gitBranch,
       startedAt: new Date(parsed.timestamp ?? Date.now()),
+      toolUses,
     })
   }
 

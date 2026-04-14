@@ -17,6 +17,7 @@ export interface Session {
   startedAt: Date
   endedAt?: Date
   estimated?: boolean
+  toolUses?: Record<string, number>  // e.g. { Read: 2, Grep: 1, Bash: 3 }
 }
 
 export interface ParseResult {
@@ -116,6 +117,7 @@ export interface ModelDetailStats {
   tools: Array<{ tool: string; costMillicents: number; sessionCount: number }>
   repos: Array<{ repo: string; costMillicents: number; sessionCount: number }>
   dailyTrend: number[]               // 30-day cost trend
+  toolUses: Array<{ name: string; count: number }>  // Claude Code tool calls: Read, Grep, etc.
 }
 
 export interface AllTimeStats {

@@ -73,6 +73,7 @@ export class SessionStore {
       totalInput: number // for avg
       tools: Map<string, { cost: number; count: number }>
       repos: Map<string, { cost: number; count: number }>
+      toolUses: Map<string, number>  // tool name -> invocation count
     }
     const modelDetailMap = new Map<string, PerModelAccum>()
     let earliest: Date | null = null
@@ -135,7 +136,7 @@ export class SessionStore {
         mdAccum = {
           tokens: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, reasoning: 0 },
           maxInput: 0, totalInput: 0,
-          tools: new Map(), repos: new Map(),
+          tools: new Map(), repos: new Map(), toolUses: new Map(),
         }
         modelDetailMap.set(s.model, mdAccum)
       }
@@ -155,6 +156,13 @@ export class SessionStore {
         const mrEntry = mdAccum.repos.get(s.gitRepo)
         if (mrEntry) { mrEntry.cost += s.costMillicents; mrEntry.count++ }
         else mdAccum.repos.set(s.gitRepo, { cost: s.costMillicents, count: 1 })
+      }
+
+      // Tool uses (Claude Code: Read, Grep, Bash, etc.)
+      if (s.toolUses) {
+        for (const [name, count] of Object.entries(s.toolUses)) {
+          mdAccum.toolUses.set(name, (mdAccum.toolUses.get(name) ?? 0) + count)
+        }
       }
 
       // Tools (all-time)
@@ -233,6 +241,9 @@ export class SessionStore {
           .map(([repo, v]) => ({ repo, costMillicents: v.cost, sessionCount: v.count }))
           .sort((a, b) => b.costMillicents - a.costMillicents),
         dailyTrend: modelTrends30[model] ?? [],
+        toolUses: Array.from(acc.toolUses.entries())
+          .map(([name, count]) => ({ name, count }))
+          .sort((a, b) => b.count - a.count),
       })
     }
 

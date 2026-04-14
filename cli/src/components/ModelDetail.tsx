@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Text } from 'ink'
 import { LineChart } from './LineChart.js'
+import { DonutWithLegend, donutPalette } from './Donut.js'
 import { formatCost, formatTokens, TOOL_COLORS, TOOL_LABELS, BAR_FULL, BAR_EMPTY } from '../theme.js'
 import type { ModelDetailStats } from '../types.js'
 
@@ -111,10 +112,30 @@ export function ModelDetail({ detail }: ModelDetailProps) {
         </Box>
       )}
 
-      {/* Tool distribution */}
+      {/* Tool usage (Read, Grep, Bash, etc.) — donut chart */}
+      {detail.toolUses.length > 0 && (
+        <Box marginBottom={1} flexDirection="column">
+          <Text color="cyan" bold>Tool usage</Text>
+          <Text color="gray" dimColor>Claude Code tool invocations</Text>
+          <Box marginTop={1}>
+            <DonutWithLegend
+              slices={detail.toolUses.slice(0, 8).map((t, i) => ({
+                label: t.name,
+                value: t.count,
+                color: donutPalette(i),
+              }))}
+              centerLabel={`${detail.toolUses.reduce((s, t) => s + t.count, 0).toLocaleString()}`}
+              chartWidth={22}
+              chartHeight={11}
+            />
+          </Box>
+        </Box>
+      )}
+
+      {/* CLI client distribution */}
       {detail.tools.length > 0 && (
         <Box marginBottom={1} flexDirection="column">
-          <Text color="cyan" bold>Tool distribution</Text>
+          <Text color="cyan" bold>CLI client distribution</Text>
           {detail.tools.map(t => {
             const barW = 20
             const fill = Math.round((t.costMillicents / maxToolCost) * barW)
