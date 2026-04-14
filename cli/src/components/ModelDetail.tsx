@@ -31,14 +31,6 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
   )
 }
 
-function Separator() {
-  return (
-    <Box marginTop={1}>
-      <Text color="#2a3040">{'\u2500'.repeat(70)}</Text>
-    </Box>
-  )
-}
-
 function pct(num: number, total: number): number {
   return total > 0 ? (num / total) * 100 : 0
 }
@@ -51,22 +43,16 @@ export function ModelDetail({ detail }: ModelDetailProps) {
   const peakContextPct = pct(detail.maxInputTokens, detail.contextWindow)
 
   const maxRepoCost = detail.repos[0]?.costMillicents ?? 1
+  const meaningfulTools = detail.tools.filter(t => t.costMillicents > 0)
+  const toolMaxCost = meaningfulTools[0]?.costMillicents ?? 1
 
-  return (
-    <Box flexDirection="column" marginTop={1} marginBottom={1}>
-      {/* 30-day line chart */}
+  const leftCol = (
+    <Box flexDirection="column" width="50%" paddingRight={2}>
       <SectionHeader title="30-day trend" subtitle="cost per day (USD)" />
-      <LineChart
-        values={detail.dailyTrend}
-        height={6}
-        color="#4CAF50"
-      />
+      <LineChart values={detail.dailyTrend} height={6} color="#4CAF50" />
 
-      <Separator />
-
-      {/* Token breakdown */}
-      <SectionHeader title="Token breakdown" />
-      <Box>
+      <Box marginTop={1}><SectionHeader title="Token breakdown" /></Box>
+      <Box flexWrap="wrap">
         <MetricCol label="Input" value={formatTokens(detail.inputTokens)} color="#64B5F6" />
         <MetricCol label="Output" value={formatTokens(detail.outputTokens)} color="#4CAF50" />
         {detail.cacheReadTokens > 0 && (
@@ -81,19 +67,14 @@ export function ModelDetail({ detail }: ModelDetailProps) {
         <MetricCol label="Sessions" value={detail.sessionCount.toLocaleString()} color="white" />
       </Box>
 
-      <Separator />
-
-      {/* Context window usage */}
-      <SectionHeader
-        title="Context window usage"
-        subtitle={`${formatTokens(detail.contextWindow)} per request`}
-      />
+      <Box marginTop={1}>
+        <SectionHeader title="Context window" subtitle={`${formatTokens(detail.contextWindow)} per request`} />
+      </Box>
       <Box>
         <Text color="gray">Avg  </Text>
         <Text color="#4CAF50">{BAR_FULL.repeat(Math.round(avgContextPct / 5))}</Text>
         <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, 20 - Math.round(avgContextPct / 5)))}</Text>
         <Text color="white" bold> {avgContextPct.toFixed(1)}%</Text>
-        <Text color="gray"> ({formatTokens(detail.avgInputTokens)})</Text>
       </Box>
       <Box>
         <Text color="gray">Peak </Text>
@@ -102,13 +83,11 @@ export function ModelDetail({ detail }: ModelDetailProps) {
         </Text>
         <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, 20 - Math.round(peakContextPct / 5)))}</Text>
         <Text color="white" bold> {peakContextPct.toFixed(1)}%</Text>
-        <Text color="gray"> ({formatTokens(detail.maxInputTokens)})</Text>
       </Box>
 
       {(cacheHitRate > 0 || reasoningRate > 0) && (
         <>
-          <Separator />
-          <SectionHeader title="Efficiency" />
+          <Box marginTop={1}><SectionHeader title="Efficiency" /></Box>
           {cacheHitRate > 0 && (
             <Box>
               <Text color="gray">Cache hit rate   </Text>
@@ -127,11 +106,14 @@ export function ModelDetail({ detail }: ModelDetailProps) {
           )}
         </>
       )}
+    </Box>
+  )
 
+  const rightCol = (
+    <Box flexDirection="column" width="50%" paddingLeft={2}>
       {detail.toolUses.length > 0 && (
         <>
-          <Separator />
-          <SectionHeader title="Tool usage" subtitle="Claude Code tool invocations" />
+          <SectionHeader title="Tool usage" subtitle="Claude Code invocations" />
           <StackedBarWithLegend
             slices={detail.toolUses.slice(0, 8).map((t, i) => ({
               label: t.name,
@@ -142,54 +124,51 @@ export function ModelDetail({ detail }: ModelDetailProps) {
         </>
       )}
 
-      {(() => {
-        // Filter out CLI clients with zero cost — those are aborted/metadata-only sessions
-        const meaningfulTools = detail.tools.filter(t => t.costMillicents > 0)
-        if (meaningfulTools.length === 0) return null
-        const toolMaxCost = meaningfulTools[0].costMillicents
-        return (
-          <>
-            <Separator />
-            <SectionHeader title="CLI client distribution" />
-            {meaningfulTools.map(t => {
-              const barW = 20
-              const fill = Math.round((t.costMillicents / toolMaxCost) * barW)
-              const color = TOOL_COLORS[t.tool] ?? 'white'
-              const label = TOOL_LABELS[t.tool] ?? t.tool
-              return (
-                <Box key={t.tool}>
-                  <Text color={color}>{label.padEnd(14)} </Text>
-                  <Text color={color}>{BAR_FULL.repeat(fill)}</Text>
-                  <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, barW - fill))}</Text>
-                  <Text color="white" bold> {formatCost(t.costMillicents).padStart(8)}</Text>
-                  <Text color="gray">  {t.sessionCount.toLocaleString()} sessions</Text>
-                </Box>
-              )
-            })}
-          </>
-        )
-      })()}
-
-      {detail.repos.length > 0 && (
+      {meaningfulTools.length > 0 && (
         <>
-          <Separator />
-          <SectionHeader title="Top repos" />
-          {detail.repos.slice(0, 5).map(r => {
-            const barW = 20
-            const fill = Math.round((r.costMillicents / maxRepoCost) * barW)
-            const name = r.repo.length > 26 ? '...' + r.repo.slice(-23) : r.repo
+          <Box marginTop={1}><SectionHeader title="CLI client distribution" /></Box>
+          {meaningfulTools.map(t => {
+            const barW = 16
+            const fill = Math.round((t.costMillicents / toolMaxCost) * barW)
+            const color = TOOL_COLORS[t.tool] ?? 'white'
+            const label = TOOL_LABELS[t.tool] ?? t.tool
             return (
-              <Box key={r.repo}>
-                <Text color="#7C6FE0">{name.padEnd(26)} </Text>
-                <Text color="#5CB8B2">{BAR_FULL.repeat(fill)}</Text>
+              <Box key={t.tool}>
+                <Text color={color}>{label.padEnd(12)} </Text>
+                <Text color={color}>{BAR_FULL.repeat(fill)}</Text>
                 <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, barW - fill))}</Text>
-                <Text color="white" bold> {formatCost(r.costMillicents).padStart(8)}</Text>
-                <Text color="gray">  {r.sessionCount.toLocaleString()} sessions</Text>
+                <Text color="white" bold> {formatCost(t.costMillicents).padStart(8)}</Text>
               </Box>
             )
           })}
         </>
       )}
+
+      {detail.repos.length > 0 && (
+        <>
+          <Box marginTop={1}><SectionHeader title="Top repos" /></Box>
+          {detail.repos.slice(0, 5).map(r => {
+            const barW = 14
+            const fill = Math.round((r.costMillicents / maxRepoCost) * barW)
+            const name = r.repo.length > 22 ? '...' + r.repo.slice(-19) : r.repo
+            return (
+              <Box key={r.repo}>
+                <Text color="#7C6FE0">{name.padEnd(22)} </Text>
+                <Text color="#5CB8B2">{BAR_FULL.repeat(fill)}</Text>
+                <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, barW - fill))}</Text>
+                <Text color="white" bold> {formatCost(r.costMillicents).padStart(8)}</Text>
+              </Box>
+            )
+          })}
+        </>
+      )}
+    </Box>
+  )
+
+  return (
+    <Box marginTop={1} marginBottom={1}>
+      {leftCol}
+      {rightCol}
     </Box>
   )
 }
