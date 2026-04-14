@@ -23,6 +23,9 @@ const PARSERS: ParserDef[] = [
   { name: 'gemini_cli', globPattern: path.join(HOME, '.gemini', 'tmp', '*', 'chats', '*.json'), parse: parseGeminiCli },
 ]
 
+// Parse files in parallel batches to saturate I/O without overwhelming memory
+const BATCH_SIZE = 50
+
 /**
  * Load all sessions from all parsers.
  * fullScan=true (default): parse from beginning of every file — shows all-time data.
@@ -32,27 +35,55 @@ export async function loadAllSessions(stateManager: StateManager, fullScan: bool
   const allSessions: Session[] = []
   const gitCache = new Map<string, { gitRepo?: string; gitBranch?: string }>()
 
+  // Collect all file-parser pairs first
+  const tasks: Array<{ filePath: string; parse: ParserDef['parse'] }> = []
   for (const parser of PARSERS) {
     const files = await glob(parser.globPattern)
     for (const filePath of files) {
-      const cursor = fullScan ? 0 : stateManager.getCursor(filePath)
-      try {
-        const result = await parser.parse(filePath, cursor)
-        stateManager.setCursor(filePath, result.newOffset)
-        for (const session of result.sessions) {
-          if (session.cwd && !session.gitRepo) {
-            if (!gitCache.has(session.cwd)) {
-              gitCache.set(session.cwd, await extractGitInfo(session.cwd))
-            }
-            const gitInfo = gitCache.get(session.cwd)!
-            session.gitRepo = gitInfo.gitRepo
-            if (!session.gitBranch) session.gitBranch = gitInfo.gitBranch
-          }
-        }
-        allSessions.push(...result.sessions)
-      } catch { continue }
+      tasks.push({ filePath, parse: parser.parse })
     }
   }
+
+  // Parse in parallel batches
+  for (let i = 0; i < tasks.length; i += BATCH_SIZE) {
+    const batch = tasks.slice(i, i + BATCH_SIZE)
+    const results = await Promise.all(
+      batch.map(async ({ filePath, parse }) => {
+        const cursor = fullScan ? 0 : stateManager.getCursor(filePath)
+        try {
+          const result = await parse(filePath, cursor)
+          stateManager.setCursor(filePath, result.newOffset)
+          return result.sessions
+        } catch {
+          return []
+        }
+      })
+    )
+    for (const sessions of results) {
+      allSessions.push(...sessions)
+    }
+  }
+
+  // Git attribution — batch unique cwds
+  const cwdsToResolve = new Set<string>()
+  for (const s of allSessions) {
+    if (s.cwd && !s.gitRepo) cwdsToResolve.add(s.cwd)
+  }
+  await Promise.all(
+    Array.from(cwdsToResolve).map(async cwd => {
+      gitCache.set(cwd, await extractGitInfo(cwd))
+    })
+  )
+  for (const s of allSessions) {
+    if (s.cwd && !s.gitRepo) {
+      const gitInfo = gitCache.get(s.cwd)
+      if (gitInfo) {
+        s.gitRepo = gitInfo.gitRepo
+        if (!s.gitBranch) s.gitBranch = gitInfo.gitBranch
+      }
+    }
+  }
+
   stateManager.save()
   return allSessions
 }

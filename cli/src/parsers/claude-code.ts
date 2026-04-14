@@ -1,17 +1,13 @@
 import { readFile, stat } from 'fs/promises'
-import { createHash } from 'crypto'
 import type { Session, ParseResult } from '../types.js'
 import { calculateCostMillicents } from '../services/cost-calculator.js'
 
 interface ClaudeCodeLine {
-  parentUuid?: string | null
-  sessionId?: string
   type: string
   cwd?: string
   gitBranch?: string
   message?: {
     model?: string
-    role?: string
     usage?: {
       input_tokens?: number
       cache_creation_input_tokens?: number
@@ -23,6 +19,10 @@ interface ClaudeCodeLine {
   timestamp?: string
 }
 
+// Fast pre-filter: only parse lines that could be assistant messages with usage data
+const ASSISTANT_MARKER = '"type":"assistant"'
+const USAGE_MARKER = '"usage"'
+
 export async function parseClaudeCode(filePath: string, fromOffset: number): Promise<ParseResult> {
   const fileStats = await stat(filePath)
   if (fromOffset >= fileStats.size) {
@@ -31,17 +31,22 @@ export async function parseClaudeCode(filePath: string, fromOffset: number): Pro
 
   const buffer = await readFile(filePath)
   const content = buffer.subarray(fromOffset).toString('utf-8')
-  const lines = content.split('\n').filter(line => line.trim().length > 0)
 
   const sessions: Session[] = []
+  let lineStart = 0
+  let lineIdx = 0
 
-  for (const line of lines) {
+  while (lineStart < content.length) {
+    const lineEnd = content.indexOf('\n', lineStart)
+    const end = lineEnd === -1 ? content.length : lineEnd
+    const line = content.substring(lineStart, end)
+    lineStart = end + 1
+
+    // Skip lines that can't be assistant messages with usage — avoids JSON.parse on ~80% of lines
+    if (!line.includes(ASSISTANT_MARKER) || !line.includes(USAGE_MARKER)) continue
+
     let parsed: ClaudeCodeLine
-    try {
-      parsed = JSON.parse(line)
-    } catch {
-      continue
-    }
+    try { parsed = JSON.parse(line) } catch { continue }
 
     if (parsed.type !== 'assistant' || !parsed.message?.usage) continue
 
@@ -52,13 +57,8 @@ export async function parseClaudeCode(filePath: string, fromOffset: number): Pro
     const cacheWriteTokens = usage.cache_creation_input_tokens ?? 0
     const model = parsed.message.model ?? 'unknown'
 
-    const id = createHash('sha256')
-      .update(`${filePath}:${parsed.uuid ?? parsed.timestamp}`)
-      .digest('hex')
-      .slice(0, 16)
-
     sessions.push({
-      id: `cc-${id}`,
+      id: `cc-${filePath.length}-${lineIdx++}-${parsed.uuid ?? parsed.timestamp ?? lineStart}`,
       tool: 'claude_code',
       model,
       provider: 'anthropic',
@@ -68,11 +68,7 @@ export async function parseClaudeCode(filePath: string, fromOffset: number): Pro
       cacheWriteTokens,
       reasoningTokens: 0,
       costMillicents: calculateCostMillicents({
-        model,
-        inputTokens,
-        outputTokens,
-        cacheReadTokens,
-        cacheWriteTokens,
+        model, inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens,
       }),
       cwd: parsed.cwd,
       gitBranch: parsed.gitBranch,

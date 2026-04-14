@@ -1,5 +1,4 @@
 import { readFile, stat } from 'fs/promises'
-import { createHash } from 'crypto'
 import type { Session, ParseResult } from '../types.js'
 import { calculateCostMillicents } from '../services/cost-calculator.js'
 
@@ -60,7 +59,7 @@ export async function parseCodex(filePath: string, fromOffset: number): Promise<
     if (parsed.type === 'event_msg' && parsed.payload.type === 'token_count') {
       const usage = parsed.payload.info?.last_token_usage
       if (!usage) continue
-      const id = createHash('sha256').update(`${filePath}:${parsed.timestamp}`).digest('hex').slice(0, 16)
+      const id = `${filePath.length}-${sessions.length}-${parsed.timestamp}`
       sessions.push({
         id: `codex-${id}`, tool: 'codex', model: currentModel,
         provider: meta?.model_provider ?? 'openai',
