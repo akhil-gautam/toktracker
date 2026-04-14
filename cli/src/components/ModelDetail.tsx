@@ -8,6 +8,19 @@ interface ModelDetailProps {
   detail: ModelDetailStats
 }
 
+const COL_WIDTH = 14
+
+function MetricCol({ label, value, color }: { label: string; value: string; color: string }) {
+  const lbl = label.length > COL_WIDTH - 1 ? label.slice(0, COL_WIDTH - 1) : label
+  const val = value.length > COL_WIDTH - 1 ? value.slice(0, COL_WIDTH - 1) : value
+  return (
+    <Box flexDirection="column" width={COL_WIDTH}>
+      <Text color="gray" dimColor>{lbl.padEnd(COL_WIDTH)}</Text>
+      <Text color={color}>{val.padEnd(COL_WIDTH)}</Text>
+    </Box>
+  )
+}
+
 function pct(num: number, total: number): number {
   return total > 0 ? (num / total) * 100 : 0
 }
@@ -37,37 +50,19 @@ export function ModelDetail({ detail }: ModelDetailProps) {
       {/* Token breakdown */}
       <Box marginBottom={1} flexDirection="column">
         <Text color="cyan" bold>Token breakdown</Text>
-        <Box gap={3}>
-          <Box flexDirection="column">
-            <Text color="gray" dimColor>Input</Text>
-            <Text color="#64B5F6">{formatTokens(detail.inputTokens)}</Text>
-          </Box>
-          <Box flexDirection="column">
-            <Text color="gray" dimColor>Output</Text>
-            <Text color="#4CAF50">{formatTokens(detail.outputTokens)}</Text>
-          </Box>
+        <Box>
+          <MetricCol label="Input" value={formatTokens(detail.inputTokens)} color="#64B5F6" />
+          <MetricCol label="Output" value={formatTokens(detail.outputTokens)} color="#4CAF50" />
           {detail.cacheReadTokens > 0 && (
-            <Box flexDirection="column">
-              <Text color="gray" dimColor>Cache Read</Text>
-              <Text color="#FFC107">{formatTokens(detail.cacheReadTokens)}</Text>
-            </Box>
+            <MetricCol label="Cache Read" value={formatTokens(detail.cacheReadTokens)} color="#FFC107" />
           )}
           {detail.cacheWriteTokens > 0 && (
-            <Box flexDirection="column">
-              <Text color="gray" dimColor>Cache Write</Text>
-              <Text color="#FF9800">{formatTokens(detail.cacheWriteTokens)}</Text>
-            </Box>
+            <MetricCol label="Cache Write" value={formatTokens(detail.cacheWriteTokens)} color="#FF9800" />
           )}
           {detail.reasoningTokens > 0 && (
-            <Box flexDirection="column">
-              <Text color="gray" dimColor>Reasoning</Text>
-              <Text color="#CE93D8">{formatTokens(detail.reasoningTokens)}</Text>
-            </Box>
+            <MetricCol label="Reasoning" value={formatTokens(detail.reasoningTokens)} color="#CE93D8" />
           )}
-          <Box flexDirection="column">
-            <Text color="gray" dimColor>Sessions</Text>
-            <Text color="white">{detail.sessionCount.toLocaleString()}</Text>
-          </Box>
+          <MetricCol label="Sessions" value={detail.sessionCount.toLocaleString()} color="white" />
         </Box>
       </Box>
 
