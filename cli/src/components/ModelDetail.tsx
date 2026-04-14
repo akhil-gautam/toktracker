@@ -24,18 +24,16 @@ function MetricCol({ label, value, color }: { label: string; value: string; colo
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <Box flexDirection="column" marginBottom={1}>
-      <Box>
-        <Text color="cyan" bold>{title}</Text>
-        {subtitle && <Text color="gray" dimColor>  {subtitle}</Text>}
-      </Box>
+    <Box>
+      <Text color="cyan" bold>{title}</Text>
+      {subtitle && <Text color="gray" dimColor>  {subtitle}</Text>}
     </Box>
   )
 }
 
 function Separator() {
   return (
-    <Box marginTop={1} marginBottom={1}>
+    <Box marginTop={1}>
       <Text color="#2a3040">{'\u2500'.repeat(70)}</Text>
     </Box>
   )
@@ -61,7 +59,7 @@ export function ModelDetail({ detail }: ModelDetailProps) {
       <SectionHeader title="30-day trend" subtitle="cost per day (USD)" />
       <LineChart
         values={detail.dailyTrend}
-        height={8}
+        height={6}
         color="#4CAF50"
       />
 

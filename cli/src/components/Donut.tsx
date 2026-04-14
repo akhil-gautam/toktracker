@@ -179,22 +179,30 @@ export function StackedBar({ slices, width = 50 }: StackedBarProps) {
 
 export function StackedBarWithLegend({ slices }: { slices: DonutSlice[] }) {
   const total = slices.reduce((s, v) => s + v.value, 0)
+  // Split into 2 columns for vertical compactness
+  const half = Math.ceil(slices.length / 2)
+  const col1 = slices.slice(0, half)
+  const col2 = slices.slice(half)
+
+  const renderRow = (s: DonutSlice) => {
+    const p = total > 0 ? (s.value / total) * 100 : 0
+    const label = s.label.length > 12 ? s.label.slice(0, 12) : s.label
+    return (
+      <Box key={s.label}>
+        <Text color={s.color}>{'\u2588 '}</Text>
+        <Text color="white">{label.padEnd(12)}</Text>
+        <Text color="gray">{s.value.toLocaleString().padStart(7)}</Text>
+        <Text color="gray" dimColor>  {p.toFixed(1).padStart(4)}%</Text>
+      </Box>
+    )
+  }
+
   return (
     <Box flexDirection="column">
-      <StackedBar slices={slices} width={50} />
-      <Box flexDirection="column" marginTop={1}>
-        {slices.map(s => {
-          const p = total > 0 ? (s.value / total) * 100 : 0
-          const barLen = Math.max(1, Math.round((s.value / total) * 16))
-          return (
-            <Box key={s.label}>
-              <Text color={s.color}>{'\u2588'.repeat(barLen).padEnd(16)}</Text>
-              <Text color="white"> {s.label.padEnd(14)}</Text>
-              <Text color="gray">{s.value.toLocaleString().padStart(8)}</Text>
-              <Text color="gray" dimColor>  {p.toFixed(1)}%</Text>
-            </Box>
-          )
-        })}
+      <StackedBar slices={slices} width={60} />
+      <Box gap={3} marginTop={0}>
+        <Box flexDirection="column">{col1.map(renderRow)}</Box>
+        <Box flexDirection="column">{col2.map(renderRow)}</Box>
       </Box>
     </Box>
   )
