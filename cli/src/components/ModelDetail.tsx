@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Text } from 'ink'
 import { LineChart } from './LineChart.js'
-import { DonutWithLegend, donutPalette } from './Donut.js'
+import { StackedBarWithLegend, donutPalette } from './Donut.js'
 import { formatCost, formatTokens, TOOL_COLORS, TOOL_LABELS, BAR_FULL, BAR_EMPTY } from '../theme.js'
 import type { ModelDetailStats } from '../types.js'
 
@@ -22,6 +22,25 @@ function MetricCol({ label, value, color }: { label: string; value: string; colo
   )
 }
 
+function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+  return (
+    <Box flexDirection="column" marginBottom={1}>
+      <Box>
+        <Text color="cyan" bold>{title}</Text>
+        {subtitle && <Text color="gray" dimColor>  {subtitle}</Text>}
+      </Box>
+    </Box>
+  )
+}
+
+function Separator() {
+  return (
+    <Box marginTop={1} marginBottom={1}>
+      <Text color="#2a3040">{'\u2500'.repeat(70)}</Text>
+    </Box>
+  )
+}
+
 function pct(num: number, total: number): number {
   return total > 0 ? (num / total) * 100 : 0
 }
@@ -37,62 +56,62 @@ export function ModelDetail({ detail }: ModelDetailProps) {
   const maxRepoCost = detail.repos[0]?.costMillicents ?? 1
 
   return (
-    <Box flexDirection="column" marginTop={0} marginBottom={1}>
-      {/* Line chart of 30-day trend */}
-      <Box marginBottom={1}>
-        <LineChart
-          values={detail.dailyTrend}
-          height={8}
-          color="#4CAF50"
-          subtitle="30-day cost trend"
-        />
-      </Box>
+    <Box flexDirection="column" marginTop={1} marginBottom={1}>
+      {/* 30-day line chart */}
+      <SectionHeader title="30-day trend" subtitle="cost per day (USD)" />
+      <LineChart
+        values={detail.dailyTrend}
+        height={8}
+        color="#4CAF50"
+      />
+
+      <Separator />
 
       {/* Token breakdown */}
-      <Box marginBottom={1} flexDirection="column">
-        <Text color="cyan" bold>Token breakdown</Text>
-        <Box>
-          <MetricCol label="Input" value={formatTokens(detail.inputTokens)} color="#64B5F6" />
-          <MetricCol label="Output" value={formatTokens(detail.outputTokens)} color="#4CAF50" />
-          {detail.cacheReadTokens > 0 && (
-            <MetricCol label="Cache Read" value={formatTokens(detail.cacheReadTokens)} color="#FFC107" />
-          )}
-          {detail.cacheWriteTokens > 0 && (
-            <MetricCol label="Cache Write" value={formatTokens(detail.cacheWriteTokens)} color="#FF9800" />
-          )}
-          {detail.reasoningTokens > 0 && (
-            <MetricCol label="Reasoning" value={formatTokens(detail.reasoningTokens)} color="#CE93D8" />
-          )}
-          <MetricCol label="Sessions" value={detail.sessionCount.toLocaleString()} color="white" />
-        </Box>
+      <SectionHeader title="Token breakdown" />
+      <Box>
+        <MetricCol label="Input" value={formatTokens(detail.inputTokens)} color="#64B5F6" />
+        <MetricCol label="Output" value={formatTokens(detail.outputTokens)} color="#4CAF50" />
+        {detail.cacheReadTokens > 0 && (
+          <MetricCol label="Cache Read" value={formatTokens(detail.cacheReadTokens)} color="#FFC107" />
+        )}
+        {detail.cacheWriteTokens > 0 && (
+          <MetricCol label="Cache Write" value={formatTokens(detail.cacheWriteTokens)} color="#FF9800" />
+        )}
+        {detail.reasoningTokens > 0 && (
+          <MetricCol label="Reasoning" value={formatTokens(detail.reasoningTokens)} color="#CE93D8" />
+        )}
+        <MetricCol label="Sessions" value={detail.sessionCount.toLocaleString()} color="white" />
       </Box>
+
+      <Separator />
 
       {/* Context window usage */}
-      <Box marginBottom={1} flexDirection="column">
-        <Text color="cyan" bold>Context window usage</Text>
-        <Text color="gray" dimColor>{formatTokens(detail.contextWindow)} window per request</Text>
-        <Box marginTop={0}>
-          <Text color="gray">Avg  </Text>
-          <Text color="#4CAF50">{BAR_FULL.repeat(Math.round(avgContextPct / 5))}</Text>
-          <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, 20 - Math.round(avgContextPct / 5)))}</Text>
-          <Text color="white" bold> {avgContextPct.toFixed(1)}%</Text>
-          <Text color="gray"> ({formatTokens(detail.avgInputTokens)})</Text>
-        </Box>
-        <Box>
-          <Text color="gray">Peak </Text>
-          <Text color={peakContextPct > 80 ? '#FF5252' : peakContextPct > 50 ? '#FFC107' : '#4CAF50'}>
-            {BAR_FULL.repeat(Math.round(peakContextPct / 5))}
-          </Text>
-          <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, 20 - Math.round(peakContextPct / 5)))}</Text>
-          <Text color="white" bold> {peakContextPct.toFixed(1)}%</Text>
-          <Text color="gray"> ({formatTokens(detail.maxInputTokens)})</Text>
-        </Box>
+      <SectionHeader
+        title="Context window usage"
+        subtitle={`${formatTokens(detail.contextWindow)} per request`}
+      />
+      <Box>
+        <Text color="gray">Avg  </Text>
+        <Text color="#4CAF50">{BAR_FULL.repeat(Math.round(avgContextPct / 5))}</Text>
+        <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, 20 - Math.round(avgContextPct / 5)))}</Text>
+        <Text color="white" bold> {avgContextPct.toFixed(1)}%</Text>
+        <Text color="gray"> ({formatTokens(detail.avgInputTokens)})</Text>
+      </Box>
+      <Box>
+        <Text color="gray">Peak </Text>
+        <Text color={peakContextPct > 80 ? '#FF5252' : peakContextPct > 50 ? '#FFC107' : '#4CAF50'}>
+          {BAR_FULL.repeat(Math.round(peakContextPct / 5))}
+        </Text>
+        <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, 20 - Math.round(peakContextPct / 5)))}</Text>
+        <Text color="white" bold> {peakContextPct.toFixed(1)}%</Text>
+        <Text color="gray"> ({formatTokens(detail.maxInputTokens)})</Text>
       </Box>
 
-      {/* Efficiency metrics */}
       {(cacheHitRate > 0 || reasoningRate > 0) && (
-        <Box marginBottom={1} flexDirection="column">
-          <Text color="cyan" bold>Efficiency</Text>
+        <>
+          <Separator />
+          <SectionHeader title="Efficiency" />
           {cacheHitRate > 0 && (
             <Box>
               <Text color="gray">Cache hit rate   </Text>
@@ -109,33 +128,27 @@ export function ModelDetail({ detail }: ModelDetailProps) {
               <Text color="white" bold> {reasoningRate.toFixed(1)}%</Text>
             </Box>
           )}
-        </Box>
+        </>
       )}
 
-      {/* Tool usage (Read, Grep, Bash, etc.) — donut chart */}
       {detail.toolUses.length > 0 && (
-        <Box marginBottom={1} flexDirection="column">
-          <Text color="cyan" bold>Tool usage</Text>
-          <Text color="gray" dimColor>Claude Code tool invocations</Text>
-          <Box marginTop={1}>
-            <DonutWithLegend
-              slices={detail.toolUses.slice(0, 8).map((t, i) => ({
-                label: t.name,
-                value: t.count,
-                color: donutPalette(i),
-              }))}
-              centerLabel={`${detail.toolUses.reduce((s, t) => s + t.count, 0).toLocaleString()}`}
-              chartWidth={22}
-              chartHeight={11}
-            />
-          </Box>
-        </Box>
+        <>
+          <Separator />
+          <SectionHeader title="Tool usage" subtitle="Claude Code tool invocations" />
+          <StackedBarWithLegend
+            slices={detail.toolUses.slice(0, 8).map((t, i) => ({
+              label: t.name,
+              value: t.count,
+              color: donutPalette(i),
+            }))}
+          />
+        </>
       )}
 
-      {/* CLI client distribution */}
       {detail.tools.length > 0 && (
-        <Box marginBottom={1} flexDirection="column">
-          <Text color="cyan" bold>CLI client distribution</Text>
+        <>
+          <Separator />
+          <SectionHeader title="CLI client distribution" />
           {detail.tools.map(t => {
             const barW = 20
             const fill = Math.round((t.costMillicents / maxToolCost) * barW)
@@ -151,13 +164,13 @@ export function ModelDetail({ detail }: ModelDetailProps) {
               </Box>
             )
           })}
-        </Box>
+        </>
       )}
 
-      {/* Top repos */}
       {detail.repos.length > 0 && (
-        <Box flexDirection="column">
-          <Text color="cyan" bold>Top repos</Text>
+        <>
+          <Separator />
+          <SectionHeader title="Top repos" />
           {detail.repos.slice(0, 5).map(r => {
             const barW = 20
             const fill = Math.round((r.costMillicents / maxRepoCost) * barW)
@@ -172,7 +185,7 @@ export function ModelDetail({ detail }: ModelDetailProps) {
               </Box>
             )
           })}
-        </Box>
+        </>
       )}
     </Box>
   )

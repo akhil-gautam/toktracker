@@ -139,3 +139,63 @@ export function DonutWithLegend({ slices, centerLabel, chartWidth = 22, chartHei
     </Box>
   )
 }
+
+/**
+ * Horizontal stacked bar chart — a single line with proportional colored segments.
+ * Much more reliable in terminals than an ASCII donut.
+ */
+interface StackedBarProps {
+  slices: DonutSlice[]
+  width?: number
+}
+
+export function StackedBar({ slices, width = 50 }: StackedBarProps) {
+  const total = slices.reduce((s, v) => s + v.value, 0)
+  if (total === 0) return <Text color="gray">No data</Text>
+
+  // Compute integer segment widths that sum to exactly `width`
+  const exactWidths = slices.map(s => (s.value / total) * width)
+  const floored = exactWidths.map(w => Math.floor(w))
+  let remainder = width - floored.reduce((a, b) => a + b, 0)
+  // Distribute remainder to segments with largest fractional part
+  const fractions = exactWidths.map((w, i) => ({ i, frac: w - floored[i] }))
+    .sort((a, b) => b.frac - a.frac)
+  for (const { i } of fractions) {
+    if (remainder <= 0) break
+    floored[i]++
+    remainder--
+  }
+
+  return (
+    <Box>
+      {slices.map((s, i) => (
+        floored[i] > 0 ? (
+          <Text key={i} color={s.color}>{'\u2588'.repeat(floored[i])}</Text>
+        ) : null
+      ))}
+    </Box>
+  )
+}
+
+export function StackedBarWithLegend({ slices }: { slices: DonutSlice[] }) {
+  const total = slices.reduce((s, v) => s + v.value, 0)
+  return (
+    <Box flexDirection="column">
+      <StackedBar slices={slices} width={50} />
+      <Box flexDirection="column" marginTop={1}>
+        {slices.map(s => {
+          const p = total > 0 ? (s.value / total) * 100 : 0
+          const barLen = Math.max(1, Math.round((s.value / total) * 16))
+          return (
+            <Box key={s.label}>
+              <Text color={s.color}>{'\u2588'.repeat(barLen).padEnd(16)}</Text>
+              <Text color="white"> {s.label.padEnd(14)}</Text>
+              <Text color="gray">{s.value.toLocaleString().padStart(8)}</Text>
+              <Text color="gray" dimColor>  {p.toFixed(1)}%</Text>
+            </Box>
+          )
+        })}
+      </Box>
+    </Box>
+  )
+}
