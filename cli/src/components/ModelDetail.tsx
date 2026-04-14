@@ -50,7 +50,6 @@ export function ModelDetail({ detail }: ModelDetailProps) {
   const avgContextPct = pct(detail.avgInputTokens, detail.contextWindow)
   const peakContextPct = pct(detail.maxInputTokens, detail.contextWindow)
 
-  const maxToolCost = detail.tools[0]?.costMillicents ?? 1
   const maxRepoCost = detail.repos[0]?.costMillicents ?? 1
 
   return (
@@ -143,27 +142,33 @@ export function ModelDetail({ detail }: ModelDetailProps) {
         </>
       )}
 
-      {detail.tools.length > 0 && (
-        <>
-          <Separator />
-          <SectionHeader title="CLI client distribution" />
-          {detail.tools.map(t => {
-            const barW = 20
-            const fill = Math.round((t.costMillicents / maxToolCost) * barW)
-            const color = TOOL_COLORS[t.tool] ?? 'white'
-            const label = TOOL_LABELS[t.tool] ?? t.tool
-            return (
-              <Box key={t.tool}>
-                <Text color={color}>{label.padEnd(14)} </Text>
-                <Text color={color}>{BAR_FULL.repeat(fill)}</Text>
-                <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, barW - fill))}</Text>
-                <Text color="white" bold> {formatCost(t.costMillicents).padStart(8)}</Text>
-                <Text color="gray">  {t.sessionCount.toLocaleString()} sessions</Text>
-              </Box>
-            )
-          })}
-        </>
-      )}
+      {(() => {
+        // Filter out CLI clients with zero cost — those are aborted/metadata-only sessions
+        const meaningfulTools = detail.tools.filter(t => t.costMillicents > 0)
+        if (meaningfulTools.length === 0) return null
+        const toolMaxCost = meaningfulTools[0].costMillicents
+        return (
+          <>
+            <Separator />
+            <SectionHeader title="CLI client distribution" />
+            {meaningfulTools.map(t => {
+              const barW = 20
+              const fill = Math.round((t.costMillicents / toolMaxCost) * barW)
+              const color = TOOL_COLORS[t.tool] ?? 'white'
+              const label = TOOL_LABELS[t.tool] ?? t.tool
+              return (
+                <Box key={t.tool}>
+                  <Text color={color}>{label.padEnd(14)} </Text>
+                  <Text color={color}>{BAR_FULL.repeat(fill)}</Text>
+                  <Text color="gray">{BAR_EMPTY.repeat(Math.max(0, barW - fill))}</Text>
+                  <Text color="white" bold> {formatCost(t.costMillicents).padStart(8)}</Text>
+                  <Text color="gray">  {t.sessionCount.toLocaleString()} sessions</Text>
+                </Box>
+              )
+            })}
+          </>
+        )
+      })()}
 
       {detail.repos.length > 0 && (
         <>
