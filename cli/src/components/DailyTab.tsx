@@ -52,23 +52,22 @@ export function DailyTab({ store }: DailyTabProps) {
   return (
     <Box flexDirection="column" paddingX={1}>
       {/* Line chart of last 30 days */}
-      <Box marginBottom={1} flexDirection="column">
-        <LineChart
-          values={chartValues}
-          labels={chartLabels}
-          height={10}
-          color="#4CAF50"
-          title="Cost by Day"
-          subtitle={`estimated API spend per day (USD) — last ${CHART_DAYS} days`}
-        />
-      </Box>
+      <LineChart
+        values={chartValues}
+        labels={chartLabels}
+        height={10}
+        color="#4CAF50"
+        title="Cost by Day"
+        subtitle={`estimated API spend per day (USD) — last ${CHART_DAYS} days`}
+        xStretch={5}
+      />
 
-      <Box marginBottom={1}>
+      <Box>
         <Text color="cyan" bold>Daily Cost</Text>
         <Text color="gray">  (last 15 days)  </Text>
         <Text color="gray">Total: </Text><Text color="white" bold>{formatCost(totalCost)}</Text>
       </Box>
-      <Box marginBottom={1}><Text color="gray" dimColor>{'─'.repeat(60)}</Text></Box>
+      <Box><Text color="gray" dimColor>{'─'.repeat(60)}</Text></Box>
       {days.map(day => (
         <DayRow key={day.date} date={day.date} cost={day.costMillicents}
           maxCost={maxCost} isToday={day.date === todayStr} isPeak={day.date === peakDate && day.costMillicents > 0} />
