@@ -10,6 +10,7 @@ interface LineChartProps {
   color?: string                // hex color for the line
   title?: string
   subtitle?: string
+  xStretch?: number             // horizontal stretch factor (default 1, e.g. 3 = triple width)
 }
 
 function formatUSD(millicents: number): string {
@@ -19,7 +20,7 @@ function formatUSD(millicents: number): string {
   return `$${dollars.toFixed(2)}`
 }
 
-export function LineChart({ values, labels, height = 12, color, title, subtitle }: LineChartProps) {
+export function LineChart({ values, labels, height = 12, color, title, subtitle, xStretch = 3 }: LineChartProps) {
   if (values.length === 0) {
     return (
       <Box flexDirection="column">
@@ -30,7 +31,22 @@ export function LineChart({ values, labels, height = 12, color, title, subtitle 
   }
 
   // Convert millicents to dollars for display
-  const dollarValues = values.map(v => v / 100_000)
+  const baseValues = values.map(v => v / 100_000)
+
+  // Stretch horizontally by interpolating extra points between each original point
+  const dollarValues: number[] = []
+  if (xStretch <= 1 || baseValues.length < 2) {
+    dollarValues.push(...baseValues)
+  } else {
+    for (let i = 0; i < baseValues.length - 1; i++) {
+      const a = baseValues[i]
+      const b = baseValues[i + 1]
+      for (let k = 0; k < xStretch; k++) {
+        dollarValues.push(a + (b - a) * (k / xStretch))
+      }
+    }
+    dollarValues.push(baseValues[baseValues.length - 1])
+  }
 
   // Render chart — asciichart takes values array + config
   const chartStr: string = asciichart.plot(dollarValues, {
@@ -39,23 +55,28 @@ export function LineChart({ values, labels, height = 12, color, title, subtitle 
     padding: '        ',
   })
 
-  // Build x-axis labels strip
+  // Build x-axis labels strip — ensure MIN_GAP chars between labels to avoid cramping
   let labelRow: string | null = null
   if (labels && labels.length > 0) {
-    // Space labels evenly across chart width
-    // asciichart outputs lines of equal width; measure from the first line
     const firstLine = chartStr.split('\n')[0]
     const chartWidth = firstLine.length
-    const labelAreaStart = 9 // account for y-axis prefix
+    const labelAreaStart = 9
     const innerWidth = chartWidth - labelAreaStart
-    const step = Math.max(1, Math.floor(labels.length / Math.min(labels.length, 8)))
+    const maxLabelLen = Math.max(...labels.map(l => l.length))
+    const MIN_GAP = 3
+    const slotWidth = maxLabelLen + MIN_GAP
+    const maxLabels = Math.max(2, Math.floor(innerWidth / slotWidth))
+    const step = Math.max(1, Math.ceil(labels.length / maxLabels))
+
     const parts: string[] = [' '.repeat(labelAreaStart)]
     let used = labelAreaStart
     for (let i = 0; i < labels.length; i += step) {
-      const pos = labelAreaStart + Math.round((i / Math.max(1, labels.length - 1)) * innerWidth)
+      const pos = labelAreaStart + Math.round((i / Math.max(1, labels.length - 1)) * (innerWidth - labels[i].length))
       if (pos > used) {
         parts.push(' '.repeat(pos - used))
         used = pos
+      } else if (pos < used) {
+        continue // skip label that would overlap
       }
       parts.push(labels[i])
       used += labels[i].length
