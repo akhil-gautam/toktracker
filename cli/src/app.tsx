@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Box, Text, useInput } from 'ink'
 import { Loading } from './components/Loading.js'
 import { TabBar } from './components/TabBar.js'
@@ -14,9 +14,23 @@ import { SessionsTab } from './components/SessionsTab.js'
 import { useTabNavigation } from './hooks/useTabNavigation.js'
 import { useSessions } from './hooks/useSessions.js'
 
+function useTerminalSize() {
+  const [size, setSize] = useState({
+    columns: process.stdout.columns || 80,
+    rows: process.stdout.rows || 24,
+  })
+  useEffect(() => {
+    const onResize = () => setSize({ columns: process.stdout.columns, rows: process.stdout.rows })
+    process.stdout.on('resize', onResize)
+    return () => { process.stdout.off('resize', onResize) }
+  }, [])
+  return size
+}
+
 interface AppProps { onExit: () => void }
 
 export function App({ onExit }: AppProps) {
+  const { rows, columns } = useTerminalSize()
   const { store, budgetResults, loading, error, serverMode } = useSessions()
   const { activeTab, commandMode, commandInput, showHelp, handleInput } = useTabNavigation()
 
@@ -24,18 +38,23 @@ export function App({ onExit }: AppProps) {
     handleInput(input, key, onExit)
   })
 
-  if (loading) return <Loading />
+  if (loading) return (
+    <Box flexDirection="column" height={rows} justifyContent="center" alignItems="center">
+      <Loading />
+    </Box>
+  )
   if (error) return (
-    <Box flexDirection="column" paddingX={1}>
+    <Box flexDirection="column" height={rows} justifyContent="center" alignItems="center">
       <Text color="red" bold>Error: {error}</Text>
     </Box>
   )
 
   if (showHelp) {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" height={rows} width={columns}>
         <TabBar activeTab={activeTab} />
-        <HelpOverlay serverMode={serverMode} />
+        <Box flexGrow={1}><HelpOverlay serverMode={serverMode} /></Box>
+        <StatusBar tab={activeTab} commandMode={commandMode} commandInput={commandInput} />
       </Box>
     )
   }
@@ -54,13 +73,13 @@ export function App({ onExit }: AppProps) {
   }
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" height={rows} width={columns}>
       <TabBar activeTab={activeTab} />
       {alerts.map(r => <BudgetAlert key={r.budget.id} result={r} />)}
-      {renderTab()}
-      <Box marginTop={1}>
-        <StatusBar tab={activeTab} commandMode={commandMode} commandInput={commandInput} />
+      <Box flexGrow={1} flexDirection="column">
+        {renderTab()}
       </Box>
+      <StatusBar tab={activeTab} commandMode={commandMode} commandInput={commandInput} />
     </Box>
   )
 }
