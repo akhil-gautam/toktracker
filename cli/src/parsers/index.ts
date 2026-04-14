@@ -30,6 +30,8 @@ const PARSERS: ParserDef[] = [
  */
 export async function loadAllSessions(stateManager: StateManager, fullScan: boolean = true): Promise<Session[]> {
   const allSessions: Session[] = []
+  const gitCache = new Map<string, { gitRepo?: string; gitBranch?: string }>()
+
   for (const parser of PARSERS) {
     const files = await glob(parser.globPattern)
     for (const filePath of files) {
@@ -39,7 +41,10 @@ export async function loadAllSessions(stateManager: StateManager, fullScan: bool
         stateManager.setCursor(filePath, result.newOffset)
         for (const session of result.sessions) {
           if (session.cwd && !session.gitRepo) {
-            const gitInfo = await extractGitInfo(session.cwd)
+            if (!gitCache.has(session.cwd)) {
+              gitCache.set(session.cwd, await extractGitInfo(session.cwd))
+            }
+            const gitInfo = gitCache.get(session.cwd)!
             session.gitRepo = gitInfo.gitRepo
             if (!session.gitBranch) session.gitBranch = gitInfo.gitBranch
           }
