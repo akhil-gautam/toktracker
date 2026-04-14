@@ -29,7 +29,7 @@ export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
 
   const earliest = store.getDateRange()?.earliest
   const dateRange = earliest
-    ? `${earliest.toISOString().slice(0, 10)} \u2192 ${new Date().toISOString().slice(0, 10)}`
+    ? `since ${earliest.toISOString().slice(0, 10)}`
     : 'no data'
 
   return (
@@ -68,7 +68,7 @@ export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
           label="Cache Reuse Ratio"
           value={`${(allTime.cacheReuseRatio * 100).toFixed(1)}%`}
           valueColor="#29B6F6"
-          caption="cache_read / (in + cache)"
+          caption="cache vs total input"
         />
       </Box>
 

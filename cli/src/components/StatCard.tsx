@@ -6,24 +6,35 @@ interface StatCardProps {
   value: string
   valueColor: string
   caption?: string
-  delta?: { value: number; positiveBad?: boolean }  // positiveBad: if true, ▲ is red (e.g. cost going up)
+  delta?: { value: number; positiveBad?: boolean }
   width?: number
   backgroundColor?: string
 }
 
-export function StatCard({ label, value, valueColor, caption, delta, width = 26, backgroundColor = '#0E1420' }: StatCardProps) {
-  // Pad content to force the backgroundColor to fill the whole width
-  const contentWidth = width - 4 // account for border (2) + paddingX (2)
+function truncate(text: string, max: number): string {
+  if (text.length <= max) return text
+  return text.slice(0, max - 1) + '\u2026'
+}
+
+export function StatCard({
+  label, value, valueColor, caption, delta, width = 26, backgroundColor = '#0E1420',
+}: StatCardProps) {
+  const innerWidth = width - 4 // border (2) + paddingX (2)
+
+  const labelLine = truncate(label.toUpperCase(), innerWidth).padEnd(innerWidth)
+  const valueLine = truncate(value, innerWidth).padEnd(innerWidth)
+  const captionLine = caption ? truncate(caption, innerWidth).padEnd(innerWidth) : null
 
   let deltaEl: React.ReactNode = null
   if (delta) {
     const arrow = delta.value >= 0 ? '\u25B2' : '\u25BC'
     const bad = delta.positiveBad !== false ? delta.value > 0 : delta.value < 0
     const pillColor = bad ? '#FF5252' : '#4CAF50'
-    const pillText = `${arrow} ${Math.abs(delta.value).toFixed(1)}% vs last week`
+    const pillText = truncate(`${arrow} ${Math.abs(delta.value).toFixed(1)}% vs last week`, innerWidth - 2)
     deltaEl = (
-      <Box marginTop={0}>
+      <Box>
         <Text backgroundColor={pillColor} color="white" bold> {pillText} </Text>
+        <Text backgroundColor={backgroundColor}>{' '.repeat(Math.max(0, innerWidth - pillText.length - 2))}</Text>
       </Box>
     )
   }
@@ -37,24 +48,10 @@ export function StatCard({ label, value, valueColor, caption, delta, width = 26,
       width={width}
       flexDirection="column"
     >
-      <Box width={contentWidth}>
-        <Text backgroundColor={backgroundColor} color="#6B7280" bold>
-          {label.toUpperCase().padEnd(contentWidth)}
-        </Text>
-      </Box>
-      <Box width={contentWidth}>
-        <Text backgroundColor={backgroundColor} color={valueColor} bold>
-          {value.padEnd(contentWidth)}
-        </Text>
-      </Box>
+      <Text backgroundColor={backgroundColor} color="#6B7280" bold>{labelLine}</Text>
+      <Text backgroundColor={backgroundColor} color={valueColor} bold>{valueLine}</Text>
       {deltaEl}
-      {caption && (
-        <Box width={contentWidth}>
-          <Text backgroundColor={backgroundColor} color="#6B7280">
-            {caption.padEnd(contentWidth)}
-          </Text>
-        </Box>
-      )}
+      {captionLine && <Text backgroundColor={backgroundColor} color="#6B7280">{captionLine}</Text>}
     </Box>
   )
 }
