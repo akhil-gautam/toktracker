@@ -1,4 +1,4 @@
-import type { Session, DayStats, ModelStats, ToolStats, RepoStats, TodayDetailStats } from '../types.js'
+import type { Session, DayStats, ModelStats, ToolStats, RepoStats, TodayDetailStats, AllTimeStats } from '../types.js'
 
 function dateKey(d: Date): string { return d.toISOString().slice(0, 10) }
 function todayKey(): string { return dateKey(new Date()) }
@@ -23,6 +23,7 @@ interface CachedStats {
   recentSessions: Session[]
   earliest: Date | null
   todayDetail: TodayDetailStats
+  allTime: AllTimeStats
 }
 
 export class SessionStore {
@@ -45,7 +46,8 @@ export class SessionStore {
     const lastWeekStart = daysAgo(13)
 
     // Accumulators
-    let allTimeTotal = 0
+    let allTimeTotal = 0, allTimeIn = 0, allTimeOut = 0, allTimeCacheRead = 0
+    let allTimeCacheWrite = 0, allTimeReasoning = 0
     let todayCost = 0, todayIn = 0, todayOut = 0, todayCount = 0
     let todayCacheRead = 0, todayCacheWrite = 0, todayReasoning = 0
     let todayFirst: Date | undefined, todayLast: Date | undefined
@@ -67,6 +69,11 @@ export class SessionStore {
     // Single pass over all sessions
     for (const s of this.sessions.values()) {
       allTimeTotal += s.costMillicents
+      allTimeIn += s.inputTokens
+      allTimeOut += s.outputTokens
+      allTimeCacheRead += s.cacheReadTokens
+      allTimeCacheWrite += s.cacheWriteTokens
+      allTimeReasoning += s.reasoningTokens
       const dk = dateKey(s.startedAt)
 
       // Today
@@ -167,6 +174,24 @@ export class SessionStore {
       .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
       .slice(0, 50)
 
+    const totalCacheIn = allTimeCacheRead + allTimeCacheWrite + allTimeIn
+    const cacheReuseRatio = totalCacheIn > 0 ? allTimeCacheRead / totalCacheIn : 0
+
+    const allTime: AllTimeStats = {
+      costMillicents: allTimeTotal,
+      sessionCount: this.sessions.size,
+      inputTokens: allTimeIn,
+      outputTokens: allTimeOut,
+      cacheReadTokens: allTimeCacheRead,
+      cacheWriteTokens: allTimeCacheWrite,
+      reasoningTokens: allTimeReasoning,
+      uniqueModels: modelMap.size,
+      uniqueTools: toolMap.size,
+      uniqueRepos: repoMap.size,
+      activeDays: dailyMap.size,
+      cacheReuseRatio,
+    }
+
     const todayDetail: TodayDetailStats = {
       costMillicents: todayCost,
       sessionCount: todayCount,
@@ -199,6 +224,7 @@ export class SessionStore {
       recentSessions,
       earliest,
       todayDetail,
+      allTime,
     }
     return this.cache
   }
@@ -215,6 +241,7 @@ export class SessionStore {
   getWeekOverWeekDelta(): number { return this.ensureCache().weekOverWeekDelta }
   getModelTrends(): Record<string, number[]> { return this.ensureCache().modelTrends }
   getTodayDetail(): TodayDetailStats { return this.ensureCache().todayDetail }
+  getAllTimeStats(): AllTimeStats { return this.ensureCache().allTime }
   getRecentSessions(limit: number = 50): Session[] { return this.ensureCache().recentSessions.slice(0, limit) }
 
   getDailyStats(days: number): DayStats[] {

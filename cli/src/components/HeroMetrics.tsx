@@ -1,9 +1,9 @@
 import React from 'react'
 import { Box, Text } from 'ink'
 import { Sparkline } from './Sparkline.js'
-import { InfoCard } from './InfoCard.js'
+import { StatCard } from './StatCard.js'
 import { useAnimatedCost } from '../hooks/useAnimatedValue.js'
-import { formatCost, budgetColor, BAR_FULL, BAR_EMPTY, TOOL_LABELS } from '../theme.js'
+import { formatCost, formatTokens } from '../theme.js'
 import type { SessionStore } from '../services/session-store.js'
 import type { BudgetResult } from '../hooks/useBudget.js'
 
@@ -16,19 +16,21 @@ export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
   const today = store.getTodayStats()
   const weekTotal = store.getWeekTotal()
   const weekDelta = store.getWeekOverWeekDelta()
-  const activeTools = store.getActiveTools()
-  const topRepo = store.getTopRepo()
+  const allTime = store.getAllTimeStats()
   const weekStats = store.getWeekStats()
   const weekCosts = weekStats.map(d => d.costMillicents)
-
-  const allTimeTotal = store.getAllTimeTotal()
-  const allTimeSessions = store.getAllTimeSessions()
 
   const todayCost = useAnimatedCost(today.costMillicents)
   const topBudget = budgetResults.length > 0 ? budgetResults.sort((a, b) => b.pct - a.pct)[0] : null
 
-  const deltaStr = weekDelta >= 0 ? `\u2191${weekDelta}%` : `\u2193${Math.abs(weekDelta)}%`
-  const deltaColor = weekDelta >= 0 ? '#FF5722' : '#4CAF50'
+  const avgPerSession = allTime.sessionCount > 0
+    ? allTime.costMillicents / allTime.sessionCount
+    : 0
+
+  const earliest = store.getDateRange()?.earliest
+  const dateRange = earliest
+    ? `${earliest.toISOString().slice(0, 10)} \u2192 ${new Date().toISOString().slice(0, 10)}`
+    : 'no data'
 
   return (
     <Box flexDirection="column">
@@ -42,43 +44,68 @@ export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
         </Box>
       </Box>
 
-      {/* Info cards - 2x2 grid */}
-      <Box marginBottom={1} gap={1}>
-        <InfoCard>
-          <Text color="#FF7043" bold>{formatCost(allTimeTotal)}</Text>
-          <Text color="gray"> all time</Text>
-          <Text color="gray" dimColor>{allTimeSessions} sessions across {activeTools.length} tools</Text>
-        </InfoCard>
-        <InfoCard>
-          <Text color="#64B5F6" bold>{formatCost(weekTotal)}</Text>
-          <Text color="gray"> this week</Text>
-          <Text color={deltaColor}>{deltaStr} from last week</Text>
-        </InfoCard>
+      {/* Row 1: All-time stats */}
+      <Box marginBottom={0} gap={1}>
+        <StatCard
+          label="Total Spend"
+          value={formatCost(allTime.costMillicents)}
+          valueColor="#4CAF50"
+          caption={`${(allTime.costMillicents / 100_000).toFixed(2)} USD all-time`}
+        />
+        <StatCard
+          label="Total Sessions"
+          value={allTime.sessionCount.toLocaleString()}
+          valueColor="#42A5F5"
+          caption={dateRange}
+        />
+        <StatCard
+          label="Output Tokens"
+          value={formatTokens(allTime.outputTokens)}
+          valueColor="#CE93D8"
+          caption={`${formatTokens(Math.round(allTime.outputTokens / Math.max(1, allTime.sessionCount)))} avg/session`}
+        />
+        <StatCard
+          label="Cache Reuse Ratio"
+          value={`${(allTime.cacheReuseRatio * 100).toFixed(1)}%`}
+          valueColor="#29B6F6"
+          caption="cache_read / (in + cache)"
+        />
       </Box>
+
+      {/* Row 2: Week / today stats */}
       <Box gap={1}>
+        <StatCard
+          label="This Week"
+          value={formatCost(weekTotal)}
+          valueColor="#64B5F6"
+          delta={{ value: weekDelta, positiveBad: true }}
+        />
+        <StatCard
+          label="Input Tokens"
+          value={formatTokens(allTime.inputTokens)}
+          valueColor="#FFC107"
+          caption={`${formatTokens(allTime.cacheReadTokens)} from cache`}
+        />
+        <StatCard
+          label="Active Days"
+          value={String(allTime.activeDays)}
+          valueColor="#FF9800"
+          caption={`${allTime.uniqueModels} models \u00B7 ${allTime.uniqueTools} tools`}
+        />
         {topBudget ? (
-          <InfoCard borderColor={topBudget.pct >= 80 ? 'red' : undefined}>
-            <Text color={budgetColor(topBudget.pct)} bold>{topBudget.pct}%</Text>
-            <Text color="gray"> budget used</Text>
-            <Text color="gray" dimColor>{formatCost(topBudget.spentCents * 1000)} / {formatCost(topBudget.budget.limitCents * 1000)}</Text>
-          </InfoCard>
+          <StatCard
+            label="Top Budget"
+            value={`${topBudget.pct}%`}
+            valueColor={topBudget.pct >= 80 ? '#FF5252' : topBudget.pct >= 50 ? '#FFC107' : '#4CAF50'}
+            caption={`${formatCost(topBudget.spentCents * 1000)} / ${formatCost(topBudget.budget.limitCents * 1000)}`}
+          />
         ) : (
-          <InfoCard>
-            <Text color="gray">No budget set</Text>
-            <Text color="gray" dimColor>/budget set to create</Text>
-          </InfoCard>
-        )}
-        {topRepo ? (
-          <InfoCard>
-            <Text color="#7C6FE0" bold>{topRepo.repo.split('/').pop()}</Text>
-            <Text color="gray"> top repo today</Text>
-            <Text color="gray" dimColor>{formatCost(topRepo.costMillicents)} across {topRepo.sessionCount} sessions</Text>
-          </InfoCard>
-        ) : (
-          <InfoCard>
-            <Text color="gray">No repos tracked</Text>
-            <Text color="gray" dimColor>Sessions need git cwd</Text>
-          </InfoCard>
+          <StatCard
+            label="Avg / Session"
+            value={formatCost(avgPerSession)}
+            valueColor="#FF7043"
+            caption={`across ${allTime.sessionCount.toLocaleString()} sessions`}
+          />
         )}
       </Box>
     </Box>

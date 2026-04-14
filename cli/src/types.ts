@@ -100,3 +100,18 @@ export interface TodayDetailStats {
   firstSession?: Date
   lastSession?: Date
 }
+
+export interface AllTimeStats {
+  costMillicents: number
+  sessionCount: number
+  inputTokens: number
+  outputTokens: number
+  cacheReadTokens: number
+  cacheWriteTokens: number
+  reasoningTokens: number
+  uniqueModels: number
+  uniqueTools: number
+  uniqueRepos: number
+  activeDays: number  // days with at least one session
+  cacheReuseRatio: number  // 0-1
+}
