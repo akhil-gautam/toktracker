@@ -1,4 +1,5 @@
-import type { Session, DayStats, ModelStats, ToolStats, RepoStats, TodayDetailStats, AllTimeStats } from '../types.js'
+import type { Session, DayStats, ModelStats, ToolStats, RepoStats, TodayDetailStats, AllTimeStats, ModelDetailStats } from '../types.js'
+import { getContextWindow } from '../data/context-windows.js'
 
 function dateKey(d: Date): string { return d.toISOString().slice(0, 10) }
 function todayKey(): string { return dateKey(new Date()) }
@@ -24,6 +25,7 @@ interface CachedStats {
   earliest: Date | null
   todayDetail: TodayDetailStats
   allTime: AllTimeStats
+  modelDetails: Map<string, ModelDetailStats>
 }
 
 export class SessionStore {
@@ -64,6 +66,15 @@ export class SessionStore {
     const dailyMap = new Map<string, DayStats>()
     // model → dateKey → cost
     const modelDailyMap = new Map<string, Map<string, number>>()
+    // Per-model detail: tools, repos, daily trend, peak input
+    interface PerModelAccum {
+      tokens: { input: number; output: number; cacheRead: number; cacheWrite: number; reasoning: number }
+      maxInput: number
+      totalInput: number // for avg
+      tools: Map<string, { cost: number; count: number }>
+      repos: Map<string, { cost: number; count: number }>
+    }
+    const modelDetailMap = new Map<string, PerModelAccum>()
     let earliest: Date | null = null
 
     // Single pass over all sessions
@@ -118,6 +129,34 @@ export class SessionStore {
       if (me) { me.costMillicents += s.costMillicents; me.inputTokens += s.inputTokens; me.outputTokens += s.outputTokens; me.sessionCount++ }
       else modelMap.set(s.model, { model: s.model, costMillicents: s.costMillicents, inputTokens: s.inputTokens, outputTokens: s.outputTokens, sessionCount: 1 })
 
+      // Per-model detail
+      let mdAccum = modelDetailMap.get(s.model)
+      if (!mdAccum) {
+        mdAccum = {
+          tokens: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, reasoning: 0 },
+          maxInput: 0, totalInput: 0,
+          tools: new Map(), repos: new Map(),
+        }
+        modelDetailMap.set(s.model, mdAccum)
+      }
+      mdAccum.tokens.input += s.inputTokens
+      mdAccum.tokens.output += s.outputTokens
+      mdAccum.tokens.cacheRead += s.cacheReadTokens
+      mdAccum.tokens.cacheWrite += s.cacheWriteTokens
+      mdAccum.tokens.reasoning += s.reasoningTokens
+      mdAccum.totalInput += s.inputTokens
+      if (s.inputTokens > mdAccum.maxInput) mdAccum.maxInput = s.inputTokens
+
+      const mtEntry = mdAccum.tools.get(s.tool)
+      if (mtEntry) { mtEntry.cost += s.costMillicents; mtEntry.count++ }
+      else mdAccum.tools.set(s.tool, { cost: s.costMillicents, count: 1 })
+
+      if (s.gitRepo) {
+        const mrEntry = mdAccum.repos.get(s.gitRepo)
+        if (mrEntry) { mrEntry.cost += s.costMillicents; mrEntry.count++ }
+        else mdAccum.repos.set(s.gitRepo, { cost: s.costMillicents, count: 1 })
+      }
+
       // Tools (all-time)
       const te = toolMap.get(s.tool)
       if (te) { te.costMillicents += s.costMillicents; te.sessionCount++ }
@@ -135,8 +174,8 @@ export class SessionStore {
       if (de) { de.costMillicents += s.costMillicents; de.inputTokens += s.inputTokens; de.outputTokens += s.outputTokens; de.sessionCount++ }
       else dailyMap.set(dk, { date: dk, costMillicents: s.costMillicents, inputTokens: s.inputTokens, outputTokens: s.outputTokens, sessionCount: 1 })
 
-      // Model trends daily
-      if (s.startedAt >= weekStart) {
+      // Model trends daily — track up to 30 days back
+      if (s.startedAt >= daysAgo(29)) {
         let md = modelDailyMap.get(s.model)
         if (!md) { md = new Map(); modelDailyMap.set(s.model, md) }
         md.set(dk, (md.get(dk) ?? 0) + s.costMillicents)
@@ -153,15 +192,48 @@ export class SessionStore {
       weekStatsMap.set(key, dailyMap.get(key) ?? { date: key, costMillicents: 0, inputTokens: 0, outputTokens: 0, sessionCount: 0 })
     }
 
-    // Build model trends (7 arrays)
+    // Build model trends (7d for existing sparkline, 30d for expanded view)
     const modelTrends: Record<string, number[]> = {}
+    const modelTrends30: Record<string, number[]> = {}
     for (const [model, dailyCosts] of modelDailyMap) {
-      const arr: number[] = []
+      const arr7: number[] = []
+      const arr30: number[] = []
       for (let i = 6; i >= 0; i--) {
         const d = new Date(); d.setDate(d.getDate() - i)
-        arr.push(dailyCosts.get(dateKey(d)) ?? 0)
+        arr7.push(dailyCosts.get(dateKey(d)) ?? 0)
       }
-      modelTrends[model] = arr
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i)
+        arr30.push(dailyCosts.get(dateKey(d)) ?? 0)
+      }
+      modelTrends[model] = arr7
+      modelTrends30[model] = arr30
+    }
+
+    // Build per-model detail stats
+    const modelDetails = new Map<string, ModelDetailStats>()
+    for (const [model, acc] of modelDetailMap) {
+      const stat = modelMap.get(model)!
+      modelDetails.set(model, {
+        model,
+        costMillicents: stat.costMillicents,
+        sessionCount: stat.sessionCount,
+        inputTokens: acc.tokens.input,
+        outputTokens: acc.tokens.output,
+        cacheReadTokens: acc.tokens.cacheRead,
+        cacheWriteTokens: acc.tokens.cacheWrite,
+        reasoningTokens: acc.tokens.reasoning,
+        maxInputTokens: acc.maxInput,
+        avgInputTokens: stat.sessionCount > 0 ? Math.round(acc.totalInput / stat.sessionCount) : 0,
+        contextWindow: getContextWindow(model),
+        tools: Array.from(acc.tools.entries())
+          .map(([tool, v]) => ({ tool, costMillicents: v.cost, sessionCount: v.count }))
+          .sort((a, b) => b.costMillicents - a.costMillicents),
+        repos: Array.from(acc.repos.entries())
+          .map(([repo, v]) => ({ repo, costMillicents: v.cost, sessionCount: v.count }))
+          .sort((a, b) => b.costMillicents - a.costMillicents),
+        dailyTrend: modelTrends30[model] ?? [],
+      })
     }
 
     // Week over week delta
@@ -225,6 +297,7 @@ export class SessionStore {
       earliest,
       todayDetail,
       allTime,
+      modelDetails,
     }
     return this.cache
   }
@@ -242,6 +315,7 @@ export class SessionStore {
   getModelTrends(): Record<string, number[]> { return this.ensureCache().modelTrends }
   getTodayDetail(): TodayDetailStats { return this.ensureCache().todayDetail }
   getAllTimeStats(): AllTimeStats { return this.ensureCache().allTime }
+  getModelDetail(model: string): ModelDetailStats | undefined { return this.ensureCache().modelDetails.get(model) }
   getRecentSessions(limit: number = 50): Session[] { return this.ensureCache().recentSessions.slice(0, limit) }
 
   getDailyStats(days: number): DayStats[] {

@@ -1,16 +1,15 @@
 import React, { useMemo } from 'react'
 import { Box, Text, useInput } from 'ink'
 import { ExpandableTable } from './ExpandableTable.js'
-import { Sparkline } from './Sparkline.js'
+import { ModelDetail } from './ModelDetail.js'
 import { useExpandableList } from '../hooks/useExpandableList.js'
-import { formatCost, formatTokens, getModelColor } from '../theme.js'
+import { formatCost, getModelColor } from '../theme.js'
 import type { SessionStore } from '../services/session-store.js'
 
 interface ModelsTabProps { store: SessionStore }
 
 export function ModelsTab({ store }: ModelsTabProps) {
   const allModels = store.getModelStats()
-  const trends = store.getModelTrends()
   const { cursor, expandedIndex, sortKey, moveUp, moveDown, toggleExpand, sort } = useExpandableList(allModels, 'cost')
 
   const sorted = useMemo(() => {
@@ -45,7 +44,7 @@ export function ModelsTab({ store }: ModelsTabProps) {
 
   const rows = sorted.map(stat => {
     const pct = totalCost > 0 ? Math.round((stat.costMillicents / totalCost) * 100) : 0
-    const modelTrend = trends[stat.model] ?? []
+    const detail = store.getModelDetail(stat.model)
 
     return {
       cells: [
@@ -55,12 +54,7 @@ export function ModelsTab({ store }: ModelsTabProps) {
         String(stat.sessionCount),
       ],
       color: getModelColor(stat.model),
-      expandedContent: (
-        <Box flexDirection="column">
-          <Box><Text color="gray" dimColor>{'│'} </Text><Sparkline values={modelTrend} color={getModelColor(stat.model)} /><Text color="gray"> 7d trend</Text></Box>
-          <Box><Text color="gray" dimColor>{'│'} In: {formatTokens(stat.inputTokens)}  Out: {formatTokens(stat.outputTokens)}</Text></Box>
-        </Box>
-      ),
+      expandedContent: detail ? <ModelDetail detail={detail} /> : <Text color="gray">No detail available</Text>,
     }
   })
 

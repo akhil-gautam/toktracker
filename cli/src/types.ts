@@ -101,6 +101,23 @@ export interface TodayDetailStats {
   lastSession?: Date
 }
 
+export interface ModelDetailStats {
+  model: string
+  costMillicents: number
+  sessionCount: number
+  inputTokens: number
+  outputTokens: number
+  cacheReadTokens: number
+  cacheWriteTokens: number
+  reasoningTokens: number
+  maxInputTokens: number             // peak single-session input
+  avgInputTokens: number
+  contextWindow: number              // for this model
+  tools: Array<{ tool: string; costMillicents: number; sessionCount: number }>
+  repos: Array<{ repo: string; costMillicents: number; sessionCount: number }>
+  dailyTrend: number[]               // 30-day cost trend
+}
+
 export interface AllTimeStats {
   costMillicents: number
   sessionCount: number
