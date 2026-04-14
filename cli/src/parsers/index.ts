@@ -23,6 +23,54 @@ const PARSERS: ParserDef[] = [
   { name: 'gemini_cli', globPattern: path.join(HOME, '.gemini', 'tmp', '*', 'chats', '*.json'), parse: parseGeminiCli },
 ]
 
+// Directories to watch for live updates
+export const WATCH_PATHS = [
+  path.join(HOME, '.claude', 'projects'),
+  path.join(HOME, '.codex', 'sessions'),
+  path.join(HOME, '.local', 'share', 'opencode'),
+  path.join(HOME, '.gemini', 'tmp'),
+]
+
+function getParserForFile(filePath: string): ParserDef['parse'] | null {
+  if (filePath.includes('.claude') && filePath.endsWith('.jsonl')) return parseClaudeCode
+  if (filePath.includes('.codex') && filePath.endsWith('.jsonl')) return parseCodex
+  if (filePath.includes('opencode') && filePath.endsWith('.db')) return parseOpenCode
+  if (filePath.includes('.gemini') && filePath.endsWith('.json')) return parseGeminiCli
+  return null
+}
+
+/**
+ * Parse a single changed file incrementally (from cursor).
+ * Returns new sessions only.
+ */
+export async function parseChangedFile(filePath: string, stateManager: StateManager): Promise<Session[]> {
+  const parse = getParserForFile(filePath)
+  if (!parse) return []
+
+  const cursor = stateManager.getCursor(filePath)
+  try {
+    const result = await parse(filePath, cursor)
+    stateManager.setCursor(filePath, result.newOffset)
+    stateManager.save()
+
+    // Git attribution for new sessions
+    const gitCache = new Map<string, { gitRepo?: string; gitBranch?: string }>()
+    for (const s of result.sessions) {
+      if (s.cwd && !s.gitRepo) {
+        if (!gitCache.has(s.cwd)) {
+          gitCache.set(s.cwd, await extractGitInfo(s.cwd))
+        }
+        const info = gitCache.get(s.cwd)!
+        s.gitRepo = info.gitRepo
+        if (!s.gitBranch) s.gitBranch = info.gitBranch
+      }
+    }
+    return result.sessions
+  } catch {
+    return []
+  }
+}
+
 // Parse files in parallel batches to saturate I/O without overwhelming memory
 const BATCH_SIZE = 50
 
