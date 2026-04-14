@@ -84,3 +84,19 @@ export interface RepoStats {
   sessionCount: number
   models: string[]
 }
+
+export interface TodayDetailStats {
+  costMillicents: number
+  sessionCount: number
+  inputTokens: number
+  outputTokens: number
+  cacheReadTokens: number
+  cacheWriteTokens: number
+  reasoningTokens: number
+  models: ModelStats[]
+  tools: ToolStats[]
+  repos: RepoStats[]
+  hourly: number[]  // 24 entries, cost per hour
+  firstSession?: Date
+  lastSession?: Date
+}
