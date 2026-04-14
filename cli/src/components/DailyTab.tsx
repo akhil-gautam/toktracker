@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Text } from 'ink'
 import { Sparkline } from './Sparkline.js'
+import { LineChart } from './LineChart.js'
 import { useAnimatedValue } from '../hooks/useAnimatedValue.js'
 import { formatCost, BAR_FULL, BAR_EMPTY, getModelColor } from '../theme.js'
 import type { SessionStore } from '../services/session-store.js'
@@ -34,19 +35,37 @@ function DayRow({ date, cost, maxCost, isToday, isPeak }: {
 
 interface DailyTabProps { store: SessionStore }
 
+const CHART_DAYS = 30
+
 export function DailyTab({ store }: DailyTabProps) {
   const days = store.getDailyStats(15)
+  const chartDays = store.getDailyStats(CHART_DAYS)
   const totalCost = days.reduce((s, d) => s + d.costMillicents, 0)
   const maxCost = Math.max(...days.map(d => d.costMillicents), 1)
   const peakDate = days.reduce((max, d) => d.costMillicents > max.costMillicents ? d : max, days[0])?.date
   const todayStr = new Date().toISOString().slice(0, 10)
   const trends = store.getModelTrends()
 
+  const chartValues = chartDays.map(d => d.costMillicents)
+  const chartLabels = chartDays.map(d => d.date.slice(5))  // MM-DD
+
   return (
     <Box flexDirection="column" paddingX={1}>
+      {/* Line chart of last 30 days */}
+      <Box marginBottom={1} flexDirection="column">
+        <LineChart
+          values={chartValues}
+          labels={chartLabels}
+          height={10}
+          color="#4CAF50"
+          title="Cost by Day"
+          subtitle={`estimated API spend per day (USD) — last ${CHART_DAYS} days`}
+        />
+      </Box>
+
       <Box marginBottom={1}>
         <Text color="cyan" bold>Daily Cost</Text>
-        <Text color="gray">{'  '.padEnd(36)}</Text>
+        <Text color="gray">  (last 15 days)  </Text>
         <Text color="gray">Total: </Text><Text color="white" bold>{formatCost(totalCost)}</Text>
       </Box>
       <Box marginBottom={1}><Text color="gray" dimColor>{'─'.repeat(60)}</Text></Box>
