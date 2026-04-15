@@ -233,7 +233,20 @@ Phase 4 of the proactive-insights feature ships the hook infrastructure: setting
 | `index.ts` | CLI entry point (`src/cli/index.ts`) compiled to `dist/cli.js`; wire-up point for all subcommands |
 
 ### `src/detection/rules/index.ts`
-Stub `registerAllRules(registry)` — filled in Parts 5 & 6 with Category A/C rules.
+`registerAllRules(registry)` — registers all 8 Category A + C rules (Parts 5 & 6; Part 6 will add B + D rules).
+
+### Rules (A+C)
+
+| File | Rule | Trigger | Description |
+|---|---|---|---|
+| `src/detection/rules/a1-redundant-tool-call.ts` | A1 | PreToolUse | Warns when the same tool+args already succeeded this session |
+| `src/detection/rules/a2-context-bloat.ts` | A2 | UserPromptSubmit | Warns when last N assistant turns exceed token ceiling (suggests /compact) |
+| `src/detection/rules/a3-cache-miss-postmortem.ts` | A3 | PostToolUse, Stop | Info when session cache ratio drops significantly vs baseline sessions |
+| `src/detection/rules/a4-model-mismatch.ts` | A4 | Stop, UserPromptSubmit | Warns when premium model is dominated by trivial tool calls (suggests Sonnet) |
+| `src/detection/rules/a5-retry-failure-waste.ts` | A5 | PostToolUse, Stop | Warns when many failed tool calls have consumed significant tokens |
+| `src/detection/rules/c10-context-window-eta.ts` | C10 | UserPromptSubmit | Warns when projected turns until context window exhaustion <= threshold |
+| `src/detection/rules/c11-preflight-cost.ts` | C11 | UserPromptSubmit | Info with estimated cost range for the upcoming turn |
+| `src/detection/rules/c12-runaway-killswitch.ts` | C12 | PreToolUse | Block when session cost exceeds configured ceiling |
 
 ### Hook install paths
 - **Local** (default `--local`): `./.claude/settings.json` (relative to `cwd`)
