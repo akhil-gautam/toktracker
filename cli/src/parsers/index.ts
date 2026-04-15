@@ -4,8 +4,12 @@ import { parseClaudeCode } from './claude-code.js'
 import { parseCodex } from './codex.js'
 import { parseOpenCode } from './opencode.js'
 import { parseGeminiCli } from './gemini-cli.js'
+import { parseClaudeCodeExtended } from './claude-code.js'
+import { parseCodexExtended } from './codex.js'
+import { parseOpencodeExtended } from './opencode.js'
+import { parseGeminiExtended } from './gemini-cli.js'
 import { extractGitInfo } from '../services/git-attribution.js'
-import type { Session, ParseResult } from '../types.js'
+import type { Session, ParseResult, ExtendedParseResult, Tool } from '../types.js'
 import type { StateManager } from '../services/state-manager.js'
 
 const HOME = process.env.HOME ?? process.env.USERPROFILE ?? '~'
@@ -134,4 +138,13 @@ export async function loadAllSessions(stateManager: StateManager, fullScan: bool
 
   stateManager.save()
   return allSessions
+}
+
+export async function parseFileExtended(tool: Tool, path: string, fromOffset: number): Promise<ExtendedParseResult> {
+  switch (tool) {
+    case 'claude_code': return parseClaudeCodeExtended(path, fromOffset)
+    case 'codex':       return parseCodexExtended(path, fromOffset)
+    case 'opencode':    return parseOpencodeExtended(path, fromOffset)
+    case 'gemini_cli':  return parseGeminiExtended(path, fromOffset)
+  }
 }
