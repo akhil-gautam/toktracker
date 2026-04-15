@@ -1,12 +1,13 @@
 import { useState, useCallback } from 'react'
 import { useInput } from 'ink'
 
-export type TabName = 'overview' | 'models' | 'daily' | 'repos' | 'budget' | 'sessions'
+export type TabName = 'overview' | 'models' | 'daily' | 'repos' | 'budget' | 'sessions' | 'insights' | 'rules' | 'attribution' | 'hooks'
 
-const TABS: TabName[] = ['overview', 'models', 'daily', 'repos', 'budget', 'sessions']
+const TABS: TabName[] = ['overview', 'models', 'daily', 'repos', 'budget', 'sessions', 'insights', 'rules', 'attribution', 'hooks']
 const TAB_LABELS: Record<TabName, string> = {
   overview: 'Overview', models: 'Models', daily: 'Daily',
   repos: 'Repos', budget: 'Budget', sessions: 'Sessions',
+  insights: 'Insights', rules: 'Rules', attribution: 'Attribution', hooks: 'Hooks',
 }
 
 export { TABS, TAB_LABELS }
@@ -42,9 +43,10 @@ export function useTabNavigation(initialTab: TabName = 'overview') {
     if (input === '?') { setShowHelp(true); return }
     if (input === 'q') { onQuit(); return }
 
-    // Number keys 1-6 for tabs
+    // Number keys 1-6 for tabs, 7-9 + 0 for new tabs
     const num = parseInt(input)
-    if (num >= 1 && num <= 6) { setActiveTab(TABS[num - 1]); return }
+    if (num >= 1 && num <= 9) { setActiveTab(TABS[num - 1]); return }
+    if (input === '0') { setActiveTab(TABS[9]); return }
 
     // Arrow keys for tab cycling
     if (key.leftArrow) {

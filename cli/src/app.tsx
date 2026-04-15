@@ -11,8 +11,16 @@ import { DailyTab } from './components/DailyTab.js'
 import { ReposTab } from './components/ReposTab.js'
 import { BudgetTab } from './components/BudgetTab.js'
 import { SessionsTab } from './components/SessionsTab.js'
+import { InsightsTab } from './components/InsightsTab.js'
+import { RulesTab } from './components/RulesTab.js'
+import { AttributionTab } from './components/AttributionTab.js'
+import { HooksTab } from './components/HooksTab.js'
+import { ContextHud } from './components/ContextHud.js'
+import { ClaudeMdOverlay } from './components/ClaudeMdOverlay.js'
+import { SavedCommandOverlay } from './components/SavedCommandOverlay.js'
 import { useTabNavigation } from './hooks/useTabNavigation.js'
 import { useSessions } from './hooks/useSessions.js'
+import { bootDb } from './db/boot.js'
 
 function useTerminalSize() {
   const [size, setSize] = useState({
@@ -33,8 +41,21 @@ export function App({ onExit }: AppProps) {
   const { rows, columns } = useTerminalSize()
   const { store, budgetResults, loading, error, serverMode } = useSessions()
   const { activeTab, commandMode, commandInput, showHelp, handleInput } = useTabNavigation()
+  const db = React.useMemo(() => bootDb(), [])
+  const [overlay, setOverlay] = React.useState<'claude_md' | 'saved_cmd' | null>(null)
+
+  const unread = React.useMemo(() => {
+    try {
+      return (db.prepare('SELECT COUNT(*) as c FROM detections WHERE acknowledged_at IS NULL').get() as { c: number }).c
+    } catch {
+      return 0
+    }
+  }, [db, activeTab])
 
   useInput((input, key) => {
+    if (overlay) return
+    if (input === '!') { setOverlay('claude_md'); return }
+    if (input === '@') { setOverlay('saved_cmd'); return }
     handleInput(input, key, onExit)
   })
 
@@ -49,10 +70,26 @@ export function App({ onExit }: AppProps) {
     </Box>
   )
 
+  if (overlay === 'claude_md') {
+    return (
+      <Box flexDirection="column" height={rows} width={columns}>
+        <ClaudeMdOverlay db={db} onClose={() => setOverlay(null)} />
+      </Box>
+    )
+  }
+
+  if (overlay === 'saved_cmd') {
+    return (
+      <Box flexDirection="column" height={rows} width={columns}>
+        <SavedCommandOverlay db={db} onClose={() => setOverlay(null)} />
+      </Box>
+    )
+  }
+
   if (showHelp) {
     return (
       <Box flexDirection="column" height={rows} width={columns}>
-        <TabBar activeTab={activeTab} />
+        <TabBar activeTab={activeTab} unreadDetections={unread} />
         <Box flexGrow={1}><HelpOverlay serverMode={serverMode} /></Box>
         <StatusBar tab={activeTab} commandMode={commandMode} commandInput={commandInput} />
       </Box>
@@ -68,13 +105,20 @@ export function App({ onExit }: AppProps) {
       case 'daily': return <DailyTab store={store} />
       case 'repos': return <ReposTab store={store} />
       case 'budget': return <BudgetTab results={budgetResults} />
-      case 'sessions': return <SessionsTab sessions={store.getRecentSessions(50)} />
+      case 'sessions': return <SessionsTab sessions={store.getRecentSessions(500)} viewportHeight={Math.max(5, rows - 10)} />
+      case 'insights': return <InsightsTab db={db} />
+      case 'rules': return <RulesTab db={db} />
+      case 'attribution': return <AttributionTab db={db} />
+      case 'hooks': return <HooksTab db={db} />
     }
   }
 
   return (
     <Box flexDirection="column" height={rows} width={columns}>
-      <TabBar activeTab={activeTab} />
+      <Box justifyContent="space-between">
+        <TabBar activeTab={activeTab} unreadDetections={unread} />
+        <ContextHud db={db} sessionId={undefined} />
+      </Box>
       {alerts.map(r => <BudgetAlert key={r.budget.id} result={r} />)}
       <Box flexGrow={1} flexDirection="column">
         {renderTab()}
