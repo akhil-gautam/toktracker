@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { rmSync } from 'node:fs'
+import { rmSync, writeFileSync, mkdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { getDb, closeDb } from '../../src/db/connection.js'
@@ -28,5 +28,21 @@ describe('migrate', () => {
     expect(() => migrate(db)).not.toThrow()
     const v = db.prepare('SELECT MAX(version) as v FROM schema_version').get() as { v: number }
     expect(v.v).toBe(1)
+  })
+})
+
+describe('legacy importer', () => {
+  it('imports budgets.json into feature_flags scope', () => {
+    const dir = join(tmpdir(), `tokscale-legacy-${Date.now()}`)
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, 'budgets.json'), JSON.stringify([
+      { id: 'b1', scope: 'global', period: 'daily', limitCents: 5000, alertAtPct: 80 },
+    ]))
+    const dbPath = join(dir, 'toktracker.db')
+    const db = getDb(dbPath)
+    migrate(db, { legacyDir: dir })
+    const row = db.prepare("SELECT config_json FROM feature_flags WHERE key='legacy_budgets'").get() as { config_json: string }
+    expect(row).toBeDefined()
+    expect(JSON.parse(row.config_json)).toHaveLength(1)
   })
 })
