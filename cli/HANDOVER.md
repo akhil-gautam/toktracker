@@ -233,7 +233,7 @@ Phase 4 of the proactive-insights feature ships the hook infrastructure: setting
 | `index.ts` | CLI entry point (`src/cli/index.ts`) compiled to `dist/cli.js`; wire-up point for all subcommands |
 
 ### `src/detection/rules/index.ts`
-`registerAllRules(registry)` — registers all 8 Category A + C rules (Parts 5 & 6; Part 6 will add B + D rules).
+`registerAllRules(registry)` — registers all 14 rules (A1–A5, B6–B9, C10–C12, D13–D14).
 
 ### Rules (A+C)
 
@@ -247,6 +247,42 @@ Phase 4 of the proactive-insights feature ships the hook infrastructure: setting
 | `src/detection/rules/c10-context-window-eta.ts` | C10 | UserPromptSubmit | Warns when projected turns until context window exhaustion <= threshold |
 | `src/detection/rules/c11-preflight-cost.ts` | C11 | UserPromptSubmit | Info with estimated cost range for the upcoming turn |
 | `src/detection/rules/c12-runaway-killswitch.ts` | C12 | PreToolUse | Block when session cost exceeds configured ceiling |
+
+---
+
+## Rules + batch (new)
+
+Phase 6 of the proactive-insights feature adds Category B (cross-session pattern) and D (attribution/waste) rules, an embedding loader with hash fallback, a PR correlator, and a nightly scheduler.
+
+### Embedding layer (`src/embeddings/`)
+
+| File | Role |
+|---|---|
+| `similarity.ts` | `cosine(a, b)` — dot-product cosine similarity for float vectors |
+| `fallback.ts` | `hashSimilarity(a, b)` — Jaccard similarity on 3-char+ token sets; used when the ML model is unavailable |
+| `loader.ts` | `getEmbedder()` — lazy-init `@xenova/transformers` pipeline (`Xenova/all-MiniLM-L6-v2`), caches model in `~/.config/tokscale/models/`; falls back to `hashSimilarity` on error. `similarity(a, b)` — top-level entry point |
+
+### PR correlator (`src/git/pr-correlator.ts`)
+
+`correlatePrToSessions(db, repo, prNumber)` — links merged PR events to sessions by branch name (confidence 0.95) and commit SHA (confidence 0.8). Inserts rows into `pr_attributions` table.
+
+### Rules (B + D)
+
+| File | Rule | Trigger | Description |
+|---|---|---|---|
+| `src/detection/rules/b6-repeat-question.ts` | B6 | UserPromptSubmit, Nightly | Info when the same question hash appears ≥ N times in last 90 days — suggests adding answer to CLAUDE.md |
+| `src/detection/rules/b7-correction-graph.ts` | B7 | Stop, PostToolUse | Info when the last user message in the session matches correction phrases (e.g. "no don't use mocks") — candidate for CLAUDE.md rule |
+| `src/detection/rules/b8-file-reopen.ts` | B8 | PostToolUse | Info when the same file has been opened via Read/Write/Edit/etc. in ≥ N distinct sessions — suggests adding to CLAUDE.md |
+| `src/detection/rules/b9-prompt-pattern.ts` | B9 | Stop, Nightly | Info when a 5-token normalised prefix appears ≥ N times across recent prompts — suggests saving as slash command |
+| `src/detection/rules/d13-cost-per-pr.ts` | D13 | GitEvent, Nightly | Info: summarises attributed cost for the most-recently merged PR across its correlated sessions |
+| `src/detection/rules/d14-abandoned-session.ts` | D14 | Nightly | Info: flags sessions older than `min_age_days` with no PR/commit events and cost > threshold, reports total waste |
+
+### Nightly scheduler (`src/scheduler/`)
+
+| File | Role |
+|---|---|
+| `jobs.ts` | `runNightlyJobs(db, registry)` — runs all Nightly-trigger rules via `DetectionRunner`, then calls `purge()`, marks job results in `batch_runs` (keys: `b6_clustering`, `b7_correction_clustering`, `b9_pattern_mining`, `d14_abandoned`, `vacuum`) |
+| `cron.ts` | `maybeRunNightly(db, registry)` — checks `batch_runs` anchor, runs nightly jobs at most once per 24 h, updates `nightly_anchor` |
 
 ### Hook install paths
 - **Local** (default `--local`): `./.claude/settings.json` (relative to `cwd`)
