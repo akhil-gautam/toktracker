@@ -1,6 +1,6 @@
 import { readFile, stat } from 'fs/promises'
 import { createHash } from 'crypto'
-import type { Session, ParseResult } from '../types.js'
+import type { Session, ParseResult, ExtendedParseResult, ParsedMessage, ParsedToolCall } from '../types.js'
 import { calculateCostMillicents } from '../services/cost-calculator.js'
 
 const DEFAULT_MODEL = 'gemini-2.5-pro'
@@ -53,4 +53,33 @@ export async function parseGeminiCli(filePath: string, fromOffset: number): Prom
     })
   }
   return { sessions, newOffset: fileStats.size }
+}
+
+export async function parseGeminiExtended(filePath: string, fromOffset: number): Promise<ExtendedParseResult> {
+  const raw = await readFile(filePath, 'utf8')
+  const bytes = Buffer.byteLength(raw, 'utf8')
+  const obj = JSON.parse(raw)
+
+  const sessions: Session[] = []
+  const messages: ParsedMessage[] = []
+  const toolCalls: ParsedToolCall[] = []
+
+  const sessionId = obj.session_id ?? obj.sessionId ?? filePath
+  const turns = Array.isArray(obj.messages ?? obj.turns) ? (obj.messages ?? obj.turns) : []
+  for (let i = 0; i < turns.length; i++) {
+    const t = turns[i]
+    // the fixture uses 'type' field; plan spec used 'role' — support both
+    const roleOrType = t.role ?? t.type
+    messages.push({
+      sessionId,
+      turnIndex: i,
+      role: roleOrType === 'user' ? 'user' : 'assistant',
+      content: String(t.content ?? t.text ?? getMessageText(t.content)),
+      createdAt: new Date(t.timestamp ?? Date.now()),
+    })
+  }
+
+  const base = await parseGeminiCli(filePath, fromOffset)
+  sessions.push(...base.sessions)
+  return { sessions, newOffset: bytes, messages, toolCalls }
 }
