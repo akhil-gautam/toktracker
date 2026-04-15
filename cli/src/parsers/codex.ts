@@ -1,5 +1,5 @@
 import { readFile, stat } from 'fs/promises'
-import type { Session, ParseResult } from '../types.js'
+import type { Session, ParseResult, ExtendedParseResult, ParsedMessage, ParsedToolCall } from '../types.js'
 import { calculateCostMillicents } from '../services/cost-calculator.js'
 
 interface CodexSessionMeta {
@@ -78,4 +78,59 @@ export async function parseCodex(filePath: string, fromOffset: number): Promise<
     }
   }
   return { sessions, newOffset: fileStats.size }
+}
+
+export async function parseCodexExtended(filePath: string, fromOffset: number): Promise<ExtendedParseResult> {
+  const raw = await readFile(filePath, 'utf8')
+  const bytes = Buffer.byteLength(raw, 'utf8')
+  const slice = fromOffset > 0 ? raw.slice(fromOffset) : raw
+
+  const sessions: Session[] = []
+  const messages: ParsedMessage[] = []
+  const toolCalls: ParsedToolCall[] = []
+  let currentSessionId: string | null = null
+  let turnIndex = 0
+
+  for (const line of slice.split('\n').filter(l => l.trim())) {
+    let obj: any
+    try { obj = JSON.parse(line) } catch { continue }
+    const kind = obj.type ?? obj.event ?? obj.kind
+    if (kind === 'session_meta') {
+      // support both obj.session_id and obj.payload.id
+      const sid = obj.session_id ?? obj.payload?.id
+      if (sid) { currentSessionId = sid; turnIndex = 0 }
+    }
+    // for message-type lines that carry session_id directly
+    if (!currentSessionId && obj.session_id) {
+      currentSessionId = obj.session_id
+    }
+    if (!currentSessionId) continue
+    if (kind === 'event_msg' || kind === 'message') {
+      const role = obj.role ?? (obj.sender === 'user' ? 'user' : 'assistant')
+      messages.push({
+        sessionId: currentSessionId,
+        turnIndex,
+        role: role === 'user' ? 'user' : 'assistant',
+        content: String(obj.content ?? obj.text ?? ''),
+        inputTokens: obj.usage?.input_tokens,
+        outputTokens: obj.usage?.output_tokens,
+        createdAt: new Date(obj.timestamp ?? Date.now()),
+      })
+      if (role !== 'user') turnIndex += 1
+    }
+    if (kind === 'tool_call' && obj.tool_name) {
+      toolCalls.push({
+        sessionId: currentSessionId,
+        turnIndex,
+        toolName: obj.tool_name,
+        argsRaw: obj.arguments ?? obj.input ?? {},
+        succeeded: obj.status === 'success',
+        createdAt: new Date(obj.timestamp ?? Date.now()),
+      })
+    }
+  }
+
+  const base = await parseCodex(filePath, fromOffset)
+  sessions.push(...base.sessions)
+  return { sessions, newOffset: bytes, messages, toolCalls }
 }

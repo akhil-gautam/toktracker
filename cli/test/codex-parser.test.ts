@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { parseCodex } from '../src/parsers/codex.js'
+import { parseCodexExtended } from '../src/parsers/codex.js'
 import { fileURLToPath } from 'url'
 import path from 'path'
+import { join } from 'node:path'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const fixturePath = path.join(__dirname, '..', 'src', 'parsers', '__fixtures__', 'codex.jsonl')
@@ -51,5 +53,13 @@ describe('Codex parser', () => {
     expect(first.newOffset).toBeGreaterThan(0)
     const second = await parseCodex(fixturePath, first.newOffset)
     expect(second.sessions.length).toBe(0)
+  })
+})
+
+describe('codex ExtendedParseResult', () => {
+  it('emits messages for a fixture session', async () => {
+    const fixture = join(__dirname, '..', 'src', 'parsers', '__fixtures__', 'codex', 'basic.jsonl')
+    const result = await parseCodexExtended(fixture, 0)
+    expect(result.messages.length).toBeGreaterThan(0)
   })
 })
