@@ -6,9 +6,6 @@ export default defineConfig({
   target: 'node20',
   outDir: 'dist',
   clean: true,
-  dts: true,
-  external: ['better-sqlite3'],
-  banner: {
-    js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);",
-  },
+  loader: { '.sql': 'copy' },
+  onSuccess: 'cp src/db/schema.sql dist/schema.sql',
 })
