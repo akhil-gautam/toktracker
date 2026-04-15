@@ -5,6 +5,7 @@ import { a3CacheMissPostmortem } from './a3-cache-miss-postmortem.js'
 import { a4ModelMismatch } from './a4-model-mismatch.js'
 import { a5RetryFailureWaste } from './a5-retry-failure-waste.js'
 import { c10ContextWindowEta } from './c10-context-window-eta.js'
+import { c11PreflightCost } from './c11-preflight-cost.js'
 
 export function registerAllRules(registry: RuleRegistry): void {
   registry.register(a1RedundantToolCall)
@@ -13,4 +14,5 @@ export function registerAllRules(registry: RuleRegistry): void {
   registry.register(a4ModelMismatch)
   registry.register(a5RetryFailureWaste)
   registry.register(c10ContextWindowEta)
+  registry.register(c11PreflightCost)
 }
