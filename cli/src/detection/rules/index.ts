@@ -7,6 +7,7 @@ import { a5RetryFailureWaste } from './a5-retry-failure-waste.js'
 import { b6RepeatQuestion } from './b6-repeat-question.js'
 import { b7CorrectionGraph } from './b7-correction-graph.js'
 import { b8FileReopen } from './b8-file-reopen.js'
+import { b9PromptPattern } from './b9-prompt-pattern.js'
 import { c10ContextWindowEta } from './c10-context-window-eta.js'
 import { c11PreflightCost } from './c11-preflight-cost.js'
 import { c12RunawayKillswitch } from './c12-runaway-killswitch.js'
@@ -20,6 +21,7 @@ export function registerAllRules(registry: RuleRegistry): void {
   registry.register(b6RepeatQuestion)
   registry.register(b7CorrectionGraph)
   registry.register(b8FileReopen)
+  registry.register(b9PromptPattern)
   registry.register(c10ContextWindowEta)
   registry.register(c11PreflightCost)
   registry.register(c12RunawayKillswitch)
