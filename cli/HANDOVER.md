@@ -307,3 +307,17 @@ echo '{"hook_event_name":"PreToolUse"}' | tokscale hook exec PreToolUse
 - **Initial load**: full-scans ~1,500+ JSONL files + OpenCode SQLite. ~3–5s on 80k+ sessions thanks to parallel batches of 50 files, pre-filter by string match before JSON.parse, and git attribution cached by cwd.
 - **Tab switches**: instant. All stats computed once in a single pass when sessions load, cached in `SessionStore`. Invalidated only on `addSessions()` from live watcher.
 - **Live updates**: chokidar watches tool directories, only re-parses the one changed file from its last cursor. Sub-second cost ticks in realtime as LLMs generate tokens.
+
+---
+
+## 4. Proactive insights layer (v0.2)
+
+The CLI now includes a proactive detection engine, Claude Code hook integration, and a polling daemon for non-hook tools. See `docs/superpowers/specs/2026-04-15-proactive-insights-design.md` for the full spec and `docs/superpowers/plans/2026-04-15-proactive-insights-plan*.md` for implementation.
+
+- Storage: SQLite at `~/.config/tokscale/toktracker.db` (WAL). Schema in `src/db/schema.sql`. Access via typed repos in `src/db/repository.ts`.
+- Data capture: parsers emit per-message + per-tool-call rows (`src/capture/`); one-time `backfill` ingests history.
+- Detection: 14 rules in `src/detection/rules/` (A1–A5, B6–B9, C10–C12, D13–D14). Registered centrally by `registerAllRules`.
+- Hook: `tokscale hook install|uninstall|status` writes marker-tagged entries to `.claude/settings.json`; `tokscale hook exec` is called by Claude Code on each hook event and returns a decision.
+- Daemon: `tokscale daemon start --detach` runs a poller for non-hook tools and emits OS notifications via `node-notifier`.
+- TUI: new tabs 7–0 (Insights, Rules, Attribution, Hooks); overlays `!` (CLAUDE.md suggestions) and `@` (saved command candidates); HUD shows real-time context usage + ETA + today's cost.
+- Redaction: plaintext + user-editable regex pipeline; built-in rules ship for AWS/GitHub/OpenAI tokens, private keys, email, phone.
