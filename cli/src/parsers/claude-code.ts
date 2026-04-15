@@ -1,5 +1,5 @@
 import { readFile, stat } from 'fs/promises'
-import type { Session, ParseResult } from '../types.js'
+import type { Session, ParseResult, ExtendedParseResult, ParsedMessage, ParsedToolCall } from '../types.js'
 import { calculateCostMillicents } from '../services/cost-calculator.js'
 
 interface ClaudeCodeLine {
@@ -90,4 +90,80 @@ export async function parseClaudeCode(filePath: string, fromOffset: number): Pro
   }
 
   return { sessions, newOffset: fileStats.size }
+}
+
+export async function parseClaudeCodeExtended(filePath: string, fromOffset: number): Promise<ExtendedParseResult> {
+  const raw = await readFile(filePath, 'utf8')
+  const bytes = Buffer.byteLength(raw, 'utf8')
+  const slice = fromOffset > 0 ? raw.slice(fromOffset) : raw
+  const lines = slice.split('\n').filter(l => l.trim().length > 0)
+
+  const sessions: Session[] = []
+  const messages: ParsedMessage[] = []
+  const toolCalls: ParsedToolCall[] = []
+
+  let currentSessionId: string | null = null
+  let turnIndex = 0
+
+  for (const line of lines) {
+    if (!line.includes('"type"')) continue
+    let obj: any
+    try { obj = JSON.parse(line) } catch { continue }
+
+    if (obj.sessionId && obj.sessionId !== currentSessionId) {
+      currentSessionId = obj.sessionId
+      turnIndex = 0
+    }
+    if (!currentSessionId) continue
+
+    if (obj.type === 'user' && obj.message?.content) {
+      messages.push({
+        sessionId: currentSessionId,
+        turnIndex,
+        role: 'user',
+        content: extractText(obj.message.content),
+        createdAt: new Date(obj.timestamp ?? Date.now()),
+      })
+    }
+    if (obj.type === 'assistant' && obj.message?.content) {
+      const content = obj.message.content
+      messages.push({
+        sessionId: currentSessionId,
+        turnIndex,
+        role: 'assistant',
+        content: extractText(content),
+        inputTokens: obj.message?.usage?.input_tokens,
+        outputTokens: obj.message?.usage?.output_tokens,
+        cacheRead: obj.message?.usage?.cache_read_input_tokens,
+        cacheWrite: obj.message?.usage?.cache_creation_input_tokens,
+        createdAt: new Date(obj.timestamp ?? Date.now()),
+      })
+      for (const block of Array.isArray(content) ? content : []) {
+        if (block?.type === 'tool_use') {
+          toolCalls.push({
+            sessionId: currentSessionId,
+            turnIndex,
+            toolName: block.name,
+            argsRaw: block.input,
+            createdAt: new Date(obj.timestamp ?? Date.now()),
+          })
+        }
+      }
+      turnIndex += 1
+    }
+  }
+
+  // Derive sessions from existing parser to preserve shape
+  const base = await parseClaudeCode(filePath, fromOffset)
+  sessions.push(...base.sessions)
+
+  return { sessions, newOffset: bytes, messages, toolCalls }
+}
+
+function extractText(content: unknown): string {
+  if (typeof content === 'string') return content
+  if (Array.isArray(content)) {
+    return content.map(b => (typeof b === 'string' ? b : (b as any)?.text ?? '')).join('\n')
+  }
+  return ''
 }
