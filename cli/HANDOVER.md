@@ -212,6 +212,47 @@ Phase 3 of the proactive-insights feature built the detection engine core — ru
 
 ---
 
+## Hook (new)
+
+Phase 4 of the proactive-insights feature ships the hook infrastructure: settings mutation, log rotation, exec entry point, schema compat check, and CLI commands.
+
+### `src/hook/`
+
+| File | Role |
+|---|---|
+| `install.ts` | `installHook(path, cmd)` / `uninstallHook(path)` / `hookStatus(path)` — reads/writes Claude Code `settings.json`, uses `__tokscale_managed__` marker for idempotent, diff-safe mutations; backs up original to `.tokscale-bak` |
+| `log.ts` | `HookLogger` — appends ISO-timestamp lines to a log file; rotates to `.1` when `maxBytes` is exceeded |
+| `exec.ts` | `runHookExec(args)` — validates hook kind, builds `DetectionContext`, runs `DetectionRunner`, persists `hook_events` row, returns `HookDecision`; also exports `readStdinJson()` and `emit()` for the CLI binary |
+| `schema-version.ts` | `supportsPayload(payload)` — checks that required fields (`hook_event_name`) are present; forward-compatible (extra fields are OK) |
+
+### `src/cli/`
+
+| File | Role |
+|---|---|
+| `hook-commands.ts` | `registerHookCommands(program, deps)` — registers `hook install/uninstall/status/exec` subcommands on a `commander` `Command`; accepts injectable `resolveSettingsPath` and `hookBinary` for testing |
+| `index.ts` | CLI entry point (`src/cli/index.ts`) compiled to `dist/cli.js`; wire-up point for all subcommands |
+
+### `src/detection/rules/index.ts`
+Stub `registerAllRules(registry)` — filled in Parts 5 & 6 with Category A/C rules.
+
+### Hook install paths
+- **Local** (default `--local`): `./.claude/settings.json` (relative to `cwd`)
+- **Global** (`--global`): `~/.claude/settings.json`
+
+### Binary dispatch (`bin/tokscale.js`)
+If `argv[2]` is a non-flag word, loads `dist/cli.js` (subcommand mode); otherwise loads `dist/index.js` (TUI mode).
+
+### Usage
+```bash
+tokscale hook install --local     # write entries to ./.claude/settings.json
+tokscale hook status --local      # print JSON { installed, kinds }
+tokscale hook uninstall --local   # remove tokscale entries
+# Claude Code invokes automatically:
+echo '{"hook_event_name":"PreToolUse"}' | tokscale hook exec PreToolUse
+```
+
+---
+
 ## Performance Notes
 
 - **Initial load**: full-scans ~1,500+ JSONL files + OpenCode SQLite. ~3–5s on 80k+ sessions thanks to parallel batches of 50 files, pre-filter by string match before JSON.parse, and git attribution cached by cwd.
