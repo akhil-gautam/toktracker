@@ -9,6 +9,7 @@ import { b7CorrectionGraph } from './b7-correction-graph.js'
 import { b8FileReopen } from './b8-file-reopen.js'
 import { b9PromptPattern } from './b9-prompt-pattern.js'
 import { c10ContextWindowEta } from './c10-context-window-eta.js'
+import { d13CostPerPr } from './d13-cost-per-pr.js'
 import { c11PreflightCost } from './c11-preflight-cost.js'
 import { c12RunawayKillswitch } from './c12-runaway-killswitch.js'
 
@@ -25,4 +26,5 @@ export function registerAllRules(registry: RuleRegistry): void {
   registry.register(c10ContextWindowEta)
   registry.register(c11PreflightCost)
   registry.register(c12RunawayKillswitch)
+  registry.register(d13CostPerPr)
 }
