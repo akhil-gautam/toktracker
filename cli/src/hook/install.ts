@@ -1,4 +1,5 @@
-import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync, copyFileSync, mkdirSync } from 'node:fs'
+import { dirname } from 'node:path'
 
 const TOKSCALE_MARKER = '__tokscale_managed__'
 const HOOK_KINDS = ['PreToolUse', 'PostToolUse', 'UserPromptSubmit', 'Stop'] as const
@@ -19,6 +20,7 @@ function readSettings(path: string): any {
 }
 
 function writeSettings(path: string, data: unknown): void {
+  mkdirSync(dirname(path), { recursive: true })
   writeFileSync(path, JSON.stringify(data, null, 2))
 }
 
