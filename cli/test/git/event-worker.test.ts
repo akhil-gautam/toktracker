@@ -23,3 +23,16 @@ describe('GitEventWorker', () => {
     expect(new GitEventsRepo(db).findByRepo('a/b').length).toBe(1)
   })
 })
+
+describe('pollCommits', () => {
+  it('stores commits from a git log function', async () => {
+    const db = getDb(tmp)
+    const runner = vi.fn().mockResolvedValue([
+      { sha: 'a1', authoredAt: '2026-04-01T00:00:00Z', branch: 'main' },
+      { sha: 'a2', authoredAt: '2026-04-01T01:00:00Z', branch: 'main' },
+    ])
+    const w = new GitEventWorker(db, { ghRun: async () => [], gitLogRun: runner })
+    await w.pollCommits('a/b', '/tmp/repo')
+    expect(new GitEventsRepo(db).findByRepo('a/b').filter(e => e.kind === 'commit').length).toBe(2)
+  })
+})
