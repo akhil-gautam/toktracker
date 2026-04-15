@@ -191,6 +191,27 @@ The opencode fixture uses a fabricated schema (`messages` + `tool_calls` tables)
 
 ---
 
+## Detection engine (new)
+
+Phase 3 of the proactive-insights feature built the detection engine core — rule registry, threshold system, runner, session-state cache, context builder, and hint formatter registry.
+
+### `src/detection/`
+
+| File | Role |
+|---|---|
+| `types.ts` | Core TypeScript interfaces: `Trigger`, `Category`, `Severity`, `Detection`, `DetectionContext`, `Rule`, `HookDecision` |
+| `registry.ts` | `RuleRegistry` — stores `Rule` objects, look up by trigger or category, throws on duplicate registration |
+| `thresholds.ts` | `ThresholdLoader` — merges per-rule `defaultThresholds` with overrides from `feature_flags` table; returns `ResolvedThresholds` with `enabled`, `hardBlock`, `thresholds` |
+| `runner.ts` | `DetectionRunner` — iterates rules for a trigger, applies 200 ms budget cap per rule, writes detections to DB via `DetectionsRepo`, aggregates severities into a `HookDecision` (block/warn/info) |
+| `context-builder.ts` | `buildHookContext(db, payload)` — maps a raw hook JSON payload (`PreToolUse`, `PostToolUse`, `UserPromptSubmit`, `Stop`) to a typed `DetectionContext` |
+| `hints/formatters.ts` | `formatHint(detection)` — formatter registry; falls back to `[ruleId] summary` when no custom formatter is registered |
+
+### `src/capture/session-state.ts`
+
+`SessionStateCache` — in-process per-session tallies (tool-call arg counts, cumulative token sums, failed-call counts, turn index). Used by rules that need live session state without hitting the DB. Singleton exported as `sessionStateCache`.
+
+---
+
 ## Performance Notes
 
 - **Initial load**: full-scans ~1,500+ JSONL files + OpenCode SQLite. ~3–5s on 80k+ sessions thanks to parallel batches of 50 files, pre-filter by string match before JSON.parse, and git attribution cached by cwd.
