@@ -120,6 +120,24 @@ export interface ModelDetailStats {
   toolUses: Array<{ name: string; count: number }>  // Claude Code tool calls: Read, Grep, etc.
 }
 
+export interface RepoDetailStats {
+  repo: string
+  costMillicents: number
+  sessionCount: number
+  inputTokens: number
+  outputTokens: number
+  cacheReadTokens: number
+  cacheWriteTokens: number
+  reasoningTokens: number
+  models: Array<{ model: string; costMillicents: number; sessionCount: number }>
+  tools: Array<{ tool: string; costMillicents: number; sessionCount: number }>
+  branches: Array<{ branch: string; costMillicents: number; sessionCount: number }>
+  dailyTrend: number[]   // 30-day cost trend
+  firstSession?: Date
+  lastSession?: Date
+  activeDays: number
+}
+
 export interface AllTimeStats {
   costMillicents: number
   sessionCount: number
@@ -133,4 +151,33 @@ export interface AllTimeStats {
   uniqueRepos: number
   activeDays: number  // days with at least one session
   cacheReuseRatio: number  // 0-1
+}
+
+export interface ParsedMessage {
+  sessionId: string
+  turnIndex: number
+  role: 'user' | 'assistant' | 'system' | 'tool'
+  content: string              // raw text, will be redacted before persist
+  inputTokens?: number
+  outputTokens?: number
+  cacheRead?: number
+  cacheWrite?: number
+  thinkingTokens?: number
+  createdAt: Date
+}
+
+export interface ParsedToolCall {
+  sessionId: string
+  turnIndex: number            // the assistant turn that invoked the tool
+  toolName: string
+  argsRaw: unknown             // will be JSON.stringify'd then redacted + hashed
+  targetPath?: string          // extracted when tool is Read/Write/Edit/Grep etc.
+  succeeded?: boolean
+  tokensReturned?: number
+  createdAt: Date
+}
+
+export interface ExtendedParseResult extends ParseResult {
+  messages: ParsedMessage[]
+  toolCalls: ParsedToolCall[]
 }
