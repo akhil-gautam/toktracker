@@ -156,3 +156,174 @@ export class ToolCallsRepo {
     return (this.db.prepare('SELECT COUNT(*) as c FROM tool_calls WHERE session_id = ? AND succeeded = 0').get(sessionId) as { c: number }).c
   }
 }
+
+export interface HookEventRow {
+  id?: number
+  sessionId: string | null
+  hookKind: string
+  payloadJson: string
+  decision?: string | null
+  reason?: string | null
+  latencyMs?: number | null
+  createdAt: number
+}
+
+export class HookEventsRepo {
+  constructor(private db: Database.Database) {}
+  insert(h: HookEventRow): HookEventRow {
+    const info = this.db.prepare(`
+      INSERT INTO hook_events (session_id, hook_kind, payload_json, decision, reason, latency_ms, created_at)
+      VALUES (@sessionId, @hookKind, @payloadJson, @decision, @reason, @latencyMs, @createdAt)
+    `).run({
+      sessionId: h.sessionId, hookKind: h.hookKind, payloadJson: h.payloadJson,
+      decision: h.decision ?? null, reason: h.reason ?? null,
+      latencyMs: h.latencyMs ?? null, createdAt: h.createdAt,
+    })
+    return { ...h, id: Number(info.lastInsertRowid) }
+  }
+  latencyPercentiles(limit = 1000): { p50: number; p95: number; count: number } {
+    const rows = this.db.prepare('SELECT latency_ms FROM hook_events WHERE latency_ms IS NOT NULL ORDER BY created_at DESC LIMIT ?').all(limit) as { latency_ms: number }[]
+    if (!rows.length) return { p50: 0, p95: 0, count: 0 }
+    const sorted = rows.map(r => r.latency_ms).sort((a, b) => a - b)
+    return { p50: sorted[Math.floor(sorted.length * 0.5)], p95: sorted[Math.floor(sorted.length * 0.95)], count: sorted.length }
+  }
+}
+
+export interface GitEventRow {
+  id?: number
+  repo: string
+  kind: string
+  sha?: string | null
+  prNumber?: number | null
+  branch?: string | null
+  createdAt: number
+}
+
+export class GitEventsRepo {
+  constructor(private db: Database.Database) {}
+  upsert(e: GitEventRow): void {
+    this.db.prepare(`
+      INSERT OR IGNORE INTO git_events (repo, kind, sha, pr_number, branch, created_at)
+      VALUES (@repo, @kind, @sha, @prNumber, @branch, @createdAt)
+    `).run({ repo: e.repo, kind: e.kind, sha: e.sha ?? null, prNumber: e.prNumber ?? null, branch: e.branch ?? null, createdAt: e.createdAt })
+  }
+  findByRepo(repo: string): GitEventRow[] {
+    return (this.db.prepare('SELECT * FROM git_events WHERE repo = ? ORDER BY created_at DESC').all(repo) as any[])
+      .map(r => ({ id: r.id, repo: r.repo, kind: r.kind, sha: r.sha, prNumber: r.pr_number, branch: r.branch, createdAt: r.created_at }))
+  }
+  recentMerged(sinceMs: number): GitEventRow[] {
+    return (this.db.prepare(`SELECT * FROM git_events WHERE kind = 'pr_merged' AND created_at >= ? ORDER BY created_at DESC`).all(sinceMs) as any[])
+      .map(r => ({ id: r.id, repo: r.repo, kind: r.kind, sha: r.sha, prNumber: r.pr_number, branch: r.branch, createdAt: r.created_at }))
+  }
+}
+
+export interface DetectionRow {
+  id?: number
+  sessionId: string | null
+  ruleId: string
+  severity: 'info' | 'warn' | 'block'
+  summary: string
+  metadataJson?: string | null
+  suggestedActionJson?: string | null
+  acknowledgedAt?: number | null
+  createdAt: number
+}
+
+export class DetectionsRepo {
+  constructor(private db: Database.Database) {}
+  insert(d: DetectionRow): DetectionRow {
+    const info = this.db.prepare(`
+      INSERT INTO detections (session_id, rule_id, severity, summary, metadata_json, suggested_action_json, acknowledged_at, created_at)
+      VALUES (@sessionId, @ruleId, @severity, @summary, @metadataJson, @suggestedActionJson, @acknowledgedAt, @createdAt)
+    `).run({
+      sessionId: d.sessionId, ruleId: d.ruleId, severity: d.severity, summary: d.summary,
+      metadataJson: d.metadataJson ?? null, suggestedActionJson: d.suggestedActionJson ?? null,
+      acknowledgedAt: d.acknowledgedAt ?? null, createdAt: d.createdAt,
+    })
+    return { ...d, id: Number(info.lastInsertRowid) }
+  }
+  recent(limit: number): DetectionRow[] {
+    return (this.db.prepare('SELECT * FROM detections ORDER BY created_at DESC LIMIT ?').all(limit) as any[])
+      .map(r => ({
+        id: r.id, sessionId: r.session_id, ruleId: r.rule_id, severity: r.severity,
+        summary: r.summary, metadataJson: r.metadata_json,
+        suggestedActionJson: r.suggested_action_json, acknowledgedAt: r.acknowledged_at, createdAt: r.created_at,
+      }))
+  }
+  acknowledge(id: number): void {
+    this.db.prepare('UPDATE detections SET acknowledged_at = ? WHERE id = ?').run(Date.now(), id)
+  }
+}
+
+export interface FeatureFlagRow {
+  key: string
+  enabled: number
+  configJson?: string | null
+}
+
+export class FeatureFlagsRepo {
+  constructor(private db: Database.Database) {}
+  set(key: string, config: Record<string, unknown>): void {
+    const enabled = config.enabled === false ? 0 : 1
+    this.db.prepare(`
+      INSERT INTO feature_flags (key, enabled, config_json) VALUES (?, ?, ?)
+      ON CONFLICT(key) DO UPDATE SET enabled = excluded.enabled, config_json = excluded.config_json
+    `).run(key, enabled, JSON.stringify(config))
+  }
+  get(key: string): { enabled: number; config: Record<string, unknown> | null } | null {
+    const row = this.db.prepare('SELECT enabled, config_json FROM feature_flags WHERE key = ?').get(key) as { enabled: number; config_json: string | null } | undefined
+    if (!row) return null
+    return { enabled: row.enabled, config: row.config_json ? JSON.parse(row.config_json) : null }
+  }
+  all(): Array<{ key: string; enabled: number; config: Record<string, unknown> | null }> {
+    return (this.db.prepare('SELECT key, enabled, config_json FROM feature_flags ORDER BY key').all() as any[])
+      .map(r => ({ key: r.key, enabled: r.enabled, config: r.config_json ? JSON.parse(r.config_json) : null }))
+  }
+}
+
+export interface PrAttributionRow {
+  prNumber: number
+  repo: string
+  sessionId: string
+  overlapKind: 'branch_match' | 'commit_ancestor' | 'file_overlap'
+  confidence: number
+}
+
+export class PrAttributionsRepo {
+  constructor(private db: Database.Database) {}
+  upsert(r: PrAttributionRow): void {
+    this.db.prepare(`
+      INSERT INTO pr_attributions (pr_number, repo, session_id, overlap_kind, confidence)
+      VALUES (@prNumber, @repo, @sessionId, @overlapKind, @confidence)
+      ON CONFLICT(pr_number, repo, session_id) DO UPDATE SET
+        overlap_kind = excluded.overlap_kind, confidence = excluded.confidence
+    `).run(r)
+  }
+  findByPr(repo: string, prNumber: number): PrAttributionRow[] {
+    return (this.db.prepare('SELECT * FROM pr_attributions WHERE repo = ? AND pr_number = ?').all(repo, prNumber) as any[])
+      .map(r => ({ prNumber: r.pr_number, repo: r.repo, sessionId: r.session_id, overlapKind: r.overlap_kind, confidence: r.confidence }))
+  }
+  totalCostCentsForPr(repo: string, prNumber: number): number {
+    const row = this.db.prepare(`
+      SELECT COALESCE(SUM(s.cost_millicents * pa.confidence), 0) as total
+      FROM pr_attributions pa JOIN sessions s ON s.id = pa.session_id
+      WHERE pa.repo = ? AND pa.pr_number = ?
+    `).get(repo, prNumber) as { total: number }
+    return Math.round(row.total / 10)
+  }
+}
+
+export class BatchRunsRepo {
+  constructor(private db: Database.Database) {}
+  mark(jobName: string, status: string, at: number = Date.now()): void {
+    this.db.prepare(`
+      INSERT INTO batch_runs (job_name, last_run_at, last_status)
+      VALUES (?, ?, ?)
+      ON CONFLICT(job_name) DO UPDATE SET last_run_at = excluded.last_run_at, last_status = excluded.last_status
+    `).run(jobName, at, status)
+  }
+  lastRunAt(jobName: string): number | null {
+    const row = this.db.prepare('SELECT last_run_at FROM batch_runs WHERE job_name = ?').get(jobName) as { last_run_at: number } | undefined
+    return row?.last_run_at ?? null
+  }
+}
