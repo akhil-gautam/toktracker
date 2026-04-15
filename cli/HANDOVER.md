@@ -142,6 +142,30 @@ Unit tests for all services + parsers + budget logic. Parsers have fixture files
 
 ---
 
+## Storage (new)
+
+Phase 1 of the proactive-insights feature introduced a SQLite-backed storage layer alongside the existing JSON files.
+
+### SQLite database
+- **Path**: `~/.config/tokscale/toktracker.db` (resolved via `src/db/paths.ts`, XDG_CONFIG_HOME-aware)
+- **Schema**: `src/db/schema.sql` — 11 tables: `sessions`, `messages`, `tool_calls`, `hook_events`, `git_events`, `detections`, `redaction_rules`, `feature_flags`, `pr_attributions`, `batch_runs`, `schema_version`
+- **Connection**: `src/db/connection.ts` — WAL mode singleton with `busy_timeout=5000`
+- **Migrations**: `src/db/migrate.ts` — idempotent, reads `schema.sql` at runtime, version-tracked in `schema_version`; also imports legacy `budgets.json` / `state.json` into `feature_flags`
+- **Boot**: `src/db/boot.ts` — single call `bootDb(path?)` that opens DB, runs migrations, and seeds builtin redaction rules
+
+### Repositories (`src/db/repository.ts`)
+Typed wrappers for each table: `SessionsRepo`, `MessagesRepo`, `ToolCallsRepo`, `HookEventsRepo`, `GitEventsRepo`, `DetectionsRepo`, `FeatureFlagsRepo`, `PrAttributionsRepo`, `BatchRunsRepo`.
+
+### Redaction (`src/redaction/`)
+- `builtins.ts` — 8 builtin regex patterns (AWS keys, GitHub tokens, OpenAI keys, Slack tokens, private keys, emails, phone numbers)
+- `pipeline.ts` — `Redactor` class: compiles enabled rules into `RegExp`, applies in order
+- `repository.ts` — `RedactionRulesRepo`: seeds builtins, CRUD for custom rules
+
+### Retention
+- `src/db/retention.ts` — `purge(db, retentionDays)` deletes old `messages`, `tool_calls`, `hook_events` rows (sessions are kept forever for cost attribution)
+
+---
+
 ## Performance Notes
 
 - **Initial load**: full-scans ~1,500+ JSONL files + OpenCode SQLite. ~3–5s on 80k+ sessions thanks to parallel batches of 50 files, pre-filter by string match before JSON.parse, and git attribution cached by cwd.
