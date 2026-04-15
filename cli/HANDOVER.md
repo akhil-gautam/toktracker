@@ -166,6 +166,31 @@ Typed wrappers for each table: `SessionsRepo`, `MessagesRepo`, `ToolCallsRepo`, 
 
 ---
 
+## Data Capture (new)
+
+Phase 2 of the proactive-insights feature added message/tool-call capture, extended parsers, and a git event worker.
+
+### Capture layer (`src/capture/`)
+- `hashing.ts` — `sha256`, `normalizeArgs` (canonical JSON with sorted keys), `extractTargetPath` (tool → file path)
+- `message-recorder.ts` — `MessageRecorder`: redacts content via `Redactor`, hashes, persists to `messages` + `tool_calls` tables
+- `backfill.ts` — `backfill(db, tool, path)`: one-time history import; parses a file with `parseFileExtended`, runs all inserts in a single transaction
+
+### Extended parsers
+Each parser now exports both the original `parse*` function (unchanged) and a new `parse*Extended` counterpart that returns `ExtendedParseResult` (adds `messages: ParsedMessage[]` and `toolCalls: ParsedToolCall[]`):
+- `src/parsers/claude-code.ts` → `parseClaudeCodeExtended`
+- `src/parsers/codex.ts` → `parseCodexExtended`
+- `src/parsers/opencode.ts` → `parseOpencodeExtended`
+- `src/parsers/gemini-cli.ts` → `parseGeminiExtended`
+- `src/parsers/index.ts` → `parseFileExtended(tool, path, fromOffset)` dispatcher
+
+Fixtures for extended parser tests live under `src/parsers/__fixtures__/{claude-code,codex,gemini,opencode}/`.
+The opencode fixture uses a fabricated schema (`messages` + `tool_calls` tables) separate from the real opencode schema.
+
+### Git event worker (`src/git/`)
+- `event-worker.ts` — `GitEventWorker`: `pollRepo(repo)` calls `gh pr list` and upserts `pr_merged` events; `pollCommits(repo, cwd)` calls `git log` and upserts `commit` events. Both are dedup-safe (SQLite `INSERT OR IGNORE`). Both accept injectable runners for testing.
+
+---
+
 ## Performance Notes
 
 - **Initial load**: full-scans ~1,500+ JSONL files + OpenCode SQLite. ~3–5s on 80k+ sessions thanks to parallel batches of 50 files, pre-filter by string match before JSON.parse, and git attribution cached by cwd.
