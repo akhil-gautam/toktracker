@@ -1,9 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { parseOpenCode } from '../src/parsers/opencode.js'
+import { parseOpencodeExtended } from '../src/parsers/opencode.js'
 import Database from 'better-sqlite3'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import path from 'path'
+import { join } from 'node:path'
 import { mkdtempSync, rmSync } from 'fs'
 import { tmpdir } from 'os'
 
@@ -62,5 +64,13 @@ describe('OpenCode parser', () => {
   it('extracts reasoning tokens', async () => {
     const result = await parseOpenCode(dbPath, 0)
     expect(result.sessions[1].reasoningTokens).toBe(100)
+  })
+})
+
+describe('opencode ExtendedParseResult', () => {
+  it('reads messages + tool calls from SQLite fixture', async () => {
+    const fixture = join(__dirname, '..', 'src', 'parsers', '__fixtures__', 'opencode', 'opencode.db')
+    const result = await parseOpencodeExtended(fixture, 0)
+    expect(result.messages.length).toBeGreaterThan(0)
   })
 })

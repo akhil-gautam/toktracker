@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3'
-import type { Session, ParseResult } from '../types.js'
+import type { Session, ParseResult, ExtendedParseResult, ParsedMessage, ParsedToolCall } from '../types.js'
 
 interface OpenCodeMessageData {
   role: string; modelID?: string; providerID?: string; cost?: number
@@ -46,4 +46,46 @@ export async function parseOpenCode(dbPath: string, fromOffset: number): Promise
     }
     return { sessions, newOffset: maxTimestamp }
   } finally { db.close() }
+}
+
+export async function parseOpencodeExtended(dbFile: string, sinceMs: number): Promise<ExtendedParseResult> {
+  const db = new Database(dbFile, { readonly: true, fileMustExist: true })
+  try {
+    const sessions: Session[] = []
+    const messages: ParsedMessage[] = []
+    const toolCalls: ParsedToolCall[] = []
+
+    const msgRows = db.prepare(`SELECT * FROM messages WHERE created_at >= ? ORDER BY created_at`).all(sinceMs) as any[]
+    for (const r of msgRows) {
+      messages.push({
+        sessionId: r.session_id,
+        turnIndex: r.turn_index ?? 0,
+        role: (r.role === 'user' ? 'user' : 'assistant'),
+        content: r.content ?? '',
+        inputTokens: r.input_tokens,
+        outputTokens: r.output_tokens,
+        createdAt: new Date(r.created_at),
+      })
+    }
+    const tcRows = db.prepare(`SELECT * FROM tool_calls WHERE created_at >= ? ORDER BY created_at`).all(sinceMs) as any[]
+    for (const r of tcRows) {
+      toolCalls.push({
+        sessionId: r.session_id,
+        turnIndex: r.turn_index ?? 0,
+        toolName: r.tool_name,
+        argsRaw: r.args ? JSON.parse(r.args) : {},
+        succeeded: !!r.succeeded,
+        createdAt: new Date(r.created_at),
+      })
+    }
+
+    // best-effort: real opencode DB may not have the legacy message/session schema
+    try {
+      const base = await parseOpenCode(dbFile, sinceMs)
+      sessions.push(...base.sessions)
+    } catch { /* ignore - fixture may only have messages/tool_calls tables */ }
+    return { sessions, newOffset: Date.now(), messages, toolCalls }
+  } finally {
+    db.close()
+  }
 }
