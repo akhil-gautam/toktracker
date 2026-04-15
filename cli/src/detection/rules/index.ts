@@ -1,5 +1,6 @@
 import type { RuleRegistry } from '../registry.js'
+import { a1RedundantToolCall } from './a1-redundant-tool-call.js'
 
-export function registerAllRules(_registry: RuleRegistry): void {
-  // Individual rule registrations are added in Parts 5 & 6.
+export function registerAllRules(registry: RuleRegistry): void {
+  registry.register(a1RedundantToolCall)
 }
