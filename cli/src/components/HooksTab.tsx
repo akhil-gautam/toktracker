@@ -11,9 +11,9 @@ export function HooksTab({ db }: { db: Database.Database }) {
   const [local, setLocal] = React.useState(hookStatus(join(process.cwd(), '.claude', 'settings.json')))
   const latency = new HookEventsRepo(db).latencyPercentiles(500)
   useInput((input) => {
-    if (input === 'i') { installHook(join(homedir(), '.claude', 'settings.json'), 'tokscale hook exec'); setGlobal(hookStatus(join(homedir(), '.claude', 'settings.json'))) }
+    if (input === 'i') { installHook(join(homedir(), '.claude', 'settings.json')); setGlobal(hookStatus(join(homedir(), '.claude', 'settings.json'))) }
     if (input === 'u') { uninstallHook(join(homedir(), '.claude', 'settings.json')); setGlobal(hookStatus(join(homedir(), '.claude', 'settings.json'))) }
-    if (input === 'I') { installHook(join(process.cwd(), '.claude', 'settings.json'), 'tokscale hook exec'); setLocal(hookStatus(join(process.cwd(), '.claude', 'settings.json'))) }
+    if (input === 'I') { installHook(join(process.cwd(), '.claude', 'settings.json')); setLocal(hookStatus(join(process.cwd(), '.claude', 'settings.json'))) }
     if (input === 'U') { uninstallHook(join(process.cwd(), '.claude', 'settings.json')); setLocal(hookStatus(join(process.cwd(), '.claude', 'settings.json'))) }
   })
   return (

@@ -5,7 +5,6 @@ import { installHook, uninstallHook, hookStatus } from '../hook/install.js'
 
 export interface HookCommandDeps {
   resolveSettingsPath?: (scope: 'global' | 'local') => string
-  hookBinary?: string
 }
 
 function defaultSettingsPath(scope: 'global' | 'local'): string {
@@ -15,7 +14,6 @@ function defaultSettingsPath(scope: 'global' | 'local'): string {
 
 export function registerHookCommands(program: Command, deps: HookCommandDeps = {}): void {
   const resolve = deps.resolveSettingsPath ?? defaultSettingsPath
-  const hookBinary = deps.hookBinary ?? 'tokscale hook exec'
   const hook = program.command('hook').description('Manage Claude Code hooks')
 
   hook.command('install')
@@ -24,7 +22,7 @@ export function registerHookCommands(program: Command, deps: HookCommandDeps = {
     .action((opts) => {
       const scope = opts.global ? 'global' : 'local'
       const path = resolve(scope)
-      installHook(path, hookBinary)
+      installHook(path)
       process.stdout.write(`installed to ${path}\n`)
     })
 
