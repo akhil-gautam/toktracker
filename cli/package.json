@@ -1,8 +1,32 @@
 {
   "name": "tokscale",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AI coding tool spend tracker",
   "type": "module",
+  "license": "MIT",
+  "author": "Akhil Gautam",
+  "homepage": "https://github.com/akhilgautam123/toktracker",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akhilgautam123/toktracker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/akhilgautam123/toktracker/issues"
+  },
+  "keywords": [
+    "claude-code",
+    "ai-coding",
+    "llm",
+    "cost-tracking",
+    "token-usage",
+    "tui",
+    "cli"
+  ],
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ],
   "bin": {
     "tokscale": "./bin/tokscale.js"
   },
@@ -12,7 +36,8 @@
     "dev": "tsup --watch",
     "test": "vitest",
     "test:run": "vitest run",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm run test:run && npm run lint"
   },
   "engines": {
     "node": ">=20"
