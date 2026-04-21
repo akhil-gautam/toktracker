@@ -5,13 +5,14 @@
   "type": "module",
   "license": "MIT",
   "author": "Akhil Gautam",
-  "homepage": "https://github.com/akhilgautam123/toktracker",
+  "homepage": "https://github.com/akhil-gautam/toktracker",
   "repository": {
     "type": "git",
-    "url": "https://github.com/akhilgautam123/toktracker.git"
+    "url": "https://github.com/akhil-gautam/toktracker.git",
+    "directory": "cli"
   },
   "bugs": {
-    "url": "https://github.com/akhilgautam123/toktracker/issues"
+    "url": "https://github.com/akhil-gautam/toktracker/issues"
   },
   "keywords": [
     "claude-code",
