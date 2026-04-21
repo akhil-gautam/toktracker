@@ -86,3 +86,16 @@ export function getModelColor(model: string): string {
   const hue = Math.abs(hash) % 360
   return `hsl(${hue}, 70%, 60%)`
 }
+
+export const REPO_PALETTE = [
+  '#7C6FE0', '#5CB8B2', '#F48FB1', '#81C784', '#FFB74D',
+  '#64B5F6', '#CE93D8', '#FF7043', '#A1887F', '#90A4AE',
+]
+
+export function getRepoColor(repo: string): string {
+  let hash = 0
+  for (let i = 0; i < repo.length; i++) {
+    hash = repo.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return REPO_PALETTE[Math.abs(hash) % REPO_PALETTE.length]
+}

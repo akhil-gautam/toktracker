@@ -51,7 +51,7 @@ export function ModelDetail({ detail, accentColor = '#7C6FE0' }: ModelDetailProp
   const leftCol = (
     <Box flexDirection="column" width="50%" paddingRight={1}>
       <SectionHeader title="30-day trend" subtitle="cost per day (USD)" accentColor={accentColor} />
-      <LineChart values={detail.dailyTrend} height={6} color={accentColor} />
+      <LineChart values={detail.dailyTrend} height={6} color={accentColor} xStretch={1} />
 
       <Box marginTop={1}>
         <SectionHeader title="Token breakdown" accentColor={accentColor} />

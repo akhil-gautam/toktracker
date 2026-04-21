@@ -1,4 +1,4 @@
-import type { Session, DayStats, ModelStats, ToolStats, RepoStats, TodayDetailStats, AllTimeStats, ModelDetailStats } from '../types.js'
+import type { Session, DayStats, ModelStats, ToolStats, RepoStats, TodayDetailStats, AllTimeStats, ModelDetailStats, RepoDetailStats } from '../types.js'
 import { getContextWindow } from '../data/context-windows.js'
 
 function dateKey(d: Date): string { return d.toISOString().slice(0, 10) }
@@ -26,6 +26,7 @@ interface CachedStats {
   todayDetail: TodayDetailStats
   allTime: AllTimeStats
   modelDetails: Map<string, ModelDetailStats>
+  repoDetails: Map<string, RepoDetailStats>
 }
 
 export class SessionStore {
@@ -76,6 +77,20 @@ export class SessionStore {
       toolUses: Map<string, number>  // tool name -> invocation count
     }
     const modelDetailMap = new Map<string, PerModelAccum>()
+
+    // Per-repo detail accumulator
+    interface PerRepoAccum {
+      tokens: { input: number; output: number; cacheRead: number; cacheWrite: number; reasoning: number }
+      models: Map<string, { cost: number; count: number }>
+      tools: Map<string, { cost: number; count: number }>
+      branches: Map<string, { cost: number; count: number }>
+      activeDates: Set<string>
+      first?: Date
+      last?: Date
+    }
+    const repoDetailMap = new Map<string, PerRepoAccum>()
+    const repoDailyMap = new Map<string, Map<string, number>>()  // repo → date → cost (30d)
+
     let earliest: Date | null = null
 
     // Single pass over all sessions
@@ -175,6 +190,46 @@ export class SessionStore {
         const re = repoMap.get(s.gitRepo)
         if (re) { re.costMillicents += s.costMillicents; re.sessionCount++; if (!re.models.includes(s.model)) re.models.push(s.model) }
         else repoMap.set(s.gitRepo, { repo: s.gitRepo, costMillicents: s.costMillicents, sessionCount: 1, models: [s.model] })
+
+        // Per-repo detail
+        let rdAccum = repoDetailMap.get(s.gitRepo)
+        if (!rdAccum) {
+          rdAccum = {
+            tokens: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, reasoning: 0 },
+            models: new Map(), tools: new Map(), branches: new Map(),
+            activeDates: new Set(),
+          }
+          repoDetailMap.set(s.gitRepo, rdAccum)
+        }
+        rdAccum.tokens.input += s.inputTokens
+        rdAccum.tokens.output += s.outputTokens
+        rdAccum.tokens.cacheRead += s.cacheReadTokens
+        rdAccum.tokens.cacheWrite += s.cacheWriteTokens
+        rdAccum.tokens.reasoning += s.reasoningTokens
+        rdAccum.activeDates.add(dk)
+        if (!rdAccum.first || s.startedAt < rdAccum.first) rdAccum.first = s.startedAt
+        if (!rdAccum.last || s.startedAt > rdAccum.last) rdAccum.last = s.startedAt
+
+        const rmEntry = rdAccum.models.get(s.model)
+        if (rmEntry) { rmEntry.cost += s.costMillicents; rmEntry.count++ }
+        else rdAccum.models.set(s.model, { cost: s.costMillicents, count: 1 })
+
+        const rtEntry = rdAccum.tools.get(s.tool)
+        if (rtEntry) { rtEntry.cost += s.costMillicents; rtEntry.count++ }
+        else rdAccum.tools.set(s.tool, { cost: s.costMillicents, count: 1 })
+
+        if (s.gitBranch) {
+          const rbEntry = rdAccum.branches.get(s.gitBranch)
+          if (rbEntry) { rbEntry.cost += s.costMillicents; rbEntry.count++ }
+          else rdAccum.branches.set(s.gitBranch, { cost: s.costMillicents, count: 1 })
+        }
+
+        // Repo daily trend (30d)
+        if (s.startedAt >= daysAgo(29)) {
+          let rd = repoDailyMap.get(s.gitRepo)
+          if (!rd) { rd = new Map(); repoDailyMap.set(s.gitRepo, rd) }
+          rd.set(dk, (rd.get(dk) ?? 0) + s.costMillicents)
+        }
       }
 
       // Daily accumulator
@@ -247,6 +302,41 @@ export class SessionStore {
       })
     }
 
+    // Build per-repo detail stats
+    const repoDetails = new Map<string, RepoDetailStats>()
+    for (const [repo, acc] of repoDetailMap) {
+      const stat = repoMap.get(repo)!
+      const trend30: number[] = []
+      const rd = repoDailyMap.get(repo)
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i)
+        trend30.push(rd?.get(dateKey(d)) ?? 0)
+      }
+      repoDetails.set(repo, {
+        repo,
+        costMillicents: stat.costMillicents,
+        sessionCount: stat.sessionCount,
+        inputTokens: acc.tokens.input,
+        outputTokens: acc.tokens.output,
+        cacheReadTokens: acc.tokens.cacheRead,
+        cacheWriteTokens: acc.tokens.cacheWrite,
+        reasoningTokens: acc.tokens.reasoning,
+        models: Array.from(acc.models.entries())
+          .map(([model, v]) => ({ model, costMillicents: v.cost, sessionCount: v.count }))
+          .sort((a, b) => b.costMillicents - a.costMillicents),
+        tools: Array.from(acc.tools.entries())
+          .map(([tool, v]) => ({ tool, costMillicents: v.cost, sessionCount: v.count }))
+          .sort((a, b) => b.costMillicents - a.costMillicents),
+        branches: Array.from(acc.branches.entries())
+          .map(([branch, v]) => ({ branch, costMillicents: v.cost, sessionCount: v.count }))
+          .sort((a, b) => b.costMillicents - a.costMillicents),
+        dailyTrend: trend30,
+        firstSession: acc.first,
+        lastSession: acc.last,
+        activeDays: acc.activeDates.size,
+      })
+    }
+
     // Week over week delta
     let weekOverWeekDelta = 0
     if (lastWeekTotal === 0) weekOverWeekDelta = thisWeekTotal > 0 ? 100 : 0
@@ -255,7 +345,7 @@ export class SessionStore {
     // Recent sessions (sorted, limited)
     const recentSessions = Array.from(this.sessions.values())
       .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
-      .slice(0, 50)
+      .slice(0, 1000)
 
     const totalCacheIn = allTimeCacheRead + allTimeCacheWrite + allTimeIn
     const cacheReuseRatio = totalCacheIn > 0 ? allTimeCacheRead / totalCacheIn : 0
@@ -309,6 +399,7 @@ export class SessionStore {
       todayDetail,
       allTime,
       modelDetails,
+      repoDetails,
     }
     return this.cache
   }
@@ -327,6 +418,7 @@ export class SessionStore {
   getTodayDetail(): TodayDetailStats { return this.ensureCache().todayDetail }
   getAllTimeStats(): AllTimeStats { return this.ensureCache().allTime }
   getModelDetail(model: string): ModelDetailStats | undefined { return this.ensureCache().modelDetails.get(model) }
+  getRepoDetail(repo: string): RepoDetailStats | undefined { return this.ensureCache().repoDetails.get(repo) }
   getRecentSessions(limit: number = 50): Session[] { return this.ensureCache().recentSessions.slice(0, limit) }
 
   getDailyStats(days: number): DayStats[] {

@@ -7,12 +7,14 @@ export interface GhPr {
   mergedAt: string | null
   headRefName?: string
   mergeCommit?: { oid?: string }
+  title?: string
 }
 
 export interface GitCommitEntry {
   sha: string
   authoredAt: string
   branch?: string
+  subject?: string
 }
 
 export interface GitEventWorkerDeps {
@@ -22,7 +24,11 @@ export interface GitEventWorkerDeps {
 
 async function defaultGhRun(repo: string): Promise<GhPr[]> {
   return new Promise((resolve, reject) => {
-    const child = spawn('gh', ['pr', 'list', '--repo', repo, '--state', 'merged', '--json', 'number,mergedAt,headRefName,mergeCommit', '--limit', '100'])
+    const child = spawn('gh', [
+      'pr', 'list', '--repo', repo, '--state', 'merged',
+      '--json', 'number,mergedAt,headRefName,mergeCommit,title',
+      '--limit', '100',
+    ])
     let out = ''
     let err = ''
     child.stdout.on('data', d => { out += d.toString() })
@@ -36,19 +42,34 @@ async function defaultGhRun(repo: string): Promise<GhPr[]> {
 
 async function defaultGitLogRun(_repo: string, cwd: string): Promise<GitCommitEntry[]> {
   return new Promise((resolve, reject) => {
-    const child = spawn('git', ['-C', cwd, 'log', '--pretty=format:%H|%aI', '-n', '500'])
+    // %x1f is an ASCII unit-separator — stable across commit subjects that
+    // contain "|" or pipes. Parse with split(US) instead.
+    const SEP = '\x1f'
+    const child = spawn('git', [
+      '-C', cwd, 'log',
+      `--pretty=format:%H${SEP}%aI${SEP}%s${SEP}%D`,
+      '-n', '500',
+    ])
     let out = ''
     let err = ''
     child.stdout.on('data', d => { out += d.toString() })
     child.stderr.on('data', d => { err += d.toString() })
     child.on('close', code => {
       if (code !== 0) return reject(new Error(err))
-      resolve(out.split('\n').filter(Boolean).map(l => {
-        const [sha, authoredAt] = l.split('|')
-        return { sha, authoredAt }
+      resolve(out.split('\n').filter(Boolean).map(line => {
+        const [sha, authoredAt, subject, refs] = line.split(SEP)
+        return { sha, authoredAt, subject, branch: extractBranch(refs ?? '') }
       }))
     })
   })
+}
+
+function extractBranch(refs: string): string | undefined {
+  for (const raw of refs.split(',')) {
+    const t = raw.trim()
+    if (t.startsWith('HEAD -> ')) return t.slice(8)
+  }
+  return undefined
 }
 
 export class GitEventWorker {
@@ -71,19 +92,25 @@ export class GitEventWorker {
         repo, kind: 'pr_merged', prNumber: p.number,
         branch: p.headRefName ?? null,
         sha: p.mergeCommit?.oid ?? null,
+        title: p.title ?? null,
         createdAt: Date.parse(p.mergedAt),
       })
     }
   }
 
-  async pollCommits(repo: string, cwd: string): Promise<void> {
+  /// Returns the parsed commit entries so the caller can correlate them to
+  /// sessions; they're also persisted in `git_events` for historical queries.
+  async pollCommits(repo: string, cwd: string): Promise<GitCommitEntry[]> {
     let commits: GitCommitEntry[]
-    try { commits = await (this.deps.gitLogRun ?? defaultGitLogRun)(repo, cwd) } catch { return }
+    try { commits = await (this.deps.gitLogRun ?? defaultGitLogRun)(repo, cwd) } catch { return [] }
     for (const c of commits) {
       this.repo.upsert({
         repo, kind: 'commit', sha: c.sha, branch: c.branch ?? null,
+        subject: c.subject ?? null,
+        committedAt: Date.parse(c.authoredAt) || null,
         prNumber: null, createdAt: Date.parse(c.authoredAt),
       })
     }
+    return commits
   }
 }

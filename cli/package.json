@@ -37,7 +37,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "lint": "tsc --noEmit",
-    "prepublishOnly": "npm run build && npm run test:run && npm run lint"
+    "sync-pricing": "node scripts/sync-pricing.mjs",
+    "prepublishOnly": "npm run sync-pricing && npm run build && npm run test:run && npm run lint"
   },
   "engines": {
     "node": ">=20"

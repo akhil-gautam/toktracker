@@ -100,7 +100,7 @@ export function App({ onExit }: AppProps) {
 
   function renderTab() {
     switch (activeTab) {
-      case 'overview': return <OverviewTab store={store} budgetResults={budgetResults} />
+      case 'overview': return <OverviewTab store={store} budgetResults={budgetResults} db={db} />
       case 'models': return <ModelsTab store={store} />
       case 'daily': return <DailyTab store={store} />
       case 'repos': return <ReposTab store={store} />

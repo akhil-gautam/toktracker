@@ -12,6 +12,7 @@ interface ExpandableTableProps {
   rows: Array<{
     cells: string[]
     color?: string
+    cellColors?: Array<string | undefined>  // optional per-cell color override
     expandedContent?: React.ReactNode
   }>
   cursor: number
@@ -45,11 +46,16 @@ export function ExpandableTable({ columns, rows, cursor, expandedIndex, sortKey,
           <React.Fragment key={idx}>
             <Box {...bgProps}>
               <Text color={row.color ?? 'white'}>{isCursor ? '\u25B8' : ' '} {arrow} </Text>
-              {row.cells.map((cell, ci) => (
-                <Text key={ci} color={ci === 0 ? (row.color ?? 'white') : (ci === 1 ? 'white' : 'gray')} bold={ci === 1}>
-                  {columns[ci]?.align === 'right' ? cell.padStart(columns[ci].width) : cell.padEnd(columns[ci].width)}
-                </Text>
-              ))}
+              {row.cells.map((cell, ci) => {
+                const override = row.cellColors?.[ci]
+                const defaultColor = ci === 0 ? (row.color ?? 'white') : (ci === 1 ? 'white' : 'gray')
+                const color = override ?? defaultColor
+                return (
+                  <Text key={ci} color={color} bold={ci === 1 && !override}>
+                    {columns[ci]?.align === 'right' ? cell.padStart(columns[ci].width) : cell.padEnd(columns[ci].width)}
+                  </Text>
+                )
+              })}
             </Box>
             {isExpanded && row.expandedContent && (
               <Box flexDirection="column" paddingLeft={4} marginBottom={1}>

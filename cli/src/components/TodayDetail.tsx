@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Text } from 'ink'
 import { Sparkline } from './Sparkline.js'
+import { VBarChart } from './VBarChart.js'
 import { formatCost, formatTokens, getModelColor, TOOL_COLORS, TOOL_LABELS, BAR_FULL, BAR_EMPTY } from '../theme.js'
 import type { TodayDetailStats } from '../types.js'
 
@@ -31,7 +32,7 @@ export function TodayDetail({ detail }: TodayDetailProps) {
   }
 
   const totalTokens = detail.inputTokens + detail.outputTokens
-  const sep = '\u2500'.repeat(58)
+  const sep = '\u2500'.repeat(120)
   const maxModelCost = detail.models[0]?.costMillicents ?? 1
   const maxToolCost = detail.tools[0]?.costMillicents ?? 1
 
@@ -41,13 +42,13 @@ export function TodayDetail({ detail }: TodayDetailProps) {
 
   return (
     <Box flexDirection="column" paddingX={1} marginTop={1}>
-      <Box marginBottom={1}>
+      <Box>
         <Text color="cyan" bold>Today's Detail</Text>
         <Text color="gray"> {'\u2014'} </Text>
         <Text color="gray">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</Text>
       </Box>
 
-      <Box marginBottom={1}><Text color="gray" dimColor>{sep}</Text></Box>
+      <Box><Text color="gray" dimColor>{sep}</Text></Box>
 
       {/* Token Summary */}
       <Box marginBottom={1} flexDirection="column">
@@ -66,19 +67,21 @@ export function TodayDetail({ detail }: TodayDetailProps) {
             <MetricCol label="Reasoning" value={formatTokens(detail.reasoningTokens)} color="#CE93D8" />
           )}
         </Box>
-        <Box marginTop={0}>
+        <Box marginTop={1}>
           <Text color="gray" dimColor>Active {firstTime} {'\u2192'} {lastTime}</Text>
         </Box>
       </Box>
 
-      {/* Hourly Activity Sparkline */}
+      {/* Hourly Activity */}
       <Box marginBottom={1} flexDirection="column">
-        <Text color="gray" dimColor>Hourly activity:</Text>
-        <Box>
-          <Text color="gray" dimColor>{'00 '}</Text>
-          <Sparkline values={detail.hourly} colorScale />
-          <Text color="gray" dimColor>{' 23'}</Text>
-        </Box>
+        <Text color="gray" dimColor>Hourly activity (24h):</Text>
+        <VBarChart
+          values={detail.hourly}
+          height={7}
+          stretch={4}
+          colorScale
+          labels={Array.from({ length: 24 }, (_, h) => (h % 3 === 0 ? String(h).padStart(2, '0') : ''))}
+        />
       </Box>
 
       <Box marginBottom={1}><Text color="gray" dimColor>{sep}</Text></Box>

@@ -5,6 +5,7 @@ import { Poller } from './poller.js'
 import { notify } from './notifier.js'
 import { writePid, clearPid } from './pidfile.js'
 import { maybeRunNightly } from '../scheduler/cron.js'
+import { pollGit } from './git-poller.js'
 
 export async function runDaemon(intervalMs = 30_000): Promise<void> {
   writePid()
@@ -20,6 +21,7 @@ export async function runDaemon(intervalMs = 30_000): Promise<void> {
   while (true) {
     try { await poller.tick() } catch {}
     try { await maybeRunNightly(db, registry) } catch {}
+    try { await pollGit(db) } catch {}
     await new Promise(r => setTimeout(r, intervalMs))
   }
 }

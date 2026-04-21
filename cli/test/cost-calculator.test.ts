@@ -10,7 +10,7 @@ describe('calculateCostMillicents', () => {
       cacheReadTokens: 2000,
       cacheWriteTokens: 100,
     })
-    expect(cost).toBe(5738)
+    expect(cost).toBe(1913)
   })
 
   it('calculates cost for gpt-4.1', () => {
@@ -56,6 +56,6 @@ describe('calculateCost (dollars)', () => {
       cacheReadTokens: 0,
       cacheWriteTokens: 0,
     })
-    expect(dollars).toBeCloseTo(15.0, 2)
+    expect(dollars).toBeCloseTo(5.0, 2)
   })
 })

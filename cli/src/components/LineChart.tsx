@@ -84,6 +84,12 @@ export function LineChart({ values, labels, height = 12, color, title, subtitle,
     labelRow = parts.join('')
   }
 
+  // Split chart lines so y-axis labels render in gray and the plot line in accent.
+  // padding=8 spaces + 1 separator char → axis region is 9 cols wide.
+  const AXIS_WIDTH = 9
+  const chartLines = chartStr.split('\n')
+  const lineColor = color ?? '#4CAF50'
+
   return (
     <Box flexDirection="column">
       {title && (
@@ -92,7 +98,17 @@ export function LineChart({ values, labels, height = 12, color, title, subtitle,
           {subtitle && <Text color="gray" dimColor>  {subtitle}</Text>}
         </Box>
       )}
-      <Text color={color ?? '#4CAF50'}>{chartStr}</Text>
+      {chartLines.map((l, i) => {
+        if (l.length <= AXIS_WIDTH) {
+          return <Text key={i} color="gray" dimColor>{l}</Text>
+        }
+        return (
+          <Box key={i}>
+            <Text color="gray" dimColor>{l.slice(0, AXIS_WIDTH)}</Text>
+            <Text color={lineColor}>{l.slice(AXIS_WIDTH)}</Text>
+          </Box>
+        )
+      })}
       {labelRow && <Text color="gray" dimColor>{labelRow}</Text>}
     </Box>
   )

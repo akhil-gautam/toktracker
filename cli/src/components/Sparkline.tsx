@@ -6,9 +6,10 @@ interface SparklineProps {
   values: number[]
   color?: string
   colorScale?: boolean  // if true, each char colored by value magnitude
+  stretch?: number      // horizontal repeat per value (default 1)
 }
 
-export function Sparkline({ values, color, colorScale }: SparklineProps) {
+export function Sparkline({ values, color, colorScale, stretch = 1 }: SparklineProps) {
   if (values.length === 0) return <Text color="gray">-</Text>
 
   const max = Math.max(...values, 1)
@@ -17,7 +18,7 @@ export function Sparkline({ values, color, colorScale }: SparklineProps) {
 
   const chars = values.map(v => {
     const idx = Math.round(((v - min) / range) * (SPARKLINE_CHARS.length - 1))
-    return SPARKLINE_CHARS[idx]
+    return SPARKLINE_CHARS[idx].repeat(stretch)
   })
 
   if (!colorScale) {

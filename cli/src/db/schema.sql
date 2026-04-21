@@ -74,6 +74,9 @@ CREATE TABLE IF NOT EXISTS git_events (
   sha             TEXT,
   pr_number       INTEGER,
   branch          TEXT,
+  title           TEXT,
+  subject         TEXT,
+  committed_at    INTEGER,
   created_at      INTEGER NOT NULL
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_git_events_dedup ON git_events(repo, kind, COALESCE(sha,''), COALESCE(pr_number,0));
@@ -115,6 +118,19 @@ CREATE TABLE IF NOT EXISTS pr_attributions (
   confidence      REAL NOT NULL,
   PRIMARY KEY (pr_number, repo, session_id)
 );
+
+CREATE TABLE IF NOT EXISTS commit_attributions (
+  commit_sha      TEXT NOT NULL,
+  repo            TEXT NOT NULL,
+  session_id      TEXT NOT NULL REFERENCES sessions(id),
+  branch          TEXT,
+  subject         TEXT,
+  committed_at    INTEGER NOT NULL,
+  created_at      INTEGER NOT NULL,
+  PRIMARY KEY (commit_sha, repo, session_id)
+);
+CREATE INDEX IF NOT EXISTS idx_commit_attr_repo ON commit_attributions(repo, committed_at);
+CREATE INDEX IF NOT EXISTS idx_commit_attr_session ON commit_attributions(session_id);
 
 CREATE TABLE IF NOT EXISTS batch_runs (
   job_name        TEXT PRIMARY KEY,

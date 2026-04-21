@@ -14,12 +14,23 @@ export interface MigrateOptions {
 export function migrate(db: Database.Database, opts: MigrateOptions = {}): void {
   const sql = readFileSync(SCHEMA_PATH, 'utf8')
   db.exec(sql)
+  // Additive migrations for DBs created before the columns existed. Safe to
+  // run every boot: each check is idempotent via PRAGMA lookup.
+  ensureColumn(db, 'git_events', 'title', 'TEXT')
+  ensureColumn(db, 'git_events', 'subject', 'TEXT')
+  ensureColumn(db, 'git_events', 'committed_at', 'INTEGER')
   const row = db.prepare('SELECT MAX(version) as v FROM schema_version').get() as { v: number | null }
   const current = row.v ?? 0
   if (current < TARGET_VERSION) {
     db.prepare('INSERT INTO schema_version (version, applied_at) VALUES (?, ?)').run(TARGET_VERSION, Date.now())
   }
   if (opts.legacyDir) importLegacy(db, opts.legacyDir)
+}
+
+function ensureColumn(db: Database.Database, table: string, column: string, type: string): void {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>
+  if (cols.some(c => c.name === column)) return
+  db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`)
 }
 
 function importLegacy(db: Database.Database, dir: string): void {

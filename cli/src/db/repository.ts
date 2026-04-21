@@ -196,16 +196,35 @@ export interface GitEventRow {
   sha?: string | null
   prNumber?: number | null
   branch?: string | null
+  title?: string | null
+  subject?: string | null
+  committedAt?: number | null
   createdAt: number
 }
 
 export class GitEventsRepo {
   constructor(private db: Database.Database) {}
   upsert(e: GitEventRow): void {
+    // INSERT OR IGNORE would skip updating title/subject on a later poll, so
+    // use ON CONFLICT DO UPDATE and only overwrite optional metadata when the
+    // new poll actually provided a non-null value.
     this.db.prepare(`
-      INSERT OR IGNORE INTO git_events (repo, kind, sha, pr_number, branch, created_at)
-      VALUES (@repo, @kind, @sha, @prNumber, @branch, @createdAt)
-    `).run({ repo: e.repo, kind: e.kind, sha: e.sha ?? null, prNumber: e.prNumber ?? null, branch: e.branch ?? null, createdAt: e.createdAt })
+      INSERT INTO git_events (repo, kind, sha, pr_number, branch, title, subject, committed_at, created_at)
+      VALUES (@repo, @kind, @sha, @prNumber, @branch, @title, @subject, @committedAt, @createdAt)
+      ON CONFLICT(repo, kind, COALESCE(sha,''), COALESCE(pr_number,0))
+      DO UPDATE SET
+        title        = COALESCE(excluded.title, git_events.title),
+        subject      = COALESCE(excluded.subject, git_events.subject),
+        committed_at = COALESCE(excluded.committed_at, git_events.committed_at),
+        branch       = COALESCE(excluded.branch, git_events.branch)
+    `).run({
+      repo: e.repo, kind: e.kind,
+      sha: e.sha ?? null, prNumber: e.prNumber ?? null,
+      branch: e.branch ?? null,
+      title: e.title ?? null, subject: e.subject ?? null,
+      committedAt: e.committedAt ?? null,
+      createdAt: e.createdAt,
+    })
   }
   findByRepo(repo: string): GitEventRow[] {
     return (this.db.prepare('SELECT * FROM git_events WHERE repo = ? ORDER BY created_at DESC').all(repo) as any[])
@@ -310,6 +329,50 @@ export class PrAttributionsRepo {
       WHERE pa.repo = ? AND pa.pr_number = ?
     `).get(repo, prNumber) as { total: number }
     return Math.round(row.total / 10)
+  }
+}
+
+export interface CommitAttributionRow {
+  sha: string
+  repo: string
+  sessionId: string
+  branch?: string | null
+  subject?: string | null
+  committedAt: number
+  createdAt: number
+}
+
+export class CommitAttributionsRepo {
+  constructor(private db: Database.Database) {}
+  upsert(r: CommitAttributionRow): void {
+    this.db.prepare(`
+      INSERT INTO commit_attributions (commit_sha, repo, session_id, branch, subject, committed_at, created_at)
+      VALUES (@sha, @repo, @sessionId, @branch, @subject, @committedAt, @createdAt)
+      ON CONFLICT(commit_sha, repo, session_id) DO UPDATE SET
+        branch       = COALESCE(excluded.branch, commit_attributions.branch),
+        subject      = COALESCE(excluded.subject, commit_attributions.subject),
+        committed_at = excluded.committed_at
+    `).run({
+      sha: r.sha, repo: r.repo, sessionId: r.sessionId,
+      branch: r.branch ?? null, subject: r.subject ?? null,
+      committedAt: r.committedAt, createdAt: r.createdAt,
+    })
+  }
+  recent(limit: number): Array<CommitAttributionRow & { cost: number }> {
+    return (this.db.prepare(`
+      SELECT ca.commit_sha, ca.repo, ca.session_id, ca.branch, ca.subject,
+             ca.committed_at, ca.created_at,
+             COALESCE(s.cost_millicents, 0) AS cost
+      FROM commit_attributions ca
+      LEFT JOIN sessions s ON s.id = ca.session_id
+      ORDER BY ca.committed_at DESC
+      LIMIT ?
+    `).all(limit) as any[]).map(r => ({
+      sha: r.commit_sha, repo: r.repo, sessionId: r.session_id,
+      branch: r.branch, subject: r.subject,
+      committedAt: r.committed_at, createdAt: r.created_at,
+      cost: r.cost ?? 0,
+    }))
   }
 }
 
