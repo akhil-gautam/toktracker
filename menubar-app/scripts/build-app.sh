@@ -32,14 +32,18 @@ cp "$BIN_DIR/Tokscale" "$CONTENTS/MacOS/Tokscale"
 cp "$BIN_DIR/TokscaleHook" "$CONTENTS/MacOS/tokscale-hook"
 cp "$ROOT/Resources/Info.plist" "$CONTENTS/Info.plist"
 
-# Copy only runtime resource bundles (skip test bundles)
+# Copy runtime resource bundles to the .app root. SwiftPM's generated
+# `resource_bundle_accessor.swift` resolves `Bundle.main.bundleURL/X.bundle`,
+# which at runtime is the .app directory — not Contents/Resources/. Putting
+# them there would only work on the build machine via the hard-coded build
+# path fallback.
 shopt -s nullglob
 for bundle in "$BIN_DIR"/*.bundle; do
     name="$(basename "$bundle")"
     case "$name" in
         *Tests.bundle) continue ;;
     esac
-    cp -R "$bundle" "$CONTENTS/Resources/"
+    cp -R "$bundle" "$APP_DIR/"
 done
 
 # Ad-hoc sign so the launcher accepts it locally
