@@ -476,6 +476,28 @@ public struct SessionsTab: View {
         let pageItems = startIdx < endIdx
             ? Array(filtered[startIdx..<endIdx]) : []
 
+        Group {
+            if let target = transcriptTarget {
+                TranscriptScreen(session: target) { transcriptTarget = nil }
+            } else {
+                sessionsList(
+                    all: all, filtered: filtered, pageItems: pageItems,
+                    totalPages: totalPages, safePage: safePage,
+                    startIdx: startIdx, endIdx: endIdx)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func sessionsList(
+        all: [SessionSummary],
+        filtered: [SessionSummary],
+        pageItems: [SessionSummary],
+        totalPages: Int,
+        safePage: Int,
+        startIdx: Int,
+        endIdx: Int
+    ) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 8) {
                 FilterPill("All · \(all.count)", active: filter == "all") {
@@ -540,9 +562,6 @@ public struct SessionsTab: View {
                     onLast: { page = totalPages - 1 }
                 )
             }
-        }
-        .sheet(item: $transcriptTarget) { s in
-            TranscriptSheet(session: s) { transcriptTarget = nil }
         }
     }
 
@@ -2640,55 +2659,64 @@ private struct TranscriptButton: View {
     }
 }
 
-// MARK: - Transcript sheet
+// MARK: - Transcript screen (inline, breadcrumb back)
 
-struct TranscriptSheet: View {
+struct TranscriptScreen: View {
     @Environment(AppStore.self) private var appStore
     let session: SessionSummary
-    let onClose: () -> Void
+    let onBack: () -> Void
     @State private var messages: [ConversationMessage] = []
     @State private var loadError: String? = nil
     @State private var loading: Bool = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Header
-            HStack(alignment: .top, spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 8) {
-                        Swatch(Linear.modelColor(session.primaryModel))
-                        Text(session.primaryModel)
-                            .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                            .foregroundStyle(Linear.modelColor(session.primaryModel))
-                        Chip(session.tool.rawValue, kind: toolChipKind(session.tool))
+            // Breadcrumb
+            HStack(spacing: 6) {
+                Button(action: onBack) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 10, weight: .semibold))
+                        Text("Sessions")
+                            .font(.system(size: 12, weight: .medium))
                     }
-                    HStack(spacing: 10) {
-                        Text(session.id)
-                            .font(.system(size: 10, design: .monospaced))
-                            .foregroundStyle(Linear.ink3)
-                        Text("·").foregroundStyle(Linear.ink4)
-                        Text("\(session.turnCount) turns")
-                            .font(.system(size: 11, design: .monospaced))
-                            .foregroundStyle(Linear.ink2)
-                        Text("·").foregroundStyle(Linear.ink4)
-                        Text(Formatters.cost(millicents: session.costMillicents))
-                            .font(.system(size: 11, design: .monospaced))
-                            .foregroundStyle(Linear.success)
-                    }
-                }
-                Spacer()
-                Button(action: onClose) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Linear.ink2)
-                        .frame(width: 28, height: 28)
-                        .background(Linear.panel)
-                        .overlay(Rectangle().stroke(Linear.border, lineWidth: 0.5))
+                    .foregroundStyle(Linear.info)
+                    .padding(.horizontal, 8).padding(.vertical, 4)
+                    .background(Linear.panel)
+                    .overlay(Rectangle().stroke(Linear.border, lineWidth: 0.5))
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .keyboardShortcut(.cancelAction)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 9))
+                    .foregroundStyle(Linear.ink3)
+                Text(String(session.id.prefix(12)))
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(Linear.ink2)
+                Spacer()
             }
-            .padding(16)
+            .padding(.horizontal, 16).padding(.top, 12).padding(.bottom, 8)
+
+            // Session meta
+            HStack(spacing: 10) {
+                Swatch(Linear.modelColor(session.primaryModel))
+                Text(session.primaryModel)
+                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(Linear.modelColor(session.primaryModel))
+                Chip(session.tool.rawValue, kind: toolChipKind(session.tool))
+                Text("·").foregroundStyle(Linear.ink4)
+                Text("\(session.turnCount) turns")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(Linear.ink2)
+                Text("·").foregroundStyle(Linear.ink4)
+                Text(Formatters.cost(millicents: session.costMillicents))
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(Linear.success)
+                Spacer()
+            }
+            .padding(.horizontal, 16).padding(.bottom, 10)
             .overlay(alignment: .bottom) {
                 Rectangle().fill(Linear.divider).frame(height: 0.5)
             }
@@ -2727,7 +2755,7 @@ struct TranscriptSheet: View {
                 }
             }
         }
-        .frame(minWidth: 640, idealWidth: 720, minHeight: 520, idealHeight: 720)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Linear.bg0)
         .onAppear(perform: load)
     }
@@ -2746,6 +2774,66 @@ struct TranscriptSheet: View {
             loading = false
         }
     }
+}
+
+private enum MessageBlockKind {
+    case text
+    case toolUse(tool: String)
+    case toolResult(id: String)
+    case thinking
+}
+
+private struct MessageBlock {
+    let kind: MessageBlockKind
+    let body: String
+}
+
+/// Split a stored message into typed blocks. The persisted content is a
+/// line-oriented serialization of Anthropic's content blocks — each block
+/// opens with a `[tool_use: X]`, `[tool_result (id)]`, `[thinking]`, or
+/// `[Image: ...]` marker, followed by its body.
+private func parseBlocks(_ raw: String) -> [MessageBlock] {
+    let markerRegex = try! NSRegularExpression(
+        pattern: #"^\[(tool_use: ([^\]]+)|tool_result \(([^)]+)\)|thinking)\]\s*$"#,
+        options: [.anchorsMatchLines])
+    let ns = raw as NSString
+    let matches = markerRegex.matches(in: raw, range: NSRange(location: 0, length: ns.length))
+    guard !matches.isEmpty else {
+        return [MessageBlock(kind: .text, body: raw.trimmingCharacters(in: .whitespacesAndNewlines))]
+    }
+    var blocks: [MessageBlock] = []
+    // Prefix text before the first marker (rare — usually empty).
+    let firstRange = matches.first!.range
+    if firstRange.location > 0 {
+        let prefix = ns.substring(with: NSRange(location: 0, length: firstRange.location))
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if !prefix.isEmpty {
+            blocks.append(MessageBlock(kind: .text, body: prefix))
+        }
+    }
+    for (i, m) in matches.enumerated() {
+        let markerLine = ns.substring(with: m.range)
+        let bodyStart = m.range.location + m.range.length
+        let bodyEnd = (i + 1 < matches.count) ? matches[i + 1].range.location : ns.length
+        let body = ns.substring(with: NSRange(location: bodyStart, length: bodyEnd - bodyStart))
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let kind: MessageBlockKind
+        if markerLine.contains("tool_use:") {
+            let tool = m.range(at: 2).location != NSNotFound
+                ? ns.substring(with: m.range(at: 2))
+                : "tool"
+            kind = .toolUse(tool: tool)
+        } else if markerLine.contains("tool_result") {
+            let id = m.range(at: 3).location != NSNotFound
+                ? ns.substring(with: m.range(at: 3))
+                : ""
+            kind = .toolResult(id: id)
+        } else {
+            kind = .thinking
+        }
+        blocks.append(MessageBlock(kind: kind, body: body))
+    }
+    return blocks
 }
 
 private struct MessageRow: View {
@@ -2781,14 +2869,11 @@ private struct MessageRow: View {
             }
 
             if let content = message.content, !content.isEmpty {
-                Text(content)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Linear.ink1)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-                    .background(Linear.panel)
-                    .overlay(Rectangle().stroke(roleColor.opacity(0.15), lineWidth: 0.5))
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(Array(parseBlocks(content).enumerated()), id: \.offset) { _, block in
+                        MessageBlockView(block: block, roleColor: roleColor)
+                    }
+                }
             } else {
                 Text("(content redacted — only hash stored)")
                     .font(.system(size: 11))
@@ -2801,6 +2886,87 @@ private struct MessageRow: View {
             }
         }
         .padding(.vertical, 6)
+    }
+}
+
+private struct MessageBlockView: View {
+    let block: MessageBlock
+    let roleColor: Color
+
+    var body: some View {
+        switch block.kind {
+        case .text:
+            Text(block.body)
+                .font(.system(size: 12))
+                .foregroundStyle(Linear.ink1)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(Linear.panel)
+                .overlay(Rectangle().stroke(roleColor.opacity(0.15), lineWidth: 0.5))
+
+        case .toolUse(let tool):
+            blockCard(
+                label: "TOOL USE",
+                name: tool,
+                accent: Linear.info,
+                body: block.body,
+                monospaced: true)
+
+        case .toolResult(let id):
+            blockCard(
+                label: "TOOL RESULT",
+                name: id.isEmpty ? nil : String(id.prefix(8)),
+                accent: Linear.success,
+                body: block.body,
+                monospaced: true)
+
+        case .thinking:
+            blockCard(
+                label: "THINKING",
+                name: nil,
+                accent: Linear.warn,
+                body: block.body,
+                monospaced: false,
+                italic: true)
+        }
+    }
+
+    private func blockCard(
+        label: String,
+        name: String?,
+        accent: Color,
+        body: String,
+        monospaced: Bool,
+        italic: Bool = false
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Text(label)
+                    .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                    .tracking(0.8)
+                    .foregroundStyle(accent)
+                if let name {
+                    Text(name)
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(Linear.ink2)
+                }
+            }
+            Text(body)
+                .font(monospaced
+                    ? .system(size: 11, design: .monospaced)
+                    : .system(size: 12))
+                .italic(italic)
+                .foregroundStyle(Linear.ink1)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(12)
+        .background(accent.opacity(0.05))
+        .overlay(alignment: .leading) {
+            Rectangle().fill(accent.opacity(0.6)).frame(width: 2)
+        }
+        .overlay(Rectangle().stroke(accent.opacity(0.2), lineWidth: 0.5))
     }
 }
 
