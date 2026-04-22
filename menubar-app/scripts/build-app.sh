@@ -15,10 +15,12 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP_DIR="$ROOT/build/Tokscale.app"
 CONTENTS="$APP_DIR/Contents"
 
+SWIFT_FLAGS=(-Xswiftc -strict-concurrency=minimal)
+
 echo ">> swift build -c $CONFIG (Tokscale)"
-(cd "$ROOT" && swift build -c "$CONFIG" --product Tokscale)
+(cd "$ROOT" && swift build -c "$CONFIG" --product Tokscale "${SWIFT_FLAGS[@]}")
 echo ">> swift build -c $CONFIG (TokscaleHook)"
-(cd "$ROOT" && swift build -c "$CONFIG" --product TokscaleHook)
+(cd "$ROOT" && swift build -c "$CONFIG" --product TokscaleHook "${SWIFT_FLAGS[@]}")
 
 BIN_DIR="$(cd "$ROOT" && swift build -c "$CONFIG" --show-bin-path)"
 
