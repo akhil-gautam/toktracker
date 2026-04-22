@@ -22,7 +22,7 @@ cd "$TAP_DIR"
 
 case "$KIND" in
   cli)
-    TARBALL_URL="https://registry.npmjs.org/tokscale/-/tokscale-${VERSION}.tgz"
+    TARBALL_URL="https://registry.npmjs.org/toktracker/-/toktracker-${VERSION}.tgz"
     echo ">> fetching $TARBALL_URL"
     TMP_TGZ="$(mktemp)"
     curl -fsSL "$TARBALL_URL" -o "$TMP_TGZ"
@@ -30,7 +30,7 @@ case "$KIND" in
     rm -f "$TMP_TGZ"
     FILE="Formula/tokscale.rb"
     /usr/bin/sed -i '' -E \
-      -e "s|url \"https://registry.npmjs.org/tokscale/-/tokscale-[^\"]+\"|url \"$TARBALL_URL\"|" \
+      -e "s|url \"https://registry.npmjs.org/toktracker/-/toktracker-[^\"]+\"|url \"$TARBALL_URL\"|" \
       -e "s|sha256 \"[0-9a-f]{64}\"|sha256 \"$SHA256\"|" \
       "$FILE"
     ;;

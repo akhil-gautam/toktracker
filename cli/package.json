@@ -1,6 +1,6 @@
 {
-  "name": "tokscale",
-  "version": "0.2.0",
+  "name": "toktracker",
+  "version": "0.2.1",
   "description": "AI coding tool spend tracker",
   "type": "module",
   "license": "MIT",

@@ -116,7 +116,7 @@ public final class AppStore {
             .filter { FileManager.default.fileExists(atPath: $0.path) }
         guard !directories.isEmpty else { return }
         let watcher = SessionWatcher(paths: directories) { [weak self] urls in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 await self?.handleChanges(urls)
             }
         }

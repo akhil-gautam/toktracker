@@ -300,6 +300,7 @@ private struct Sidebar: View {
             .padding(.horizontal, 10).padding(.top, 10).padding(.bottom, 4)
     }
 
+    @MainActor
     private func count(for tab: DashboardTab) -> String? {
         let agg = store.aggregates
         switch tab {

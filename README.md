@@ -22,10 +22,10 @@ brew install tokscale
 ### CLI — npm
 
 ```bash
-npm install -g tokscale
+npm install -g toktracker
 ```
 
-Requires Node 20+.
+Installs the `tokscale` binary. Requires Node 20+.
 
 ### CLI — from GitHub source
 
