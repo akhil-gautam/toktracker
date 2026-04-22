@@ -8,7 +8,7 @@ import { registerExportCommands } from './export-commands.js'
 import { registerPrivacyCommands } from './privacy-commands.js'
 
 const program = new Command()
-program.name('tokscale').description('AI coding tool tracker').version('0.2.0')
+program.name('toktracker').description('AI coding tool tracker').version('0.2.2')
 registerHookCommands(program)
 registerDaemonCommands(program)
 registerRedactCommands(program)

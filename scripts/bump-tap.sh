@@ -28,7 +28,7 @@ case "$KIND" in
     curl -fsSL "$TARBALL_URL" -o "$TMP_TGZ"
     SHA256=$(shasum -a 256 "$TMP_TGZ" | awk '{print $1}')
     rm -f "$TMP_TGZ"
-    FILE="Formula/tokscale.rb"
+    FILE="Formula/toktracker.rb"
     /usr/bin/sed -i '' -E \
       -e "s|url \"https://registry.npmjs.org/toktracker/-/toktracker-[^\"]+\"|url \"$TARBALL_URL\"|" \
       -e "s|sha256 \"[0-9a-f]{64}\"|sha256 \"$SHA256\"|" \
@@ -41,7 +41,7 @@ case "$KIND" in
     curl -fsSL "$ZIP_URL" -o "$TMP_ZIP"
     SHA256=$(shasum -a 256 "$TMP_ZIP" | awk '{print $1}')
     rm -f "$TMP_ZIP"
-    FILE="Casks/tokscale.rb"
+    FILE="Casks/toktracker.rb"
     /usr/bin/sed -i '' -E \
       -e "s|version \"[^\"]+\"|version \"$VERSION\"|" \
       -e "s|sha256 \"[0-9a-f]{64}\"|sha256 \"$SHA256\"|" \

@@ -16,7 +16,7 @@ Two surfaces, one data model:
 
 ```bash
 brew tap akhil-gautam/tap
-brew install tokscale
+brew install toktracker
 ```
 
 ### CLI — npm
@@ -25,7 +25,7 @@ brew install tokscale
 npm install -g toktracker
 ```
 
-Installs the `tokscale` binary. Requires Node 20+.
+Installs the `toktracker` binary. Requires Node 20+.
 
 ### CLI — from GitHub source
 
@@ -41,7 +41,7 @@ npm link
 
 ```bash
 brew tap akhil-gautam/tap
-brew install --cask tokscale
+brew install --cask toktracker
 ```
 
 Requires macOS 14 (Sonoma) or newer. The cask pulls a signed + notarized
@@ -69,10 +69,10 @@ will warn. Use the Homebrew cask or the signed release zip for the clean path.
 
 ```bash
 # Open the TUI dashboard
-tokscale
+toktracker
 
 # Install the Claude Code hook so sessions are captured automatically
-tokscale hook install
+toktracker hook install
 ```
 
 The first launch bootstraps `~/.config/tokscale/` (CLI) and

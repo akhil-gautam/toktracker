@@ -26,8 +26,8 @@ export interface HookStatus {
  * Priority:
  *   1. TOKSCALE_HOOK_COMMAND env var (power-user escape hatch)
  *   2. process.argv[1] exists on disk → use absolute node + script path
- *   3. `which tokscale` resolves → use `tokscale hook exec`
- *   4. fallback → `npx -y tokscale hook exec`
+ *   3. `which toktracker` resolves → use `toktracker hook exec`
+ *   4. fallback → `npx -y toktracker hook exec`
  */
 export function resolveHookCommand(): string {
   if (process.env.TOKSCALE_HOOK_COMMAND) {
@@ -38,14 +38,14 @@ export function resolveHookCommand(): string {
     return `"${process.execPath}" "${argv1}" hook exec`
   }
   try {
-    const result = spawnSync('which', ['tokscale'], { encoding: 'utf8' })
+    const result = spawnSync('which', ['toktracker'], { encoding: 'utf8' })
     if (result.status === 0 && result.stdout.trim()) {
-      return 'tokscale hook exec'
+      return 'toktracker hook exec'
     }
   } catch {
     // ignore
   }
-  return 'npx -y tokscale hook exec'
+  return 'npx -y toktracker hook exec'
 }
 
 function readSettings(path: string): any {
