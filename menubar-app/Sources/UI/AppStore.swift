@@ -9,7 +9,12 @@ import GitOps
 import Scheduler
 import GRDB
 
-@MainActor
+// Intentionally not @MainActor: Swift 5.10 (the CI toolchain) infers
+// @MainActor-isolated properties from that annotation, which breaks dozens
+// of view-side accessors that are still inferred nonisolated in 5.x. The
+// @Observable macro provides the atomic storage we need, and @MainActor-
+// sensitive writes (SwiftUI rebuilds, timers) hop onto the main actor
+// explicitly at the call site.
 @Observable
 public final class AppStore {
     public var db: AppDB?
