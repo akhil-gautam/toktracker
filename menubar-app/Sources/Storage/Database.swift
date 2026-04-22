@@ -71,10 +71,20 @@ public enum Boot {
     public static func open(path: String? = nil) throws -> AppDB {
         let resolvedPath = try path ?? AppDB.defaultPath()
         let db = try AppDB(path: resolvedPath)
-        // Prefer the main .app bundle (Contents/Resources/schema.sql), fall
-        // back to the SPM module bundle for tests and `swift run`.
-        let url = Bundle.main.url(forResource: "schema", withExtension: "sql")
-            ?? Bundle.module.url(forResource: "schema", withExtension: "sql")
+        // In a shipped .app read schema.sql from Contents/Resources/ via
+        // Bundle.main. Only fall back to Bundle.module (whose SPM-generated
+        // accessor hard-codes a build-dir path) in dev/test where that dir
+        // actually exists. Referencing Bundle.module unconditionally would
+        // trigger its static initializer and fatalError on end-user Macs.
+        let fromMain = Bundle.main.url(forResource: "schema", withExtension: "sql")
+        let url: URL?
+        if fromMain != nil {
+            url = fromMain
+        } else if !Bundle.main.bundlePath.hasSuffix(".app") {
+            url = Bundle.module.url(forResource: "schema", withExtension: "sql")
+        } else {
+            url = nil
+        }
         guard let url else {
             throw StorageError.schemaMissing
         }

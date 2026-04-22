@@ -6,7 +6,18 @@ public final class CostCalculator: @unchecked Sendable {
     private let pricing: [String: ModelPricing]
 
     public convenience init() {
-        self.init(bundle: .module)
+        // In a shipped .app read pricing.json from Contents/Resources/
+        // via Bundle.main. Only fall back to Bundle.module in dev/test —
+        // merely referencing Bundle.module on an end-user Mac triggers
+        // SwiftPM's generated accessor which fatalErrors on missing
+        // build-dir paths.
+        let bundle: Bundle
+        if Bundle.main.bundlePath.hasSuffix(".app") {
+            bundle = Bundle.main
+        } else {
+            bundle = Bundle.module
+        }
+        self.init(bundle: bundle)
     }
 
     internal init(bundle: Bundle) {
@@ -14,12 +25,8 @@ public final class CostCalculator: @unchecked Sendable {
     }
 
     private static func load(bundle: Bundle) -> [String: ModelPricing] {
-        // Try the main .app bundle first so macOS users read
-        // Contents/Resources/pricing.json, then fall back to the SPM module
-        // bundle for tests and `swift run`.
-        let url = Bundle.main.url(forResource: "pricing", withExtension: "json")
-            ?? bundle.url(forResource: "pricing", withExtension: "json")
-        guard let url, let data = try? Data(contentsOf: url) else {
+        guard let url = bundle.url(forResource: "pricing", withExtension: "json"),
+              let data = try? Data(contentsOf: url) else {
             return [:]
         }
         return (try? JSONDecoder().decode([String: ModelPricing].self, from: data)) ?? [:]
