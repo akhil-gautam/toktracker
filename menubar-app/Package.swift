@@ -101,5 +101,6 @@ let package = Package(
         .testTarget(name: "CaptureTests", dependencies: ["Capture", "Storage", "Core", "Parsers"]),
         .testTarget(name: "DetectionTests", dependencies: ["Detection", "Storage", "Core"]),
         .testTarget(name: "HookTests", dependencies: ["Hook", "Storage", "Core"]),
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )
