@@ -32,18 +32,21 @@ cp "$BIN_DIR/Tokscale" "$CONTENTS/MacOS/Tokscale"
 cp "$BIN_DIR/TokscaleHook" "$CONTENTS/MacOS/tokscale-hook"
 cp "$ROOT/Resources/Info.plist" "$CONTENTS/Info.plist"
 
-# Copy runtime resource bundles to the .app root. SwiftPM's generated
-# `resource_bundle_accessor.swift` resolves `Bundle.main.bundleURL/X.bundle`,
-# which at runtime is the .app directory — not Contents/Resources/. Putting
-# them there would only work on the build machine via the hard-coded build
-# path fallback.
+# Copy runtime resource bundles into Contents/Resources/ (standard layout),
+# and also flatten the files we actually read at runtime (pricing.json,
+# schema.sql) directly into Contents/Resources/. Our loaders try Bundle.main
+# first — that avoids SwiftPM's resource_bundle_accessor.swift which hard-
+# codes the build-machine's .build path as the fallback and blows up on any
+# other machine.
 shopt -s nullglob
 for bundle in "$BIN_DIR"/*.bundle; do
     name="$(basename "$bundle")"
     case "$name" in
         *Tests.bundle) continue ;;
     esac
-    cp -R "$bundle" "$APP_DIR/"
+    cp -R "$bundle" "$CONTENTS/Resources/"
+    # Flatten everything inside the bundle so Bundle.main sees the files.
+    find "$bundle" -type f -exec cp -n {} "$CONTENTS/Resources/" \;
 done
 
 # Ad-hoc sign so the launcher accepts it locally

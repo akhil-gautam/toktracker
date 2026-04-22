@@ -71,7 +71,11 @@ public enum Boot {
     public static func open(path: String? = nil) throws -> AppDB {
         let resolvedPath = try path ?? AppDB.defaultPath()
         let db = try AppDB(path: resolvedPath)
-        guard let url = Bundle.module.url(forResource: "schema", withExtension: "sql") else {
+        // Prefer the main .app bundle (Contents/Resources/schema.sql), fall
+        // back to the SPM module bundle for tests and `swift run`.
+        let url = Bundle.main.url(forResource: "schema", withExtension: "sql")
+            ?? Bundle.module.url(forResource: "schema", withExtension: "sql")
+        guard let url else {
             throw StorageError.schemaMissing
         }
         try db.migrate(schemaURL: url)
