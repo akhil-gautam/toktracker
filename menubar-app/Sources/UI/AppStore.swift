@@ -122,11 +122,35 @@ public final class AppStore {
         guard !directories.isEmpty else { return }
         let watcher = SessionWatcher(paths: directories) { [weak self] urls in
             Task { @MainActor [weak self] in
-                await self?.handleChanges(urls)
+                self?.enqueue(urls: urls)
             }
         }
         watcher.start()
         self.watcher = watcher
+    }
+
+    // Coalesce rapid watcher fires: when Claude is actively streaming we see
+    // dozens of writes per second, each of which was triggering a full
+    // aggregates() rebuild (O(N sessions) + SwiftUI invalidation of every
+    // view observing `store.aggregates`). The popover became unresponsive
+    // and main-thread memory churned into the gigabytes. We now append to
+    // a pending-URL set and only run handleChanges once per debounce
+    // window.
+    private var pendingURLs: Set<URL> = []
+    private var debounceTask: Task<Void, Never>?
+    private static let debounceNanos: UInt64 = 500_000_000   // 500ms
+
+    private func enqueue(urls: [URL]) {
+        for u in urls { pendingURLs.insert(u) }
+        if debounceTask != nil { return }
+        debounceTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: AppStore.debounceNanos)
+            guard let self else { return }
+            let snapshot = Array(self.pendingURLs)
+            self.pendingURLs.removeAll(keepingCapacity: true)
+            self.debounceTask = nil
+            await self.handleChanges(snapshot)
+        }
     }
 
     private func handleChanges(_ urls: [URL]) async {

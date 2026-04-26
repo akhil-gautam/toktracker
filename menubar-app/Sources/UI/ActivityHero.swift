@@ -256,14 +256,7 @@ struct ActivityHeroSection: View {
     }
 
     private func mobyDickFact(totalTokens: Int) -> String {
-        guard totalTokens > 0 else { return "—" }
-        let mobyDick = 210_000
-        let ratio = Double(totalTokens) / Double(mobyDick)
-        if ratio < 1 {
-            let pct = Int(ratio * 100)
-            return "That's \(pct)% of Moby-Dick."
-        }
-        return "That's \(Formatters.tokens(Int(ratio)))× more tokens than Moby-Dick."
+        tokenComparison(tokens: totalTokens)
     }
 }
 

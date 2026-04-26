@@ -605,11 +605,11 @@ private struct SessionsSearchField: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 11))
+                .font(.system(size: 12))
                 .foregroundStyle(Linear.ink3)
             TextField("Search id or messages", text: $text)
                 .textFieldStyle(.plain)
-                .font(.system(size: 11))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Linear.ink1)
                 .frame(width: 220)
                 .onChange(of: text) { _, newValue in onChange(newValue) }
@@ -619,15 +619,18 @@ private struct SessionsSearchField: View {
             } else if !text.isEmpty {
                 Button { text = ""; onChange("") } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 11))
+                        .font(.system(size: 12))
                         .foregroundStyle(Linear.ink3)
                 }
                 .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, 8).padding(.vertical, 4)
+        .padding(.horizontal, 10)
+        .frame(height: 28)
         .background(Linear.panel)
-        .overlay(Rectangle().stroke(Linear.border, lineWidth: 0.5))
+        .overlay(RoundedRectangle(cornerRadius: 7)
+            .stroke(Linear.border, lineWidth: 0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 7))
     }
 }
 
@@ -2661,13 +2664,29 @@ private struct TranscriptButton: View {
 
 // MARK: - Transcript screen (inline, breadcrumb back)
 
+/// One turn, fully preprocessed at load time so the scroll path renders
+/// static SwiftUI — no regex, no sanitize, no per-frame computation.
+fileprivate struct PreparedMessage: Identifiable {
+    let id: Int64
+    let message: ConversationMessage
+    let blocks: [MessageBlock]
+    let roleKind: ChipKind
+    let roleColor: Color
+    let tokenTotal: Int
+}
+
 struct TranscriptScreen: View {
     @Environment(AppStore.self) private var appStore
     let session: SessionSummary
     let onBack: () -> Void
-    @State private var messages: [ConversationMessage] = []
+    @State private var prepared: [PreparedMessage] = []
     @State private var loadError: String? = nil
     @State private var loading: Bool = true
+    /// Tail window: render only the last N turns by default. Older turns are
+    /// revealed on demand. Keeps SwiftUI's view graph small on 1k+ turn
+    /// transcripts.
+    @State private var visible: Int = 120
+    private static let pageSize = 200
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -2729,7 +2748,7 @@ struct TranscriptScreen: View {
                     .font(.system(size: 12))
                     .foregroundStyle(Linear.danger)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if messages.isEmpty {
+            } else if prepared.isEmpty {
                 VStack(spacing: 8) {
                     Image(systemName: "text.bubble")
                         .font(.system(size: 28))
@@ -2745,10 +2764,30 @@ struct TranscriptScreen: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
+                let window = windowed(prepared: prepared, visible: visible)
+                let hidden = prepared.count - window.count
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(messages) { msg in
-                            MessageRow(message: msg)
+                        if hidden > 0 {
+                            HStack {
+                                Spacer()
+                                Button {
+                                    visible = min(prepared.count, visible + Self.pageSize)
+                                } label: {
+                                    Text("Show earlier · \(hidden) more turn\(hidden == 1 ? "" : "s")")
+                                        .font(.system(size: 11, weight: .medium))
+                                        .foregroundStyle(Linear.info)
+                                        .padding(.horizontal, 10).padding(.vertical, 6)
+                                        .background(Linear.panel)
+                                        .overlay(Rectangle().stroke(Linear.border, lineWidth: 0.5))
+                                }
+                                .buttonStyle(.plain)
+                                Spacer()
+                            }
+                            .padding(.vertical, 8)
+                        }
+                        ForEach(window) { pm in
+                            MessageRow(prepared: pm)
                         }
                     }
                     .padding(.horizontal, 16).padding(.vertical, 12)
@@ -2757,23 +2796,83 @@ struct TranscriptScreen: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Linear.bg0)
-        .onAppear(perform: load)
+        .task { await load() }
     }
 
-    private func load() {
+    /// Slice of `prepared` that should actually render. Takes the last
+    /// `visible` turns so the most-recent content is on-screen.
+    private func windowed(prepared: [PreparedMessage], visible: Int) -> [PreparedMessage] {
+        guard prepared.count > visible else { return prepared }
+        return Array(prepared.suffix(visible))
+    }
+
+    private func load() async {
         guard let db = appStore.db else {
             loading = false
             loadError = "Database not available"
             return
         }
+        let sid = session.id
         do {
-            messages = try MessagesRepo(db: db).byConversation(session.id)
-            loading = false
+            let raw = try MessagesRepo(db: db).byConversation(sid)
+            // Heavy lifting (regex sanitize + block parsing) off-main so the
+            // UI thread stays responsive on 1k+ turn transcripts.
+            let built: [PreparedMessage] = await Task.detached(priority: .userInitiated) {
+                raw.map { PreparedMessage.build(from: $0) }
+            }.value
+            self.prepared = built
+            self.loading = false
         } catch {
-            loadError = error.localizedDescription
-            loading = false
+            self.loadError = error.localizedDescription
+            self.loading = false
         }
     }
+}
+
+extension PreparedMessage {
+    static func build(from m: ConversationMessage) -> PreparedMessage {
+        let (color, kind): (Color, ChipKind) = {
+            switch m.role.lowercased() {
+            case "user":      return (Linear.accent, .accent)
+            case "assistant": return (Linear.info, .info)
+            case "system":    return (Linear.warn, .warn)
+            default:          return (Linear.ink2, .ghost)
+            }
+        }()
+        let raw = (m.content.map { parseBlocks($0) }) ?? []
+        // Auto-format every block body: pretty-print JSON where we can,
+        // unescape embedded newlines/quotes so editor tool args read like
+        // the file, not a wall of `\n`.
+        let blocks = raw.map { MessageBlock(kind: $0.kind, body: prettyFormat($0.body)) }
+        let tokens = m.inputTokens + m.outputTokens + m.cacheRead + m.cacheWrite
+        return PreparedMessage(
+            id: m.id, message: m, blocks: blocks,
+            roleKind: kind, roleColor: color, tokenTotal: tokens)
+    }
+}
+
+/// Best-effort reformatter for tool bodies. Claude Code serialises tool
+/// input/output as single-line JSON with escape sequences inside — we
+/// pretty-print the JSON and then un-escape `\n`, `\t`, and `\"` in leaf
+/// string values so code-shaped arguments (Edit's `new_string`, Bash's
+/// `command`) render as multi-line code rather than one-line blobs.
+private func prettyFormat(_ raw: String) -> String {
+    let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard trimmed.first == "{" || trimmed.first == "[",
+          let data = trimmed.data(using: .utf8),
+          let obj = try? JSONSerialization.jsonObject(
+            with: data, options: [.fragmentsAllowed]),
+          let pretty = try? JSONSerialization.data(
+            withJSONObject: obj,
+            options: [.prettyPrinted, .sortedKeys]),
+          let out = String(data: pretty, encoding: .utf8)
+    else {
+        return raw
+    }
+    return out
+        .replacingOccurrences(of: "\\n", with: "\n")
+        .replacingOccurrences(of: "\\t", with: "    ")
+        .replacingOccurrences(of: "\\\"", with: "\"")
 }
 
 private enum MessageBlockKind {
@@ -2788,6 +2887,62 @@ private struct MessageBlock {
     let body: String
 }
 
+/// Strip Claude Code's internal plumbing from a message body before display.
+/// These markers live in the raw jsonl and help the agent, but they're noise
+/// for a human reading a transcript.
+private func sanitizeDisplay(_ raw: String) -> String {
+    var out = raw
+
+    // Slash-command plumbing:
+    //   <command-name>/foo</command-name>
+    //   <command-message>foo</command-message>
+    //   <command-args>bar</command-args>
+    // Collapse the whole run into a readable `/foo bar` one-liner.
+    let slashCmd = try! NSRegularExpression(
+        pattern: #"<command-name>([^<]*)</command-name>\s*<command-message>[^<]*</command-message>\s*<command-args>([^<]*)</command-args>"#,
+        options: [.dotMatchesLineSeparators])
+    out = slashCmd.stringByReplacingMatches(
+        in: out,
+        range: NSRange(location: 0, length: (out as NSString).length),
+        withTemplate: "[slash] $1 $2")
+
+    // Any leftover <command-*> tags — strip.
+    let cmdTag = try! NSRegularExpression(
+        pattern: #"</?command-[a-z]+>"#, options: [])
+    out = cmdTag.stringByReplacingMatches(
+        in: out,
+        range: NSRange(location: 0, length: (out as NSString).length),
+        withTemplate: "")
+
+    // Local-command caveats — drop entirely, they only exist to instruct the
+    // model not to respond to shell output.
+    let caveat = try! NSRegularExpression(
+        pattern: #"<local-command-caveat>.*?</local-command-caveat>"#,
+        options: [.dotMatchesLineSeparators])
+    out = caveat.stringByReplacingMatches(
+        in: out,
+        range: NSRange(location: 0, length: (out as NSString).length),
+        withTemplate: "")
+
+    // Verbose image-cache source paths → just `[Image]`.
+    let imageSrc = try! NSRegularExpression(
+        pattern: #"\[Image: source: [^\]]+\]"#, options: [])
+    out = imageSrc.stringByReplacingMatches(
+        in: out,
+        range: NSRange(location: 0, length: (out as NSString).length),
+        withTemplate: "[Image]")
+
+    // Collapse 3+ blank lines left over after stripping.
+    let blanks = try! NSRegularExpression(
+        pattern: #"\n{3,}"#, options: [])
+    out = blanks.stringByReplacingMatches(
+        in: out,
+        range: NSRange(location: 0, length: (out as NSString).length),
+        withTemplate: "\n\n")
+
+    return out.trimmingCharacters(in: .whitespacesAndNewlines)
+}
+
 /// Split a stored message into typed blocks. The persisted content is a
 /// line-oriented serialization of Anthropic's content blocks — each block
 /// opens with a `[tool_use: X]`, `[tool_result (id)]`, `[thinking]`, or
@@ -2799,14 +2954,16 @@ private func parseBlocks(_ raw: String) -> [MessageBlock] {
     let ns = raw as NSString
     let matches = markerRegex.matches(in: raw, range: NSRange(location: 0, length: ns.length))
     guard !matches.isEmpty else {
-        return [MessageBlock(kind: .text, body: raw.trimmingCharacters(in: .whitespacesAndNewlines))]
+        let cleaned = sanitizeDisplay(raw)
+        guard !cleaned.isEmpty else { return [] }
+        return [MessageBlock(kind: .text, body: cleaned)]
     }
     var blocks: [MessageBlock] = []
     // Prefix text before the first marker (rare — usually empty).
     let firstRange = matches.first!.range
     if firstRange.location > 0 {
-        let prefix = ns.substring(with: NSRange(location: 0, length: firstRange.location))
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let prefix = sanitizeDisplay(
+            ns.substring(with: NSRange(location: 0, length: firstRange.location)))
         if !prefix.isEmpty {
             blocks.append(MessageBlock(kind: .text, body: prefix))
         }
@@ -2837,44 +2994,28 @@ private func parseBlocks(_ raw: String) -> [MessageBlock] {
 }
 
 private struct MessageRow: View {
-    let message: ConversationMessage
+    let prepared: PreparedMessage
 
     var body: some View {
-        let (roleColor, roleKind): (Color, ChipKind) = {
-            switch message.role.lowercased() {
-            case "user":      return (Linear.accent, .accent)
-            case "assistant": return (Linear.info, .info)
-            case "system":    return (Linear.warn, .warn)
-            default:          return (Linear.ink2, .ghost)
-            }
-        }()
-        let tokenTotal = message.inputTokens + message.outputTokens
-            + message.cacheRead + message.cacheWrite
-
+        let m = prepared.message
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                Chip(message.role.uppercased(), kind: roleKind)
-                Text("#\(message.turnIndex)")
+                Chip(m.role.uppercased(), kind: prepared.roleKind)
+                Text("#\(m.turnIndex)")
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundStyle(Linear.ink3)
                 Spacer()
-                if tokenTotal > 0 {
-                    Text("\(Formatters.tokens(tokenTotal)) tok")
+                if prepared.tokenTotal > 0 {
+                    Text("\(Formatters.tokens(prepared.tokenTotal)) tok")
                         .font(.system(size: 10, design: .monospaced))
                         .foregroundStyle(Linear.ink3)
                 }
-                Text(message.createdAt.formatted(date: .omitted, time: .standard))
+                Text(m.createdAt.formatted(date: .omitted, time: .standard))
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundStyle(Linear.ink3)
             }
 
-            if let content = message.content, !content.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    ForEach(Array(parseBlocks(content).enumerated()), id: \.offset) { _, block in
-                        MessageBlockView(block: block, roleColor: roleColor)
-                    }
-                }
-            } else {
+            if prepared.blocks.isEmpty {
                 Text("(content redacted — only hash stored)")
                     .font(.system(size: 11))
                     .italic()
@@ -2883,90 +3024,183 @@ private struct MessageRow: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Linear.panel)
                     .overlay(Rectangle().stroke(Linear.border, lineWidth: 0.5))
+            } else {
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(Array(prepared.blocks.enumerated()), id: \.offset) { _, block in
+                        MessageBlockView(block: block, roleColor: prepared.roleColor)
+                    }
+                }
             }
         }
         .padding(.vertical, 6)
     }
 }
 
+/// Drop `.textSelection(.enabled)` — it's the single biggest scroll-
+/// killer on long transcripts. Each block gets a Copy button instead so
+/// users can still grab content.
 private struct MessageBlockView: View {
     let block: MessageBlock
     let roleColor: Color
 
+    private static let collapseThreshold = 12
+
     var body: some View {
         switch block.kind {
         case .text:
-            Text(block.body)
-                .font(.system(size: 12))
-                .foregroundStyle(Linear.ink1)
-                .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
-                .background(Linear.panel)
-                .overlay(Rectangle().stroke(roleColor.opacity(0.15), lineWidth: 0.5))
+            BlockContainer(
+                label: nil,
+                name: nil,
+                accent: roleColor,
+                bg: Linear.panel,
+                leadingBar: false,
+                borderOpacity: 0.15,
+                text: block.body,
+                monospaced: false,
+                italic: false)
 
         case .toolUse(let tool):
-            blockCard(
+            BlockContainer(
                 label: "TOOL USE",
                 name: tool,
                 accent: Linear.info,
-                body: block.body,
-                monospaced: true)
+                bg: Linear.info.opacity(0.05),
+                leadingBar: true,
+                borderOpacity: 0.2,
+                text: block.body,
+                monospaced: true,
+                italic: false)
 
         case .toolResult(let id):
-            blockCard(
+            BlockContainer(
                 label: "TOOL RESULT",
                 name: id.isEmpty ? nil : String(id.prefix(8)),
                 accent: Linear.success,
-                body: block.body,
-                monospaced: true)
+                bg: Linear.success.opacity(0.05),
+                leadingBar: true,
+                borderOpacity: 0.2,
+                text: block.body,
+                monospaced: true,
+                italic: false)
 
         case .thinking:
-            blockCard(
+            BlockContainer(
                 label: "THINKING",
                 name: nil,
                 accent: Linear.warn,
-                body: block.body,
+                bg: Linear.warn.opacity(0.05),
+                leadingBar: true,
+                borderOpacity: 0.2,
+                text: block.body,
                 monospaced: false,
                 italic: true)
         }
     }
+}
 
-    private func blockCard(
-        label: String,
-        name: String?,
-        accent: Color,
-        body: String,
-        monospaced: Bool,
-        italic: Bool = false
-    ) -> some View {
+/// Shared chrome for every block type: header (label + name + copy),
+/// collapsible body, and optional accent bar.
+private struct BlockContainer: View {
+    let label: String?
+    let name: String?
+    let accent: Color
+    let bg: Color
+    let leadingBar: Bool
+    let borderOpacity: Double
+    let text: String
+    let monospaced: Bool
+    let italic: Bool
+
+    @State private var expanded = false
+
+    private static let collapseLines = 10
+
+    var body: some View {
+        let lines = text.split(separator: "\n", omittingEmptySubsequences: false)
+        let needsCollapse = lines.count > Self.collapseLines
+        let shown = needsCollapse && !expanded
+            ? lines.prefix(Self.collapseLines).joined(separator: "\n")
+            : text
+
         VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 6) {
-                Text(label)
-                    .font(.system(size: 9, weight: .semibold, design: .monospaced))
-                    .tracking(0.8)
-                    .foregroundStyle(accent)
-                if let name {
-                    Text(name)
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundStyle(Linear.ink2)
+            if label != nil || name != nil {
+                HStack(spacing: 6) {
+                    if let label {
+                        Text(label)
+                            .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                            .tracking(0.8)
+                            .foregroundStyle(accent)
+                    }
+                    if let name {
+                        Text(name)
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundStyle(Linear.ink2)
+                    }
+                    Spacer()
+                    CopyButton(payload: text)
                 }
+            } else {
+                // Text blocks have no label row — put copy in the top-right
+                // overlay of the body.
+                HStack { Spacer(); CopyButton(payload: text) }
+                    .frame(height: 0)
             }
-            Text(body)
+
+            Text(shown)
                 .font(monospaced
                     ? .system(size: 11, design: .monospaced)
                     : .system(size: 12))
                 .italic(italic)
                 .foregroundStyle(Linear.ink1)
-                .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .lineLimit(nil)
+
+            if needsCollapse {
+                Button {
+                    expanded.toggle()
+                } label: {
+                    Text(expanded
+                         ? "Show less"
+                         : "Show all (\(lines.count) lines)")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(accent)
+                }
+                .buttonStyle(.plain)
+            }
         }
         .padding(12)
-        .background(accent.opacity(0.05))
+        .background(bg)
         .overlay(alignment: .leading) {
-            Rectangle().fill(accent.opacity(0.6)).frame(width: 2)
+            if leadingBar {
+                Rectangle().fill(accent.opacity(0.6)).frame(width: 2)
+            }
         }
-        .overlay(Rectangle().stroke(accent.opacity(0.2), lineWidth: 0.5))
+        .overlay(Rectangle().stroke(accent.opacity(borderOpacity), lineWidth: 0.5))
+    }
+}
+
+private struct CopyButton: View {
+    let payload: String
+    @State private var copied = false
+
+    var body: some View {
+        Button {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(payload, forType: .string)
+            copied = true
+            Task {
+                try? await Task.sleep(nanoseconds: 1_200_000_000)
+                copied = false
+            }
+        } label: {
+            Image(systemName: copied ? "checkmark" : "doc.on.doc")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(copied ? Linear.success : Linear.ink3)
+                .padding(4)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .help(copied ? "Copied" : "Copy")
     }
 }
 

@@ -228,25 +228,13 @@ struct DeltaPill: View {
 
 struct AnimatedCost: View {
     let target: Int // millicents
-    @State private var started = Date()
-    @State private var endTarget: Int = 0
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 60)) { ctx in
-            let elapsed = ctx.date.timeIntervalSince(started)
-            let t = min(1, elapsed / 0.9)
-            let eased = 1 - pow(1 - t, 3)
-            let v = Double(endTarget) * eased
-            CostDisplay(millicents: Int(v))
-        }
-        .onAppear {
-            started = Date()
-            endTarget = target
-        }
-        .onChange(of: target) { _, new in
-            started = Date()
-            endTarget = new
-        }
+        // The previous ease-out animation restarted every time the capture
+        // pipeline wrote a new session, so the header was stuck at ~5% of
+        // the true cost whenever Claude was live. Just render the current
+        // value — the LIVE pill already tells the user it's streaming.
+        CostDisplay(millicents: target)
     }
 }
 
@@ -254,11 +242,15 @@ struct CostDisplay: View {
     let millicents: Int
 
     var body: some View {
+        // Split on absolute value so negative dollars render as `-$3.98`
+        // instead of `$-3.-98` (naive `%02d` on a negative int).
         let dollars = Double(millicents) / 100_000
-        let whole = Int(dollars)
-        let cents = Int((dollars - Double(whole)) * 100)
+        let sign = dollars < 0 ? "-" : ""
+        let absDollars = abs(dollars)
+        let whole = Int(absDollars)
+        let cents = Int((absDollars - Double(whole)) * 100 + 0.5)
         HStack(alignment: .firstTextBaseline, spacing: 0) {
-            Text("$\(whole)")
+            Text("\(sign)$\(whole)")
                 .font(.system(size: 34, weight: .semibold, design: .monospaced))
                 .foregroundStyle(Palette.text)
             Text(String(format: ".%02d", cents))
@@ -365,7 +357,6 @@ struct HourlyBars: View {
             TimelineView(.animation(minimumInterval: 1.0 / 60, paused: done)) { ctx in
                 let elapsed = ctx.date.timeIntervalSince(started)
                 let progress = min(1.0, elapsed / loopDuration)
-                // first 0.6s: bars rise in from 0 to full — gates on `entered`
                 let entrance = entered ? 1.0 : 0.0
 
                 Canvas { context, size in
@@ -430,6 +421,10 @@ struct HourlyBars: View {
                 Path(roundedRect: b.rect, cornerRadius: radius),
                 with: .color(barBaseColor(hour: b.hour, current: currentHour, value: b.value)))
         }
+
+        // Once the one-shot trail animation has finished, leave only the
+        // bars in place — otherwise the comet head parks at progress=1.0.
+        if done { return }
 
         // --- Top-edge path that traces the silhouette of the bars ---
         // Left-up → across the top of bar 0 → drop/rise to top of bar 1 in the gap → across → …
@@ -743,7 +738,7 @@ struct TokensBreakdownSection: View {
                     .font(.system(size: 12, design: .monospaced))
                     .foregroundStyle(Palette.textSoft)
             }
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4),
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 2),
                       spacing: 10) {
                 TokenMiniCard(label: "Input", value: input)
                 TokenMiniCard(label: "Output", value: output)
@@ -757,17 +752,24 @@ struct TokensBreakdownSection: View {
 private struct TokenMiniCard: View {
     let label: String
     let value: Int
+    // Fixed typography so every card aligns identically in the 2×2 grid —
+    // no minimumScaleFactor or wrapping to change visual weight per card.
+    private static let labelFont = Font.system(size: 11, weight: .medium, design: .monospaced)
+    private static let valueFont = Font.system(size: 15, weight: .semibold, design: .monospaced)
     var body: some View {
-        HStack(alignment: .firstTextBaseline) {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text(label)
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .font(Self.labelFont)
                 .foregroundStyle(Palette.textSoft)
-            Spacer()
+                .lineLimit(1)
+            Spacer(minLength: 4)
             Text(Formatters.tokens(value))
-                .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                .font(Self.valueFont)
                 .foregroundStyle(Palette.text)
+                .lineLimit(1)
         }
-        .padding(.horizontal, 10).padding(.vertical, 8)
+        .padding(.horizontal, 12).padding(.vertical, 10)
+        .frame(maxWidth: .infinity, minHeight: 40)
         .background(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(Color.white.opacity(0.05)))
@@ -831,13 +833,57 @@ struct MenubarActivitySection: View {
     }
 
     private func mobyDickFact(tokens: Int) -> String {
-        let mobyDick = 210_000
-        let ratio = Double(tokens) / Double(mobyDick)
-        if ratio < 1 {
-            return "≈ \(Int(ratio * 100))% of Moby-Dick."
-        }
-        return "≈ \(Formatters.tokens(Int(ratio)))× Moby-Dick."
+        tokenComparison(tokens: tokens)
     }
+}
+
+/// Shared pool of "X is like Y" comparisons for the Activity strip. A unit
+/// is picked based on the total-token magnitude so the ratio lands in a
+/// readable range, plus a per-day rotation so the subtitle stays fresh.
+struct TokenComparisonUnit {
+    let tokens: Int
+    let label: String
+}
+
+private let tokenComparisonUnits: [TokenComparisonUnit] = [
+    .init(tokens:      280, label: "a tweet"),
+    .init(tokens:    1_500, label: "a news article"),
+    .init(tokens:   10_000, label: "a Wikipedia featured article"),
+    .init(tokens:   25_000, label: "a short story"),
+    .init(tokens:  120_000, label: "an average novel"),
+    .init(tokens:  210_000, label: "Moby-Dick"),
+    .init(tokens:  560_000, label: "War and Peace"),
+    .init(tokens:  780_000, label: "the King James Bible"),
+    .init(tokens:  900_000, label: "the complete works of Shakespeare"),
+    .init(tokens: 1_200_000, label: "the Harry Potter series"),
+    .init(tokens: 44_000_000, label: "the Encyclopaedia Britannica"),
+    .init(tokens: 120_000_000, label: "every Wikipedia featured article"),
+]
+
+func tokenComparison(tokens: Int, seed: Int? = nil) -> String {
+    guard tokens > 0 else { return "—" }
+
+    // Filter to units that produce a sane ratio (not absurdly tiny, not
+    // absurdly huge), then pick deterministically from the survivors so
+    // the subtitle stays stable within a session.
+    let candidates = tokenComparisonUnits.filter { unit in
+        let r = Double(tokens) / Double(unit.tokens)
+        // Show anything from 10% up to 2000× — avoids "0.0001× Britannica".
+        return r >= 0.10 && r <= 2_000
+    }
+    let pool = candidates.isEmpty ? tokenComparisonUnits : candidates
+    let day = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
+    let idx = (seed ?? day) % pool.count
+    let unit = pool[idx]
+
+    let ratio = Double(tokens) / Double(unit.tokens)
+    if ratio < 1 {
+        return "≈ \(Int((ratio * 100).rounded())) % of \(unit.label)."
+    }
+    if ratio < 10 {
+        return "≈ \(String(format: "%.1f", ratio))× \(unit.label)."
+    }
+    return "≈ \(Formatters.tokens(Int(ratio)))× \(unit.label)."
 }
 
 private struct MiniHero: View {

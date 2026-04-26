@@ -268,7 +268,8 @@ public struct FilterPill: View {
         Button(action: onTap) {
             Text(label)
                 .font(.system(size: 12, weight: .medium))
-                .padding(.horizontal, 10).padding(.vertical, 5)
+                .padding(.horizontal, 10)
+                .frame(height: 28)
                 .foregroundStyle(active ? Linear.accent : Linear.ink1)
                 .background(active ? Linear.accentDim : Linear.panel)
                 .overlay(RoundedRectangle(cornerRadius: 7)
