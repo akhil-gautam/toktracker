@@ -35,7 +35,7 @@ struct GeneralPane: View {
                     launchAtLogin = newValue
                     toggle(newValue)
                 }))
-            Text("Tokscale needs permission to send notifications. Grant it in System Settings → Notifications if alerts aren't appearing.")
+            Text("Toktracker needs permission to send notifications. Grant it in System Settings → Notifications if alerts aren't appearing.")
                 .font(.caption).foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             Button("Request notification authorization") {
@@ -165,7 +165,7 @@ struct HookPane: View {
 
     private var settingsURL: URL { HookInstaller.defaultSettingsURL(global: true) }
     private var hookBinary: URL {
-        Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/tokscale-hook")
+        Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/toktracker-hook")
     }
 
     private func install() {

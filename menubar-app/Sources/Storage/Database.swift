@@ -61,6 +61,9 @@ public final class AppDB: @unchecked Sendable {
         guard let base = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             throw StorageError.appSupportUnavailable
         }
+        // Stay on the "Tokscale" directory name so existing user databases
+        // are picked up after the rebrand. Renaming this would orphan every
+        // installed copy of the app.
         let dir = base.appendingPathComponent("Tokscale", isDirectory: true)
         try fm.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.appendingPathComponent("tokscale.db").path

@@ -2,11 +2,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "Tokscale",
+    name: "Toktracker",
     platforms: [.macOS(.v14)],
     products: [
-        .executable(name: "Tokscale", targets: ["Tokscale"]),
-        .executable(name: "TokscaleHook", targets: ["TokscaleHook"]),
+        .executable(name: "Toktracker", targets: ["Toktracker"]),
+        .executable(name: "ToktrackerHook", targets: ["ToktrackerHook"]),
         .library(name: "Core", targets: ["Core"]),
         .library(name: "Storage", targets: ["Storage"]),
         .library(name: "Parsers", targets: ["Parsers"]),
@@ -80,7 +80,7 @@ let package = Package(
             ]
         ),
         .executableTarget(
-            name: "Tokscale",
+            name: "Toktracker",
             dependencies: [
                 "Core", "Storage", "Parsers", "Capture",
                 "Detection", "Embeddings", "GitOps",
@@ -88,7 +88,7 @@ let package = Package(
             ]
         ),
         .executableTarget(
-            name: "TokscaleHook",
+            name: "ToktrackerHook",
             dependencies: ["Core", "Storage", "Detection", "Hook"]
         ),
         .testTarget(name: "CoreTests", dependencies: ["Core"]),

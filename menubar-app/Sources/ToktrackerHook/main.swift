@@ -5,7 +5,7 @@ import Detection
 import Hook
 
 @main
-struct TokscaleHookMain {
+struct ToktrackerHookMain {
     static func main() async {
         let args = CommandLine.arguments
         let kind = args.count > 1 ? args[1] : "Stop"
@@ -29,7 +29,7 @@ struct TokscaleHookMain {
             }
             exit(0)
         } catch {
-            FileHandle.standardError.write(Data("tokscale-hook: \(error)\n".utf8))
+            FileHandle.standardError.write(Data("toktracker-hook: \(error)\n".utf8))
             exit(0)
         }
     }

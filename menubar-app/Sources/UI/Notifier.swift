@@ -48,7 +48,7 @@ public final class Notifier: @unchecked Sendable {
     public func postKillswitch(sessionId: String, cents: Int, ceiling: Int) {
         post(
             key: "killswitch-\(sessionId)",
-            title: "Tokscale killswitch hit",
+            title: "Toktracker killswitch hit",
             body: "Session cost $\(cents / 100) exceeds ceiling $\(ceiling / 100)")
     }
 

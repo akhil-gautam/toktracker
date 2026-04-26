@@ -3,7 +3,7 @@ import AppKit
 import UI
 
 @main
-struct TokscaleApp: App {
+struct ToktrackerApp: App {
     @State private var store = AppStore()
 
     init() {
@@ -21,7 +21,7 @@ struct TokscaleApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        Window("Tokscale", id: "dashboard") {
+        Window("Toktracker", id: "dashboard") {
             DashboardWindow()
                 .environment(store)
                 .frame(minWidth: 1100, minHeight: 720)

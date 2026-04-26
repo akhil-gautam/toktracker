@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 env:
-  APP_NAME: Tokscale
-  BUNDLE_ID: com.tokscale.Tokscale
+  APP_NAME: Toktracker
+  BUNDLE_ID: com.toktracker.menubar
 
 jobs:
   build:

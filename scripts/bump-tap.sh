@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bump Tokscale formula or cask in the akhil-gautam/homebrew-tap repo.
+# Bump Toktracker formula or cask in the akhil-gautam/homebrew-tap repo.
 #
 # Usage:
 #   ./scripts/bump-tap.sh cli <version>     # after CLI npm publish
@@ -35,7 +35,7 @@ case "$KIND" in
       "$FILE"
     ;;
   mac)
-    ZIP_URL="https://github.com/akhil-gautam/toktracker/releases/download/mac-v${VERSION}/Tokscale-${VERSION}.zip"
+    ZIP_URL="https://github.com/akhil-gautam/toktracker/releases/download/mac-v${VERSION}/Toktracker-${VERSION}.zip"
     echo ">> fetching $ZIP_URL"
     TMP_ZIP="$(mktemp)"
     curl -fsSL "$ZIP_URL" -o "$TMP_ZIP"

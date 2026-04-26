@@ -5,11 +5,11 @@ import Core
 final class HookInstallerTests: XCTestCase {
     func testInstallAndUninstallRoundtrip() throws {
         let tmp = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("tokscale-hook-\(UUID().uuidString)")
+            .appendingPathComponent("toktracker-hook-\(UUID().uuidString)")
             .appendingPathComponent("settings.json")
         defer { try? FileManager.default.removeItem(at: tmp.deletingLastPathComponent()) }
 
-        let hook = URL(fileURLWithPath: "/usr/local/bin/tokscale-hook")
+        let hook = URL(fileURLWithPath: "/usr/local/bin/toktracker-hook")
         try HookInstaller.install(at: tmp, hookBinary: hook)
 
         var status = HookInstaller.status(at: tmp)
@@ -27,7 +27,7 @@ final class HookInstallerTests: XCTestCase {
 
     func testInstallPreservesExistingEntries() throws {
         let tmp = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("tokscale-hook-\(UUID().uuidString)")
+            .appendingPathComponent("toktracker-hook-\(UUID().uuidString)")
             .appendingPathComponent("settings.json")
         defer { try? FileManager.default.removeItem(at: tmp.deletingLastPathComponent()) }
 
@@ -44,7 +44,7 @@ final class HookInstallerTests: XCTestCase {
         """
         try seed.write(to: tmp, atomically: true, encoding: .utf8)
 
-        let hook = URL(fileURLWithPath: "/usr/local/bin/tokscale-hook")
+        let hook = URL(fileURLWithPath: "/usr/local/bin/toktracker-hook")
         try HookInstaller.install(at: tmp, hookBinary: hook)
 
         let raw = try String(contentsOf: tmp)

@@ -125,7 +125,7 @@ struct PanelHeader: View {
             AppGlyph()
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 8) {
-                    Text("Tokscale")
+                    Text("Toktracker")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(Palette.text)
                     LivePill()

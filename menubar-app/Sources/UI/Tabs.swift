@@ -1102,7 +1102,7 @@ enum ClaudeMDUpdater {
             let newBody = replaceOrAppendEntry(in: blockBody, relPath: relPath, entry: entry)
             return content.replacingCharacters(in: blockRange, with: newBody)
         }
-        let header = "\n\n## Hot paths (auto-maintained by Tokscale)\n\n"
+        let header = "\n\n## Hot paths (auto-maintained by Toktracker)\n\n"
         let block = "\(blockStart)\n\(entry)\n\(blockEnd)"
         let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
@@ -1193,7 +1193,7 @@ enum ClaudeMDUpdater {
             return content.replacingCharacters(in: blockRange,
                                                with: lines.joined(separator: "\n"))
         }
-        let header = "\n\n## Recurring corrections (auto-maintained by Tokscale)\n\n"
+        let header = "\n\n## Recurring corrections (auto-maintained by Toktracker)\n\n"
         let block = "\(correctionsStart)\n\(entry)\n\(correctionsEnd)"
         let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
@@ -1230,14 +1230,14 @@ enum SlashCommandWriter {
         let fileURL = dir.appendingPathComponent("\(slug).md")
         let body = """
             ---
-            description: Tokscale scaffold — recurring prompt pattern captured from \
+            description: Toktracker scaffold — recurring prompt pattern captured from \
             your session history.
             ---
 
             \(trimmed)
 
             <!--
-            Edit this file to flesh out the command. Tokscale only seeded it with
+            Edit this file to flesh out the command. Toktracker only seeded it with
             the detected prefix; fill in the rest of your workflow here.
             -->
             """
@@ -2265,7 +2265,7 @@ public struct HooksTab: View {
 
     private var settingsPath: URL { HookInstaller.defaultSettingsURL(global: true) }
     private var hookBinary: URL {
-        Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/tokscale-hook")
+        Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/toktracker-hook")
     }
     private func refreshStatus() { status = HookInstaller.status(at: settingsPath) }
     private func install() {
@@ -2756,7 +2756,7 @@ struct TranscriptScreen: View {
                     Text("No transcript captured")
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(Linear.ink1)
-                    Text("Message bodies are only stored when Tokscale's hook or capture pipeline ran during this session.")
+                    Text("Message bodies are only stored when Toktracker's hook or capture pipeline ran during this session.")
                         .font(.system(size: 11))
                         .foregroundStyle(Linear.ink3)
                         .multilineTextAlignment(.center)

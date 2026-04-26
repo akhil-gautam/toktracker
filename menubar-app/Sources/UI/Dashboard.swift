@@ -185,7 +185,7 @@ private struct Sidebar: View {
                     .shadow(color: Color(red: 1.00, green: 0.80, blue: 0.25).opacity(0.35),
                             radius: 5, y: 2)
                 if !collapsed {
-                    Text("Tokscale")
+                    Text("Toktracker")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(Linear.ink0)
                     Spacer()
