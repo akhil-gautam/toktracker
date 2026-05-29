@@ -12,8 +12,9 @@ public struct SessionsRepo: Sendable {
                 INSERT INTO sessions
                   (id, conversation_id, tool, model, cwd, git_repo, git_branch,
                    started_at, ended_at,
-                   input_tokens, output_tokens, cache_read, cache_write, cost_millicents)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                   input_tokens, output_tokens, cache_read, cache_write, cost_millicents,
+                   estimated, unpriced, pricing_version)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 ON CONFLICT(id) DO UPDATE SET
                   conversation_id=excluded.conversation_id,
                   ended_at=excluded.ended_at,
@@ -21,7 +22,10 @@ public struct SessionsRepo: Sendable {
                   output_tokens=excluded.output_tokens,
                   cache_read=excluded.cache_read,
                   cache_write=excluded.cache_write,
-                  cost_millicents=excluded.cost_millicents
+                  cost_millicents=excluded.cost_millicents,
+                  estimated=excluded.estimated,
+                  unpriced=excluded.unpriced,
+                  pricing_version=excluded.pricing_version
                 """,
                 arguments: [
                     session.id, session.conversationId,
@@ -32,6 +36,9 @@ public struct SessionsRepo: Sendable {
                     session.inputTokens, session.outputTokens,
                     session.cacheReadTokens, session.cacheWriteTokens,
                     session.costMillicents,
+                    session.estimated ? 1 : 0,
+                    session.unpriced ? 1 : 0,
+                    CostCalculator.currentPricingVersion,
                 ])
         }
     }
@@ -69,7 +76,52 @@ public struct SessionsRepo: Sendable {
             gitRepo: row["git_repo"],
             gitBranch: row["git_branch"],
             startedAt: Date(timeIntervalSince1970: Double(startedMs) / 1000),
-            endedAt: endedMs.map { Date(timeIntervalSince1970: Double($0) / 1000) })
+            endedAt: endedMs.map { Date(timeIntervalSince1970: Double($0) / 1000) },
+            estimated: ((row["estimated"] as Int?) ?? 0) != 0,
+            unpriced: ((row["unpriced"] as Int?) ?? 0) != 0)
+    }
+
+    /// One-shot corrective pass: recompute cost for rows whose cost predates the
+    /// current pricing logic (pricing_version < version), and stamp the unpriced
+    /// flag. Heals rows that the old fuzzy lookup mis-priced. OpenCode rows keep
+    /// their tool-reported cost (only the version is stamped). Returns rows touched.
+    @discardableResult
+    public func backfillPricing(version: Int = CostCalculator.currentPricingVersion,
+                                calculator: CostCalculator = .shared) throws -> Int {
+        try db.queue.write { db in
+            let rows = try Row.fetchAll(db, sql: """
+                SELECT id, tool, model, input_tokens, output_tokens, cache_read, cache_write
+                FROM sessions WHERE pricing_version < ?
+                """, arguments: [version])
+            var updated = 0
+            for row in rows {
+                guard let id: String = row["id"], let model: String = row["model"] else { continue }
+                let toolRaw: String = (row["tool"] as String?) ?? ""
+                if toolRaw == Tool.opencode.rawValue {
+                    // Cost is authoritative (reported by OpenCode) — only stamp version.
+                    try db.execute(sql: "UPDATE sessions SET pricing_version=? WHERE id=?",
+                                   arguments: [version, id])
+                    updated += 1
+                    continue
+                }
+                let input = (row["input_tokens"] as Int?) ?? 0
+                let output = (row["output_tokens"] as Int?) ?? 0
+                let cacheRead = (row["cache_read"] as Int?) ?? 0
+                let cacheWrite = (row["cache_write"] as Int?) ?? 0
+                // Codex stores full input (incl. cached) in input_tokens; the cost
+                // formula bills only the non-cached portion. Other tools store the
+                // already-fresh input. Mirror the parsers exactly.
+                let freshInput = (toolRaw == Tool.codex.rawValue) ? max(0, input - cacheRead) : input
+                let cost = calculator.cost(model: model, inputTokens: freshInput,
+                                           outputTokens: output,
+                                           cacheReadTokens: cacheRead, cacheWriteTokens: cacheWrite)
+                let unpriced = calculator.isPriced(model) ? 0 : 1
+                try db.execute(sql: "UPDATE sessions SET cost_millicents=?, unpriced=?, pricing_version=? WHERE id=?",
+                               arguments: [cost, unpriced, version, id])
+                updated += 1
+            }
+            return updated
+        }
     }
 }
 

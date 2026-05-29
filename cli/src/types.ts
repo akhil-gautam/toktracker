@@ -16,7 +16,8 @@ export interface Session {
   gitBranch?: string
   startedAt: Date
   endedAt?: Date
-  estimated?: boolean
+  estimated?: boolean   // tokens were estimated (not reported by the tool) — distinct from `unpriced`
+  unpriced?: boolean    // model has no known price; cost is $0 as a fallback, not a real $0
   toolUses?: Record<string, number>  // e.g. { Read: 2, Grep: 1, Bash: 3 }
 }
 
@@ -107,6 +108,7 @@ export interface TodayDetailStats {
   cacheReadTokens: number
   cacheWriteTokens: number
   reasoningTokens: number
+  unpricedSessionCount: number       // sessions on models with no known price
   models: ModelStats[]
   tools: ToolStats[]
   repos: RepoStats[]
@@ -164,6 +166,7 @@ export interface AllTimeStats {
   uniqueRepos: number
   activeDays: number  // days with at least one session
   cacheReuseRatio: number  // 0-1
+  unpricedSessionCount: number  // sessions on models with no known price
 }
 
 export interface ParsedMessage {

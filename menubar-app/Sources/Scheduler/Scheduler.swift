@@ -17,6 +17,9 @@ public struct NightlyJobs: Sendable {
         let runner = DetectionRunner(registry: registry, db: db)
         _ = runner.run(context: context)
         markRun("nightly")
+        // Re-cost rows whose pricing predates the current logic (one pass, gated by
+        // pricing_version). Heals fuzzy-mispriced historical sessions.
+        _ = try? SessionsRepo(db: db).backfillPricing()
         purge(olderThanDays: 90)
     }
 

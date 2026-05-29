@@ -1,7 +1,15 @@
 import pricingData from '../data/pricing.json' with { type: 'json' }
 import type { ModelPricing, PricingMap } from '../types.js'
+import { loadCachedPricing } from './pricing-cache.js'
 
-const pricing: PricingMap = pricingData
+// Bundled pricing is the always-present baseline/floor. If the optional runtime
+// refresh has written a cache, overlay it (additive — it only adds/updates models,
+// never removes the bundled floor). Computed once at module load.
+const pricing: PricingMap = (() => {
+  const base: PricingMap = { ...(pricingData as PricingMap) }
+  const overlay = loadCachedPricing()
+  return overlay ? { ...base, ...overlay } : base
+})()
 
 interface CostInput {
   model: string
@@ -20,20 +28,57 @@ const ZERO_PRICING: ModelPricing = {
   cacheWritePerMillion: 0,
 }
 
-function lookupPricing(model: string) {
-  if (pricing[model]) return pricing[model]
+// Deterministic normalization: from the most specific model id, strip recognized
+// trailing markers one at a time — @YYYYMMDD (vertex), :N (bedrock), -vN, -YYYYMMDD —
+// yielding progressively-shorter candidates that are each matched EXACTLY.
+// We never scan for arbitrary prefix overlaps: that silently mis-priced new models
+// against unrelated siblings (e.g. 'gemini-3-pro' -> 'gemini-3-pro-image-preview').
+function candidateKeys(model: string): string[] {
+  const out: string[] = []
+  const seen = new Set<string>()
+  const push = (k: string) => { if (k && !seen.has(k)) { seen.add(k); out.push(k) } }
 
-  for (const key of Object.keys(pricing)) {
-    if (model.startsWith(key) || key.startsWith(model)) {
-      return pricing[key]
-    }
+  push(model)
+  let cur = model
+  for (let i = 0; i < 8; i++) {
+    let next = cur
+    if (/@\d{8}$/.test(next)) next = next.replace(/@\d{8}$/, '')
+    else if (/:\d+$/.test(next)) next = next.replace(/:\d+$/, '')
+    else if (/-v\d+$/.test(next)) next = next.replace(/-v\d+$/, '')
+    else if (/-\d{8}$/.test(next)) next = next.replace(/-\d{8}$/, '')
+    if (next === cur) break
+    push(next)
+    cur = next
   }
-
-  return ZERO_PRICING
+  return out
 }
 
-export function calculateCostMillicents(input: CostInput): number {
-  const p = lookupPricing(input.model)
+export interface PricingLookup {
+  pricing: ModelPricing
+  priced: boolean
+}
+
+export function lookupPricing(model: string): PricingLookup {
+  for (const key of candidateKeys(model)) {
+    const p = pricing[key]
+    if (p) return { pricing: p, priced: true }
+  }
+  // Unknown model: return an explicit unpriced sentinel (cost $0) rather than
+  // guessing a neighbor's price. Callers should mark the session unpriced.
+  return { pricing: ZERO_PRICING, priced: false }
+}
+
+export function isModelPriced(model: string): boolean {
+  return lookupPricing(model).priced
+}
+
+export interface CostResult {
+  costMillicents: number
+  priced: boolean
+}
+
+export function priceSession(input: CostInput): CostResult {
+  const { pricing: p, priced } = lookupPricing(input.model)
 
   // Tier is decided by the request's total input context (fresh + cached +
   // cache-creation). Matching real provider billing, once it crosses the
@@ -65,7 +110,11 @@ export function calculateCostMillicents(input: CostInput): number {
       input.cacheWriteTokens * cacheWriteRate) /
     1_000_000
 
-  return Math.round(cost * 100_000)
+  return { costMillicents: Math.round(cost * 100_000), priced }
+}
+
+export function calculateCostMillicents(input: CostInput): number {
+  return priceSession(input).costMillicents
 }
 
 export function calculateCost(input: CostInput): number {

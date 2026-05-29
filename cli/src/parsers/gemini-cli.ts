@@ -1,7 +1,7 @@
 import { readFile, stat } from 'fs/promises'
 import { createHash } from 'crypto'
 import type { Session, ParseResult, ExtendedParseResult, ParsedMessage, ParsedToolCall } from '../types.js'
-import { calculateCostMillicents } from '../services/cost-calculator.js'
+import { priceSession } from '../services/cost-calculator.js'
 
 const DEFAULT_MODEL = 'gemini-2.5-pro'
 const CHARS_PER_TOKEN = 4
@@ -45,11 +45,12 @@ export async function parseGeminiCli(filePath: string, fromOffset: number): Prom
     cumulativeInputText += outputText + '\n'
 
     const id = createHash('sha256').update(`${filePath}:${msg.id}`).digest('hex').slice(0, 16)
+    const { costMillicents, priced } = priceSession({ model: DEFAULT_MODEL, inputTokens, outputTokens, cacheReadTokens: 0, cacheWriteTokens: 0 })
     sessions.push({
       id: `gem-${id}`, tool: 'gemini_cli', model: DEFAULT_MODEL, provider: 'google',
       inputTokens, outputTokens, cacheReadTokens: 0, cacheWriteTokens: 0, reasoningTokens: 0,
-      costMillicents: calculateCostMillicents({ model: DEFAULT_MODEL, inputTokens, outputTokens, cacheReadTokens: 0, cacheWriteTokens: 0 }),
-      startedAt: new Date(msg.timestamp), estimated: true,
+      costMillicents,
+      startedAt: new Date(msg.timestamp), estimated: true, unpriced: !priced,
     })
   }
   return { sessions, newOffset: fileStats.size }

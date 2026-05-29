@@ -29,6 +29,18 @@ describe('SessionStore', () => {
     expect(stats.sessionCount).toBe(2)
   })
 
+  it('counts unpriced sessions in all-time and today stats', () => {
+    const store = new SessionStore()
+    const today = new Date()
+    store.addSessions([
+      makeSession({ startedAt: today }),                          // priced
+      makeSession({ startedAt: today, unpriced: true }),          // unpriced today
+      makeSession({ startedAt: new Date('2026-04-13T10:00:00Z'), unpriced: true }), // unpriced, not today
+    ])
+    expect(store.getAllTimeStats().unpricedSessionCount).toBe(2)
+    expect(store.getTodayDetail().unpricedSessionCount).toBe(1)
+  })
+
   it('computes stats by model', () => {
     const store = new SessionStore()
     const today = new Date()

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculateCost, calculateCostMillicents } from '../src/services/cost-calculator.js'
+import { calculateCost, calculateCostMillicents, lookupPricing, priceSession, isModelPriced } from '../src/services/cost-calculator.js'
 
 describe('calculateCostMillicents', () => {
   it('calculates cost for claude-opus-4-6', () => {
@@ -120,6 +120,44 @@ describe('priority service-tier pricing', () => {
       priority: true,
     })
     expect(withFlag).toBe(base)
+  })
+})
+
+describe('lookup normalization + unpriced sentinel', () => {
+  it('marks a brand-new model as unpriced instead of guessing a neighbor', () => {
+    // 'gemini-3-pro' has no exact key; the old fuzzy fallback mis-matched it to
+    // 'gemini-3-pro-image-preview'. It must now be unpriced with $0, not a guess.
+    const r = priceSession({
+      model: 'gemini-3-pro',
+      inputTokens: 1_000_000, outputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0,
+    })
+    expect(r.priced).toBe(false)
+    expect(r.costMillicents).toBe(0)
+    expect(isModelPriced('gemini-3-pro')).toBe(false)
+  })
+
+  it('does not fuzzy-match unrelated prefixes', () => {
+    expect(isModelPriced('gpt')).toBe(false)
+    expect(isModelPriced('claude')).toBe(false)
+  })
+
+  it('resolves a known model exactly', () => {
+    expect(lookupPricing('claude-opus-4-6').priced).toBe(true)
+    expect(lookupPricing('gpt-4.1').priced).toBe(true)
+  })
+
+  it('strips a trailing date suffix to the base model when the dated key is absent', () => {
+    // A future-dated variant not in the catalog should fall back to the base family,
+    // not become unpriced.
+    const base = lookupPricing('claude-sonnet-4-5')
+    const dated = lookupPricing('claude-sonnet-4-5-20991231')
+    expect(dated.priced).toBe(true)
+    expect(dated.pricing.inputPerMillion).toBe(base.pricing.inputPerMillion)
+  })
+
+  it('prefers the exact dated key over the stripped base when both exist', () => {
+    // claude-sonnet-4-5-20250929 exists as its own key in the catalog.
+    expect(lookupPricing('claude-sonnet-4-5-20250929').priced).toBe(true)
   })
 })
 

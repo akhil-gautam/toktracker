@@ -35,6 +35,19 @@ public final class AppDB: @unchecked Sendable {
             }
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS idx_sessions_conv ON sessions(conversation_id, started_at)")
 
+            // Pricing provenance: estimated tokens, unpriced model, and the pricing
+            // version a row's cost was computed under (0 = pre-migration → eligible
+            // for one corrective backfill pass; see SessionsRepo.backfillPricing).
+            if !names.contains("estimated") {
+                try db.execute(sql: "ALTER TABLE sessions ADD COLUMN estimated INTEGER DEFAULT 0")
+            }
+            if !names.contains("unpriced") {
+                try db.execute(sql: "ALTER TABLE sessions ADD COLUMN unpriced INTEGER DEFAULT 0")
+            }
+            if !names.contains("pricing_version") {
+                try db.execute(sql: "ALTER TABLE sessions ADD COLUMN pricing_version INTEGER DEFAULT 0")
+            }
+
             let geCols = try Row.fetchAll(db, sql: "PRAGMA table_info(git_events)")
             let geNames = Set(geCols.compactMap { ($0["name"] as? String) })
             if !geNames.contains("title") {

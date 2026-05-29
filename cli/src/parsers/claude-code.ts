@@ -1,6 +1,6 @@
 import { readFile, stat } from 'fs/promises'
 import type { Session, ParseResult, ExtendedParseResult, ParsedMessage, ParsedToolCall } from '../types.js'
-import { calculateCostMillicents } from '../services/cost-calculator.js'
+import { priceSession } from '../services/cost-calculator.js'
 
 interface ClaudeCodeLine {
   type: string
@@ -69,6 +69,10 @@ export async function parseClaudeCode(filePath: string, fromOffset: number): Pro
       }
     }
 
+    const { costMillicents, priced } = priceSession({
+      model, inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens,
+    })
+
     sessions.push({
       id: `cc-${filePath.length}-${lineIdx++}-${parsed.uuid ?? parsed.timestamp ?? lineStart}`,
       tool: 'claude_code',
@@ -79,9 +83,8 @@ export async function parseClaudeCode(filePath: string, fromOffset: number): Pro
       cacheReadTokens,
       cacheWriteTokens,
       reasoningTokens: 0,
-      costMillicents: calculateCostMillicents({
-        model, inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens,
-      }),
+      costMillicents,
+      unpriced: !priced,
       cwd: parsed.cwd,
       gitBranch: parsed.gitBranch,
       startedAt: new Date(parsed.timestamp ?? Date.now()),

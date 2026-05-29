@@ -207,13 +207,23 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 30,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "anthropic.claude-3-5-sonnet-20241022-v2:0": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 30,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "anthropic.claude-3-7-sonnet-20240620-v1:0": {
     "inputPerMillion": 3.6,
@@ -305,6 +315,12 @@
     "cacheReadPerMillion": 0.5,
     "cacheWritePerMillion": 6.25
   },
+  "anthropic.claude-mythos-preview": {
+    "inputPerMillion": 0,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "global.anthropic.claude-opus-4-7": {
     "inputPerMillion": 5,
     "outputPerMillion": 25,
@@ -324,6 +340,36 @@
     "cacheWritePerMillion": 6.875
   },
   "au.anthropic.claude-opus-4-7": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 27.5,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 6.875
+  },
+  "anthropic.claude-opus-4-8": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 25,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 6.25
+  },
+  "global.anthropic.claude-opus-4-8": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 25,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 6.25
+  },
+  "us.anthropic.claude-opus-4-8": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 27.5,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 6.875
+  },
+  "eu.anthropic.claude-opus-4-8": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 27.5,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 6.875
+  },
+  "au.anthropic.claude-opus-4-8": {
     "inputPerMillion": 5.5,
     "outputPerMillion": 27.5,
     "cacheReadPerMillion": 0.55,
@@ -359,17 +405,33 @@
     "cacheReadPerMillion": 0.33,
     "cacheWritePerMillion": 4.125
   },
+  "jp.anthropic.claude-sonnet-4-6": {
+    "inputPerMillion": 3.3,
+    "outputPerMillion": 16.5,
+    "cacheReadPerMillion": 0.33,
+    "cacheWritePerMillion": 4.125
+  },
   "anthropic.claude-sonnet-4-20250514-v1:0": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "anthropic.claude-sonnet-4-5-20250929-v1:0": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "anthropic.claude-v1": {
     "inputPerMillion": 8,
@@ -507,13 +569,23 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "au.anthropic.claude-sonnet-4-5-20250929-v1:0": {
     "inputPerMillion": 3.3,
     "outputPerMillion": 16.5,
     "cacheReadPerMillion": 0.33,
-    "cacheWritePerMillion": 4.125
+    "cacheWritePerMillion": 4.125,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6.6,
+    "outputPerMillionAboveThreshold": 24.75,
+    "cacheReadPerMillionAboveThreshold": 0.66,
+    "cacheWritePerMillionAboveThreshold": 8.25
   },
   "azure/ada": {
     "inputPerMillion": 0.1,
@@ -557,6 +629,12 @@
     "cacheReadPerMillion": 0.5,
     "cacheWritePerMillion": 6.25
   },
+  "azure_ai/claude-opus-4-8": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 25,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 6.25
+  },
   "azure_ai/claude-opus-4-1": {
     "inputPerMillion": 15,
     "outputPerMillion": 75,
@@ -586,6 +664,110 @@
     "outputPerMillion": 0.6,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
+  },
+  "azure_ai/gpt-5.4": {
+    "inputPerMillion": 2.5,
+    "outputPerMillion": 15,
+    "cacheReadPerMillion": 0.25,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 5,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.5,
+    "priorityInputPerMillion": 5,
+    "priorityOutputPerMillion": 30,
+    "priorityCacheReadPerMillion": 0.5
+  },
+  "azure_ai/gpt-5.4-2026-03-05": {
+    "inputPerMillion": 2.5,
+    "outputPerMillion": 15,
+    "cacheReadPerMillion": 0.25,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 5,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.5,
+    "priorityInputPerMillion": 5,
+    "priorityOutputPerMillion": 30,
+    "priorityCacheReadPerMillion": 0.5
+  },
+  "azure_ai/gpt-5.4-pro": {
+    "inputPerMillion": 30,
+    "outputPerMillion": 180,
+    "cacheReadPerMillion": 3,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 60,
+    "outputPerMillionAboveThreshold": 270,
+    "cacheReadPerMillionAboveThreshold": 6,
+    "priorityInputPerMillion": 60,
+    "priorityOutputPerMillion": 360,
+    "priorityCacheReadPerMillion": 6
+  },
+  "azure_ai/gpt-5.4-pro-2026-03-05": {
+    "inputPerMillion": 30,
+    "outputPerMillion": 180,
+    "cacheReadPerMillion": 3,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 60,
+    "outputPerMillionAboveThreshold": 270,
+    "cacheReadPerMillionAboveThreshold": 6,
+    "priorityInputPerMillion": 60,
+    "priorityOutputPerMillion": 360,
+    "priorityCacheReadPerMillion": 6
+  },
+  "azure_ai/gpt-5.4-mini": {
+    "inputPerMillion": 0.75,
+    "outputPerMillion": 4.5,
+    "cacheReadPerMillion": 0.075,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 1.5,
+    "outputPerMillionAboveThreshold": 6.75,
+    "cacheReadPerMillionAboveThreshold": 0.15,
+    "priorityInputPerMillion": 1.5,
+    "priorityOutputPerMillion": 9,
+    "priorityCacheReadPerMillion": 0.15
+  },
+  "azure_ai/gpt-5.4-mini-2026-03-17": {
+    "inputPerMillion": 0.75,
+    "outputPerMillion": 4.5,
+    "cacheReadPerMillion": 0.075,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 1.5,
+    "outputPerMillionAboveThreshold": 6.75,
+    "cacheReadPerMillionAboveThreshold": 0.15,
+    "priorityInputPerMillion": 1.5,
+    "priorityOutputPerMillion": 9,
+    "priorityCacheReadPerMillion": 0.15
+  },
+  "azure_ai/gpt-5.4-nano": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 1.25,
+    "cacheReadPerMillion": 0.02,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 0.4,
+    "outputPerMillionAboveThreshold": 1.875,
+    "cacheReadPerMillionAboveThreshold": 0.04,
+    "priorityInputPerMillion": 0.4,
+    "priorityOutputPerMillion": 2.5,
+    "priorityCacheReadPerMillion": 0.04
+  },
+  "azure_ai/gpt-5.4-nano-2026-03-17": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 1.25,
+    "cacheReadPerMillion": 0.02,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 0.4,
+    "outputPerMillionAboveThreshold": 1.875,
+    "cacheReadPerMillionAboveThreshold": 0.04,
+    "priorityInputPerMillion": 0.4,
+    "priorityOutputPerMillion": 2.5,
+    "priorityCacheReadPerMillion": 0.04
   },
   "azure_ai/model_router": {
     "inputPerMillion": 0.14,
@@ -1035,25 +1217,37 @@
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.5,
+    "priorityOutputPerMillion": 20,
+    "priorityCacheReadPerMillion": 0.25
   },
   "azure/gpt-5.1-chat-2025-11-13": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.5,
+    "priorityOutputPerMillion": 20,
+    "priorityCacheReadPerMillion": 0.25
   },
   "azure/gpt-5.1-codex-2025-11-13": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.5,
+    "priorityOutputPerMillion": 20,
+    "priorityCacheReadPerMillion": 0.25
   },
   "azure/gpt-5.1-codex-mini-2025-11-13": {
     "inputPerMillion": 0.25,
     "outputPerMillion": 2,
     "cacheReadPerMillion": 0.025,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.45,
+    "priorityOutputPerMillion": 3.6,
+    "priorityCacheReadPerMillion": 0.045
   },
   "azure/gpt-5": {
     "inputPerMillion": 1.25,
@@ -1155,19 +1349,28 @@
     "inputPerMillion": 1.75,
     "outputPerMillion": 14,
     "cacheReadPerMillion": 0.175,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 28,
+    "priorityCacheReadPerMillion": 0.35
   },
   "azure/gpt-5.2-chat": {
     "inputPerMillion": 1.75,
     "outputPerMillion": 14,
     "cacheReadPerMillion": 0.175,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 28,
+    "priorityCacheReadPerMillion": 0.35
   },
   "azure/gpt-5.2-chat-2025-12-11": {
     "inputPerMillion": 1.75,
     "outputPerMillion": 14,
     "cacheReadPerMillion": 0.175,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 28,
+    "priorityCacheReadPerMillion": 0.35
   },
   "azure/gpt-5.2-codex": {
     "inputPerMillion": 1.75,
@@ -1179,7 +1382,10 @@
     "inputPerMillion": 1.75,
     "outputPerMillion": 14,
     "cacheReadPerMillion": 0.175,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 28,
+    "priorityCacheReadPerMillion": 0.35
   },
   "azure/gpt-5.3-codex": {
     "inputPerMillion": 1.75,
@@ -1203,27 +1409,101 @@
     "inputPerMillion": 2.5,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.25,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 5,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.5,
+    "priorityInputPerMillion": 5,
+    "priorityOutputPerMillion": 30,
+    "priorityCacheReadPerMillion": 0.5
   },
   "azure/gpt-5.4-2026-03-05": {
     "inputPerMillion": 2.5,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.25,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 5,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.5,
+    "priorityInputPerMillion": 5,
+    "priorityOutputPerMillion": 30,
+    "priorityCacheReadPerMillion": 0.5
   },
   "azure/gpt-5.4-pro": {
     "inputPerMillion": 30,
     "outputPerMillion": 180,
     "cacheReadPerMillion": 3,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 60,
+    "outputPerMillionAboveThreshold": 270,
+    "cacheReadPerMillionAboveThreshold": 6
   },
   "azure/gpt-5.4-pro-2026-03-05": {
     "inputPerMillion": 30,
     "outputPerMillion": 180,
     "cacheReadPerMillion": 3,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 60,
+    "outputPerMillionAboveThreshold": 270,
+    "cacheReadPerMillionAboveThreshold": 6
+  },
+  "azure/gpt-5.5": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 30,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 10,
+    "outputPerMillionAboveThreshold": 45,
+    "cacheReadPerMillionAboveThreshold": 1,
+    "priorityInputPerMillion": 10,
+    "priorityOutputPerMillion": 60,
+    "priorityCacheReadPerMillion": 1
+  },
+  "azure/gpt-5.5-2026-04-23": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 30,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 10,
+    "outputPerMillionAboveThreshold": 45,
+    "cacheReadPerMillionAboveThreshold": 1,
+    "priorityInputPerMillion": 10,
+    "priorityOutputPerMillion": 60,
+    "priorityCacheReadPerMillion": 1
+  },
+  "azure/gpt-5.5-pro": {
+    "inputPerMillion": 30,
+    "outputPerMillion": 180,
+    "cacheReadPerMillion": 3,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 60,
+    "outputPerMillionAboveThreshold": 270,
+    "cacheReadPerMillionAboveThreshold": 6
+  },
+  "azure/gpt-5.5-pro-2026-04-23": {
+    "inputPerMillion": 30,
+    "outputPerMillion": 180,
+    "cacheReadPerMillion": 3,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 60,
+    "outputPerMillionAboveThreshold": 270,
+    "cacheReadPerMillionAboveThreshold": 6
   },
   "azure/gpt-5.4-mini": {
+    "inputPerMillion": 0.75,
+    "outputPerMillion": 4.5,
+    "cacheReadPerMillion": 0.075,
+    "cacheWritePerMillion": 0
+  },
+  "azure/gpt-5.4-mini-2026-03-17": {
     "inputPerMillion": 0.75,
     "outputPerMillion": 4.5,
     "cacheReadPerMillion": 0.075,
@@ -1233,6 +1513,24 @@
     "inputPerMillion": 0.2,
     "outputPerMillion": 1.25,
     "cacheReadPerMillion": 0.02,
+    "cacheWritePerMillion": 0
+  },
+  "azure/gpt-5.4-nano-2026-03-17": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 1.25,
+    "cacheReadPerMillion": 0.02,
+    "cacheWritePerMillion": 0
+  },
+  "azure/gpt-image-2": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 1.25,
+    "cacheWritePerMillion": 0
+  },
+  "azure/gpt-image-2-2026-04-21": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 1.25,
     "cacheWritePerMillion": 0
   },
   "azure/mistral-large-2402": {
@@ -2679,19 +2977,34 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "claude-sonnet-4-5": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "claude-sonnet-4-5-20250929": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "claude-sonnet-4-6": {
     "inputPerMillion": 3,
@@ -2703,7 +3016,12 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "claude-opus-4-1": {
     "inputPerMillion": 15,
@@ -2759,11 +3077,22 @@
     "cacheReadPerMillion": 0.5,
     "cacheWritePerMillion": 6.25
   },
+  "claude-opus-4-8": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 25,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 6.25
+  },
   "claude-sonnet-4-20250514": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "cloudflare/@cf/meta/llama-2-7b-chat-fp16": {
     "inputPerMillion": 1.923,
@@ -3837,13 +4166,23 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "eu.anthropic.claude-sonnet-4-5-20250929-v1:0": {
     "inputPerMillion": 3.3,
     "outputPerMillion": 16.5,
     "cacheReadPerMillion": 0.33,
-    "cacheWritePerMillion": 4.125
+    "cacheWritePerMillion": 4.125,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6.6,
+    "outputPerMillionAboveThreshold": 24.75,
+    "cacheReadPerMillionAboveThreshold": 0.66,
+    "cacheWritePerMillionAboveThreshold": 8.25
   },
   "eu.meta.llama3-2-1b-instruct-v1:0": {
     "inputPerMillion": 0.13,
@@ -4001,6 +4340,12 @@
     "cacheReadPerMillion": 0.3,
     "cacheWritePerMillion": 0
   },
+  "fireworks_ai/accounts/fireworks/models/glm-5p1": {
+    "inputPerMillion": 1.4,
+    "outputPerMillion": 4.4,
+    "cacheReadPerMillion": 0.26,
+    "cacheWritePerMillion": 0
+  },
   "fireworks_ai/accounts/fireworks/models/gpt-oss-120b": {
     "inputPerMillion": 0.15,
     "outputPerMillion": 0.6,
@@ -4119,6 +4464,12 @@
     "inputPerMillion": 0.6,
     "outputPerMillion": 2.2,
     "cacheReadPerMillion": 0.3,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/glm-5p1": {
+    "inputPerMillion": 1.4,
+    "outputPerMillion": 4.4,
+    "cacheReadPerMillion": 0.26,
     "cacheWritePerMillion": 0
   },
   "fireworks_ai/kimi-k2p5": {
@@ -4307,6 +4658,15 @@
     "cacheReadPerMillion": 0.025,
     "cacheWritePerMillion": 0
   },
+  "gemini-3.1-flash-lite": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 1.5,
+    "cacheReadPerMillion": 0.025,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.45,
+    "priorityOutputPerMillion": 2.7,
+    "priorityCacheReadPerMillion": 0.045
+  },
   "deep-research-pro-preview-12-2025": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
@@ -4353,55 +4713,121 @@
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 2.5,
+    "outputPerMillionAboveThreshold": 15,
+    "cacheReadPerMillionAboveThreshold": 0.25,
+    "cacheWritePerMillionAboveThreshold": 0.25
   },
   "gemini-3-pro-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "cacheWritePerMillionAboveThreshold": 0.25,
+    "priorityInputPerMillion": 3.6,
+    "priorityOutputPerMillion": 21.6,
+    "priorityCacheReadPerMillion": 0.36
   },
   "gemini-3.1-pro-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "cacheWritePerMillionAboveThreshold": 0.25,
+    "priorityInputPerMillion": 3.6,
+    "priorityOutputPerMillion": 21.6,
+    "priorityCacheReadPerMillion": 0.36
   },
   "gemini-3.1-pro-preview-customtools": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "cacheWritePerMillionAboveThreshold": 0.25
   },
   "vertex_ai/gemini-3-pro-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "cacheWritePerMillionAboveThreshold": 0.25,
+    "priorityInputPerMillion": 3.6,
+    "priorityOutputPerMillion": 21.6,
+    "priorityCacheReadPerMillion": 0.36
   },
   "vertex_ai/gemini-3-flash-preview": {
     "inputPerMillion": 0.5,
     "outputPerMillion": 3,
     "cacheReadPerMillion": 0.05,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.9,
+    "priorityOutputPerMillion": 5.4,
+    "priorityCacheReadPerMillion": 0.09
+  },
+  "vertex_ai/gemini-3.5-flash": {
+    "inputPerMillion": 1.5,
+    "outputPerMillion": 9,
+    "cacheReadPerMillion": 0.15,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.7,
+    "priorityOutputPerMillion": 16.2,
+    "priorityCacheReadPerMillion": 0.27
   },
   "vertex_ai/gemini-3.1-pro-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "cacheWritePerMillionAboveThreshold": 0.25,
+    "priorityInputPerMillion": 3.6,
+    "priorityOutputPerMillion": 21.6,
+    "priorityCacheReadPerMillion": 0.36
   },
   "vertex_ai/gemini-3.1-pro-preview-customtools": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "cacheWritePerMillionAboveThreshold": 0.25,
+    "priorityInputPerMillion": 3.6,
+    "priorityOutputPerMillion": 21.6,
+    "priorityCacheReadPerMillion": 0.36
   },
   "gemini-2.5-pro-preview-tts": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 2.5,
+    "outputPerMillionAboveThreshold": 15,
+    "cacheReadPerMillionAboveThreshold": 0.25
   },
   "gemini-robotics-er-1.5-preview": {
     "inputPerMillion": 0.3,
@@ -4419,7 +4845,10 @@
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 2.5,
+    "outputPerMillionAboveThreshold": 15
   },
   "gemini-embedding-001": {
     "inputPerMillion": 0.15,
@@ -4433,7 +4862,19 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "gemini-embedding-2": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "vertex_ai/gemini-embedding-2-preview": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "vertex_ai/gemini-embedding-2": {
     "inputPerMillion": 0.2,
     "outputPerMillion": 0,
     "cacheReadPerMillion": 0,
@@ -4457,11 +4898,19 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "gemini/gemini-embedding-2": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "gemini/gemini-1.5-flash": {
     "inputPerMillion": 0.075,
     "outputPerMillion": 0,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0.15
   },
   "gemini/gemini-2.0-flash": {
     "inputPerMillion": 0.1,
@@ -4557,19 +5006,35 @@
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 2.5,
+    "outputPerMillionAboveThreshold": 15,
+    "cacheReadPerMillionAboveThreshold": 0.25,
+    "priorityInputPerMillion": 1.25,
+    "priorityOutputPerMillion": 10
   },
   "gemini/gemini-2.5-computer-use-preview-10-2025": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 2.5,
+    "outputPerMillionAboveThreshold": 15
   },
   "gemini/gemini-3-pro-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "priorityInputPerMillion": 3.6,
+    "priorityOutputPerMillion": 21.6,
+    "priorityCacheReadPerMillion": 0.36
   },
   "gemini/gemini-3.1-flash-lite-preview": {
     "inputPerMillion": 0.25,
@@ -4577,47 +5042,104 @@
     "cacheReadPerMillion": 0.025,
     "cacheWritePerMillion": 0
   },
+  "gemini/gemini-3.1-flash-lite": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 1.5,
+    "cacheReadPerMillion": 0.025,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.45,
+    "priorityOutputPerMillion": 2.7,
+    "priorityCacheReadPerMillion": 0.045
+  },
   "gemini/gemini-3-flash-preview": {
     "inputPerMillion": 0.5,
     "outputPerMillion": 3,
     "cacheReadPerMillion": 0.05,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.9,
+    "priorityOutputPerMillion": 5.4,
+    "priorityCacheReadPerMillion": 0.09
+  },
+  "gemini/gemini-3.5-flash": {
+    "inputPerMillion": 1.5,
+    "outputPerMillion": 9,
+    "cacheReadPerMillion": 0.15,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.7,
+    "priorityOutputPerMillion": 16.2,
+    "priorityCacheReadPerMillion": 0.27
   },
   "gemini/gemini-3.1-pro-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "priorityInputPerMillion": 3.6,
+    "priorityOutputPerMillion": 21.6,
+    "priorityCacheReadPerMillion": 0.36
   },
   "gemini/gemini-3.1-pro-preview-customtools": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "priorityInputPerMillion": 3.6,
+    "priorityOutputPerMillion": 21.6,
+    "priorityCacheReadPerMillion": 0.36
   },
   "gemini-3-flash-preview": {
     "inputPerMillion": 0.5,
     "outputPerMillion": 3,
     "cacheReadPerMillion": 0.05,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.9,
+    "priorityOutputPerMillion": 5.4,
+    "priorityCacheReadPerMillion": 0.09
+  },
+  "gemini-3.5-flash": {
+    "inputPerMillion": 1.5,
+    "outputPerMillion": 9,
+    "cacheReadPerMillion": 0.15,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.7,
+    "priorityOutputPerMillion": 16.2,
+    "priorityCacheReadPerMillion": 0.27
   },
   "gemini/gemini-2.5-pro-preview-tts": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 2.5,
+    "outputPerMillionAboveThreshold": 15,
+    "cacheReadPerMillionAboveThreshold": 0.25
   },
   "gemini/gemini-exp-1114": {
     "inputPerMillion": 0,
     "outputPerMillion": 0,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0,
+    "outputPerMillionAboveThreshold": 0
   },
   "gemini/gemini-exp-1206": {
     "inputPerMillion": 0,
     "outputPerMillion": 0,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0,
+    "outputPerMillionAboveThreshold": 0
   },
   "gemini/gemini-gemma-2-27b-it": {
     "inputPerMillion": 0.35,
@@ -4635,13 +5157,19 @@
     "inputPerMillion": 0,
     "outputPerMillion": 0,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0,
+    "outputPerMillionAboveThreshold": 0
   },
   "gemini/learnlm-1.5-pro-experimental": {
     "inputPerMillion": 0,
     "outputPerMillion": 0,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0,
+    "outputPerMillionAboveThreshold": 0
   },
   "gemini/lyria-3-clip-preview": {
     "inputPerMillion": 0,
@@ -4881,13 +5409,23 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "global.anthropic.claude-sonnet-4-20250514-v1:0": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
     "inputPerMillion": 1,
@@ -4989,7 +5527,10 @@
     "inputPerMillion": 2,
     "outputPerMillion": 8,
     "cacheReadPerMillion": 0.5,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 14,
+    "priorityCacheReadPerMillion": 0.875
   },
   "gpt-4.1-2025-04-14": {
     "inputPerMillion": 2,
@@ -5001,7 +5542,10 @@
     "inputPerMillion": 0.4,
     "outputPerMillion": 1.6,
     "cacheReadPerMillion": 0.1,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.7,
+    "priorityOutputPerMillion": 2.8,
+    "priorityCacheReadPerMillion": 0.175
   },
   "gpt-4.1-mini-2025-04-14": {
     "inputPerMillion": 0.4,
@@ -5013,7 +5557,10 @@
     "inputPerMillion": 0.1,
     "outputPerMillion": 0.4,
     "cacheReadPerMillion": 0.025,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.2,
+    "priorityOutputPerMillion": 0.8,
+    "priorityCacheReadPerMillion": 0.05
   },
   "gpt-4.1-nano-2025-04-14": {
     "inputPerMillion": 0.1,
@@ -5025,13 +5572,18 @@
     "inputPerMillion": 2.5,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 1.25,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 4.25,
+    "priorityOutputPerMillion": 17,
+    "priorityCacheReadPerMillion": 2.125
   },
   "gpt-4o-2024-05-13": {
     "inputPerMillion": 5,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 8.75,
+    "priorityOutputPerMillion": 26.25
   },
   "gpt-4o-2024-08-06": {
     "inputPerMillion": 2.5,
@@ -5103,7 +5655,10 @@
     "inputPerMillion": 0.15,
     "outputPerMillion": 0.6,
     "cacheReadPerMillion": 0.075,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.25,
+    "priorityOutputPerMillion": 1,
+    "priorityCacheReadPerMillion": 0.125
   },
   "gpt-4o-mini-2024-07-18": {
     "inputPerMillion": 0.15,
@@ -5207,53 +5762,89 @@
     "cacheReadPerMillion": 1.25,
     "cacheWritePerMillion": 0
   },
+  "gpt-image-2": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 1.25,
+    "cacheWritePerMillion": 0
+  },
+  "gpt-image-2-2026-04-21": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 1.25,
+    "cacheWritePerMillion": 0
+  },
   "gpt-5": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.5,
+    "priorityOutputPerMillion": 20,
+    "priorityCacheReadPerMillion": 0.25
   },
   "gpt-5.1": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.5,
+    "priorityOutputPerMillion": 20,
+    "priorityCacheReadPerMillion": 0.25
   },
   "gpt-5.1-2025-11-13": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.5,
+    "priorityOutputPerMillion": 20,
+    "priorityCacheReadPerMillion": 0.25
   },
   "gpt-5.1-chat-latest": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.5,
+    "priorityOutputPerMillion": 20,
+    "priorityCacheReadPerMillion": 0.25
   },
   "gpt-5.2": {
     "inputPerMillion": 1.75,
     "outputPerMillion": 14,
     "cacheReadPerMillion": 0.175,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 28,
+    "priorityCacheReadPerMillion": 0.35
   },
   "gpt-5.2-2025-12-11": {
     "inputPerMillion": 1.75,
     "outputPerMillion": 14,
     "cacheReadPerMillion": 0.175,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 28,
+    "priorityCacheReadPerMillion": 0.35
   },
   "gpt-5.2-chat-latest": {
     "inputPerMillion": 1.75,
     "outputPerMillion": 14,
     "cacheReadPerMillion": 0.175,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 28,
+    "priorityCacheReadPerMillion": 0.35
   },
   "gpt-5.3-chat-latest": {
     "inputPerMillion": 1.75,
     "outputPerMillion": 14,
     "cacheReadPerMillion": 0.175,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 28,
+    "priorityCacheReadPerMillion": 0.35
   },
   "gpt-5.2-pro": {
     "inputPerMillion": 21,
@@ -5267,37 +5858,123 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "gpt-5.5": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 30,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 10,
+    "outputPerMillionAboveThreshold": 45,
+    "cacheReadPerMillionAboveThreshold": 1,
+    "priorityInputPerMillion": 10,
+    "priorityOutputPerMillion": 60,
+    "priorityCacheReadPerMillion": 1
+  },
+  "gpt-5.5-2026-04-23": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 30,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 10,
+    "outputPerMillionAboveThreshold": 45,
+    "cacheReadPerMillionAboveThreshold": 1,
+    "priorityInputPerMillion": 10,
+    "priorityOutputPerMillion": 60,
+    "priorityCacheReadPerMillion": 1
+  },
+  "gpt-5.5-pro": {
+    "inputPerMillion": 30,
+    "outputPerMillion": 180,
+    "cacheReadPerMillion": 3,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 60,
+    "outputPerMillionAboveThreshold": 270,
+    "cacheReadPerMillionAboveThreshold": 6
+  },
+  "gpt-5.5-pro-2026-04-23": {
+    "inputPerMillion": 30,
+    "outputPerMillion": 180,
+    "cacheReadPerMillion": 3,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 60,
+    "outputPerMillionAboveThreshold": 270,
+    "cacheReadPerMillionAboveThreshold": 6
+  },
   "gpt-5.4": {
     "inputPerMillion": 2.5,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.25,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 5,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.5,
+    "priorityInputPerMillion": 5,
+    "priorityOutputPerMillion": 30,
+    "priorityCacheReadPerMillion": 0.5
   },
   "gpt-5.4-2026-03-05": {
     "inputPerMillion": 2.5,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.25,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 5,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.5,
+    "priorityInputPerMillion": 5,
+    "priorityOutputPerMillion": 30,
+    "priorityCacheReadPerMillion": 0.5
   },
   "gpt-5.4-pro": {
     "inputPerMillion": 30,
     "outputPerMillion": 180,
     "cacheReadPerMillion": 3,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 60,
+    "outputPerMillionAboveThreshold": 270,
+    "cacheReadPerMillionAboveThreshold": 6
   },
   "gpt-5.4-pro-2026-03-05": {
     "inputPerMillion": 30,
     "outputPerMillion": 180,
     "cacheReadPerMillion": 3,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 60,
+    "outputPerMillionAboveThreshold": 270,
+    "cacheReadPerMillionAboveThreshold": 6
   },
   "gpt-5.4-mini": {
     "inputPerMillion": 0.75,
     "outputPerMillion": 4.5,
     "cacheReadPerMillion": 0.075,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 1.5,
+    "priorityOutputPerMillion": 9,
+    "priorityCacheReadPerMillion": 0.15
+  },
+  "gpt-5.4-mini-2026-03-17": {
+    "inputPerMillion": 0.75,
+    "outputPerMillion": 4.5,
+    "cacheReadPerMillion": 0.075,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 1.5,
+    "priorityOutputPerMillion": 9,
+    "priorityCacheReadPerMillion": 0.15
   },
   "gpt-5.4-nano": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 1.25,
+    "cacheReadPerMillion": 0.02,
+    "cacheWritePerMillion": 0
+  },
+  "gpt-5.4-nano-2026-03-17": {
     "inputPerMillion": 0.2,
     "outputPerMillion": 1.25,
     "cacheReadPerMillion": 0.02,
@@ -5319,7 +5996,10 @@
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.5,
+    "priorityOutputPerMillion": 20,
+    "priorityCacheReadPerMillion": 0.25
   },
   "gpt-5-chat": {
     "inputPerMillion": 1.25,
@@ -5343,7 +6023,10 @@
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.5,
+    "priorityOutputPerMillion": 20,
+    "priorityCacheReadPerMillion": 0.25
   },
   "gpt-5.1-codex-max": {
     "inputPerMillion": 1.25,
@@ -5355,37 +6038,53 @@
     "inputPerMillion": 0.25,
     "outputPerMillion": 2,
     "cacheReadPerMillion": 0.025,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.45,
+    "priorityOutputPerMillion": 3.6,
+    "priorityCacheReadPerMillion": 0.045
   },
   "gpt-5.2-codex": {
     "inputPerMillion": 1.75,
     "outputPerMillion": 14,
     "cacheReadPerMillion": 0.175,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 28,
+    "priorityCacheReadPerMillion": 0.35
   },
   "gpt-5.3-codex": {
     "inputPerMillion": 1.75,
     "outputPerMillion": 14,
     "cacheReadPerMillion": 0.175,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 28,
+    "priorityCacheReadPerMillion": 0.35
   },
   "gpt-5-mini": {
     "inputPerMillion": 0.25,
     "outputPerMillion": 2,
     "cacheReadPerMillion": 0.025,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.45,
+    "priorityOutputPerMillion": 3.6,
+    "priorityCacheReadPerMillion": 0.045
   },
   "gpt-5-mini-2025-08-07": {
     "inputPerMillion": 0.25,
     "outputPerMillion": 2,
     "cacheReadPerMillion": 0.025,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.45,
+    "priorityOutputPerMillion": 3.6,
+    "priorityCacheReadPerMillion": 0.045
   },
   "gpt-5-nano": {
     "inputPerMillion": 0.05,
     "outputPerMillion": 0.4,
     "cacheReadPerMillion": 0.005,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2.5
   },
   "gpt-5-nano-2025-08-07": {
     "inputPerMillion": 0.05,
@@ -5400,6 +6099,12 @@
     "cacheWritePerMillion": 0
   },
   "gpt-realtime-1.5": {
+    "inputPerMillion": 4,
+    "outputPerMillion": 16,
+    "cacheReadPerMillion": 0.4,
+    "cacheWritePerMillion": 0
+  },
+  "gpt-realtime-2": {
     "inputPerMillion": 4,
     "outputPerMillion": 16,
     "cacheReadPerMillion": 0.4,
@@ -5775,13 +6480,60 @@
     "inputPerMillion": 3.3,
     "outputPerMillion": 16.5,
     "cacheReadPerMillion": 0.33,
-    "cacheWritePerMillion": 4.125
+    "cacheWritePerMillion": 4.125,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6.6,
+    "outputPerMillionAboveThreshold": 24.75,
+    "cacheReadPerMillionAboveThreshold": 0.66,
+    "cacheWritePerMillionAboveThreshold": 8.25
   },
   "jp.anthropic.claude-haiku-4-5-20251001-v1:0": {
     "inputPerMillion": 1.1,
     "outputPerMillion": 5.5,
     "cacheReadPerMillion": 0.11,
     "cacheWritePerMillion": 1.375
+  },
+  "crusoe/deepseek-ai/DeepSeek-R1-0528": {
+    "inputPerMillion": 3,
+    "outputPerMillion": 7,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "crusoe/deepseek-ai/DeepSeek-V3-0324": {
+    "inputPerMillion": 1.5,
+    "outputPerMillion": 1.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "crusoe/google/gemma-3-12b-it": {
+    "inputPerMillion": 0.1,
+    "outputPerMillion": 0.1,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "crusoe/meta-llama/Llama-3.3-70B-Instruct": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 0.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "crusoe/moonshotai/Kimi-K2-Thinking": {
+    "inputPerMillion": 2.5,
+    "outputPerMillion": 2.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "crusoe/openai/gpt-oss-120b": {
+    "inputPerMillion": 0.8,
+    "outputPerMillion": 0.8,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "crusoe/Qwen/Qwen3-235B-A22B-Instruct-2507": {
+    "inputPerMillion": 3,
+    "outputPerMillion": 3,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
   },
   "lambda_ai/deepseek-llama3.3-70b": {
     "inputPerMillion": 0.2,
@@ -5900,42 +6652,6 @@
   "lambda_ai/qwen3-32b-fp8": {
     "inputPerMillion": 0.05,
     "outputPerMillion": 0.1,
-    "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
-  },
-  "luminous-base": {
-    "inputPerMillion": 30,
-    "outputPerMillion": 33,
-    "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
-  },
-  "luminous-base-control": {
-    "inputPerMillion": 37.5,
-    "outputPerMillion": 41.25,
-    "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
-  },
-  "luminous-extended": {
-    "inputPerMillion": 45,
-    "outputPerMillion": 49.5,
-    "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
-  },
-  "luminous-extended-control": {
-    "inputPerMillion": 56.25,
-    "outputPerMillion": 61.875,
-    "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
-  },
-  "luminous-supreme": {
-    "inputPerMillion": 175,
-    "outputPerMillion": 192.5,
-    "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
-  },
-  "luminous-supreme-control": {
-    "inputPerMillion": 218.75,
-    "outputPerMillion": 240.625,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -6365,6 +7081,12 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "mistral/ministral-8b-2512": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.15,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "mistral/mistral-tiny": {
     "inputPerMillion": 0.25,
     "outputPerMillion": 0.25,
@@ -6459,6 +7181,12 @@
     "inputPerMillion": 0.6,
     "outputPerMillion": 3,
     "cacheReadPerMillion": 0.1,
+    "cacheWritePerMillion": 0
+  },
+  "moonshot/kimi-k2.6": {
+    "inputPerMillion": 0.95,
+    "outputPerMillion": 4,
+    "cacheReadPerMillion": 0.16,
     "cacheWritePerMillion": 0
   },
   "moonshot/kimi-latest": {
@@ -6903,7 +7631,10 @@
     "inputPerMillion": 2,
     "outputPerMillion": 8,
     "cacheReadPerMillion": 0.5,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 3.5,
+    "priorityOutputPerMillion": 14,
+    "priorityCacheReadPerMillion": 0.875
   },
   "o3-2025-04-16": {
     "inputPerMillion": 2,
@@ -6951,7 +7682,10 @@
     "inputPerMillion": 1.1,
     "outputPerMillion": 4.4,
     "cacheReadPerMillion": 0.275,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 2,
+    "priorityOutputPerMillion": 8,
+    "priorityCacheReadPerMillion": 0.5
   },
   "o4-mini-2025-04-16": {
     "inputPerMillion": 1.1,
@@ -6969,6 +7703,18 @@
     "inputPerMillion": 2,
     "outputPerMillion": 8,
     "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0
+  },
+  "oci/meta.llama-3.1-8b-instruct": {
+    "inputPerMillion": 0.72,
+    "outputPerMillion": 0.72,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "oci/meta.llama-3.1-70b-instruct": {
+    "inputPerMillion": 0.72,
+    "outputPerMillion": 0.72,
+    "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
   "oci/meta.llama-3.1-405b-instruct": {
@@ -7049,6 +7795,36 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "oci/google.gemini-2.5-flash": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.6,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "oci/google.gemini-2.5-pro": {
+    "inputPerMillion": 1.25,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "oci/google.gemini-2.5-flash-lite": {
+    "inputPerMillion": 0.075,
+    "outputPerMillion": 0.3,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "oci/cohere.command-a-vision": {
+    "inputPerMillion": 1.56,
+    "outputPerMillion": 1.56,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "oci/cohere.command-a-reasoning": {
+    "inputPerMillion": 1.56,
+    "outputPerMillion": 1.56,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "oci/cohere.command-a-reasoning-08-2025": {
     "inputPerMillion": 1.56,
     "outputPerMillion": 1.56,
@@ -7082,12 +7858,6 @@
   "oci/meta.llama-3.2-11b-vision-instruct": {
     "inputPerMillion": 2,
     "outputPerMillion": 2,
-    "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
-  },
-  "oci/meta.llama-3.1-70b-instruct": {
-    "inputPerMillion": 0.72,
-    "outputPerMillion": 0.72,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -7127,21 +7897,21 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
-  "oci/google.gemini-2.5-pro": {
+  "oci/openai.gpt-5": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
-  "oci/google.gemini-2.5-flash": {
-    "inputPerMillion": 0.15,
-    "outputPerMillion": 0.6,
+  "oci/openai.gpt-5-mini": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 2,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
-  "oci/google.gemini-2.5-flash-lite": {
-    "inputPerMillion": 0.075,
-    "outputPerMillion": 0.3,
+  "oci/openai.gpt-5-nano": {
+    "inputPerMillion": 0.05,
+    "outputPerMillion": 0.4,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -7437,13 +8207,23 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "openrouter/anthropic/claude-sonnet-4.6": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "openrouter/anthropic/claude-opus-4.5": {
     "inputPerMillion": 5,
@@ -7461,13 +8241,24 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "openrouter/anthropic/claude-haiku-4.5": {
     "inputPerMillion": 1,
     "outputPerMillion": 5,
     "cacheReadPerMillion": 0.1,
     "cacheWritePerMillion": 1.25
+  },
+  "openrouter/anthropic/claude-opus-4.7": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 25,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 6.25
   },
   "openrouter/bytedance/ui-tars-1.5-7b": {
     "inputPerMillion": 0.1,
@@ -7539,7 +8330,12 @@
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "cacheWritePerMillionAboveThreshold": 0.25
   },
   "openrouter/google/gemini-3-flash-preview": {
     "inputPerMillion": 0.5,
@@ -7553,11 +8349,22 @@
     "cacheReadPerMillion": 0.025,
     "cacheWritePerMillion": 0
   },
+  "openrouter/google/gemini-3.1-flash-lite": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 1.5,
+    "cacheReadPerMillion": 0.025,
+    "cacheWritePerMillion": 0
+  },
   "openrouter/google/gemini-3.1-pro-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
     "cacheReadPerMillion": 0.2,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 18,
+    "cacheReadPerMillionAboveThreshold": 0.4,
+    "cacheWritePerMillionAboveThreshold": 0.25
   },
   "openrouter/gryphe/mythomax-l2-13b": {
     "inputPerMillion": 1.875,
@@ -7823,6 +8630,12 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "openrouter/qwen/qwen3.6-plus": {
+    "inputPerMillion": 0.325,
+    "outputPerMillion": 1.95,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "openrouter/qwen/qwen3.5-35b-a3b": {
     "inputPerMillion": 0.25,
     "outputPerMillion": 2,
@@ -7851,7 +8664,10 @@
     "inputPerMillion": 0.4,
     "outputPerMillion": 2.4,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 256000,
+    "inputPerMillionAboveThreshold": 0.5,
+    "outputPerMillionAboveThreshold": 3
   },
   "openrouter/qwen/qwen3.5-397b-a17b": {
     "inputPerMillion": 0.6,
@@ -7890,9 +8706,21 @@
     "cacheWritePerMillion": 0
   },
   "openrouter/xiaomi/mimo-v2-flash": {
-    "inputPerMillion": 0.09,
-    "outputPerMillion": 0.29,
-    "cacheReadPerMillion": 0,
+    "inputPerMillion": 0.1,
+    "outputPerMillion": 0.3,
+    "cacheReadPerMillion": 0.01,
+    "cacheWritePerMillion": 0
+  },
+  "openrouter/xiaomi/mimo-v2.5-pro": {
+    "inputPerMillion": 1,
+    "outputPerMillion": 3,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 0
+  },
+  "openrouter/xiaomi/mimo-v2.5": {
+    "inputPerMillion": 0.4,
+    "outputPerMillion": 2,
+    "cacheReadPerMillion": 0.08,
     "cacheWritePerMillion": 0
   },
   "openrouter/z-ai/glm-4.7": {
@@ -8621,6 +9449,12 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "sambanova/MiniMax-M2.7": {
+    "inputPerMillion": 0.3,
+    "outputPerMillion": 1.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "sambanova/DeepSeek-R1": {
     "inputPerMillion": 5,
     "outputPerMillion": 7,
@@ -9117,13 +9951,23 @@
     "inputPerMillion": 3.3,
     "outputPerMillion": 16.5,
     "cacheReadPerMillion": 0.33,
-    "cacheWritePerMillion": 4.125
+    "cacheWritePerMillion": 4.125,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6.6,
+    "outputPerMillionAboveThreshold": 24.75,
+    "cacheReadPerMillionAboveThreshold": 0.66,
+    "cacheWritePerMillionAboveThreshold": 8.25
   },
   "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0": {
     "inputPerMillion": 3.3,
     "outputPerMillion": 16.5,
     "cacheReadPerMillion": 0.33,
-    "cacheWritePerMillion": 4.125
+    "cacheWritePerMillion": 4.125,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6.6,
+    "outputPerMillionAboveThreshold": 24.75,
+    "cacheReadPerMillionAboveThreshold": 0.66,
+    "cacheWritePerMillionAboveThreshold": 8.25
   },
   "au.anthropic.claude-haiku-4-5-20251001-v1:0": {
     "inputPerMillion": 1.1,
@@ -9159,7 +10003,12 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "us.deepseek.r1-v1:0": {
     "inputPerMillion": 1.35,
@@ -10001,11 +10850,28 @@
     "cacheReadPerMillion": 0.5,
     "cacheWritePerMillion": 6.25
   },
+  "vertex_ai/claude-opus-4-8": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 25,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 6.25
+  },
+  "vertex_ai/claude-opus-4-8@default": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 25,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 6.25
+  },
   "vertex_ai/claude-sonnet-4-5": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "vertex_ai/claude-sonnet-4-6": {
     "inputPerMillion": 3,
@@ -10017,7 +10883,12 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "vertex_ai/claude-opus-4@20250514": {
     "inputPerMillion": 15,
@@ -10029,13 +10900,23 @@
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "vertex_ai/claude-sonnet-4@20250514": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "cacheWritePerMillion": 3.75,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.6,
+    "cacheWritePerMillionAboveThreshold": 7.5
   },
   "vertex_ai/mistralai/codestral-2@001": {
     "inputPerMillion": 0.3,
@@ -10120,6 +11001,15 @@
     "outputPerMillion": 1.5,
     "cacheReadPerMillion": 0.025,
     "cacheWritePerMillion": 0
+  },
+  "vertex_ai/gemini-3.1-flash-lite": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 1.5,
+    "cacheReadPerMillion": 0.025,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 0.45,
+    "priorityOutputPerMillion": 2.7,
+    "priorityCacheReadPerMillion": 0.045
   },
   "vertex_ai/deep-research-pro-preview-12-2025": {
     "inputPerMillion": 2,
@@ -10335,6 +11225,30 @@
     "inputPerMillion": 0.075,
     "outputPerMillion": 0.3,
     "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "vertex_ai/xai/grok-4.1-fast-non-reasoning": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 0.5,
+    "cacheReadPerMillion": 0.05,
+    "cacheWritePerMillion": 0
+  },
+  "vertex_ai/xai/grok-4.1-fast-reasoning": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 0.5,
+    "cacheReadPerMillion": 0.05,
+    "cacheWritePerMillion": 0
+  },
+  "vertex_ai/xai/grok-4.20-non-reasoning": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 6,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 0
+  },
+  "vertex_ai/xai/grok-4.20-reasoning": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 6,
+    "cacheReadPerMillion": 0.2,
     "cacheWritePerMillion": 0
   },
   "vertex_ai/qwen/qwen3-235b-a22b-instruct-2507-maas": {
@@ -10851,55 +11765,82 @@
     "inputPerMillion": 0.2,
     "outputPerMillion": 0.5,
     "cacheReadPerMillion": 0.05,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0.4,
+    "outputPerMillionAboveThreshold": 1
   },
   "xai/grok-4-fast-non-reasoning": {
     "inputPerMillion": 0.2,
     "outputPerMillion": 0.5,
     "cacheReadPerMillion": 0.05,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0.4,
+    "outputPerMillionAboveThreshold": 1
   },
   "xai/grok-4-0709": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 30
   },
   "xai/grok-4-latest": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
     "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 6,
+    "outputPerMillionAboveThreshold": 30
   },
   "xai/grok-4-1-fast": {
     "inputPerMillion": 0.2,
     "outputPerMillion": 0.5,
     "cacheReadPerMillion": 0.05,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0.4,
+    "outputPerMillionAboveThreshold": 1
   },
   "xai/grok-4-1-fast-reasoning": {
     "inputPerMillion": 0.2,
     "outputPerMillion": 0.5,
     "cacheReadPerMillion": 0.05,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0.4,
+    "outputPerMillionAboveThreshold": 1
   },
   "xai/grok-4-1-fast-reasoning-latest": {
     "inputPerMillion": 0.2,
     "outputPerMillion": 0.5,
     "cacheReadPerMillion": 0.05,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0.4,
+    "outputPerMillionAboveThreshold": 1
   },
   "xai/grok-4-1-fast-non-reasoning": {
     "inputPerMillion": 0.2,
     "outputPerMillion": 0.5,
     "cacheReadPerMillion": 0.05,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0.4,
+    "outputPerMillionAboveThreshold": 1
   },
   "xai/grok-4-1-fast-non-reasoning-latest": {
     "inputPerMillion": 0.2,
     "outputPerMillion": 0.5,
     "cacheReadPerMillion": 0.05,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 128000,
+    "inputPerMillionAboveThreshold": 0.4,
+    "outputPerMillionAboveThreshold": 1
   },
   "xai/grok-4.20-multi-agent-beta-0309": {
     "inputPerMillion": 2,
@@ -10913,11 +11854,37 @@
     "cacheReadPerMillion": 0.2,
     "cacheWritePerMillion": 0
   },
+  "xai/grok-4.20-0309-reasoning": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 6,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 0
+  },
   "xai/grok-4.20-beta-0309-non-reasoning": {
     "inputPerMillion": 2,
     "outputPerMillion": 6,
     "cacheReadPerMillion": 0.2,
     "cacheWritePerMillion": 0
+  },
+  "xai/grok-4.3": {
+    "inputPerMillion": 1.25,
+    "outputPerMillion": 2.5,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 2.5,
+    "outputPerMillionAboveThreshold": 5,
+    "cacheReadPerMillionAboveThreshold": 0.4
+  },
+  "xai/grok-4.3-latest": {
+    "inputPerMillion": 1.25,
+    "outputPerMillion": 2.5,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 2.5,
+    "outputPerMillionAboveThreshold": 5,
+    "cacheReadPerMillionAboveThreshold": 0.4
   },
   "xai/grok-beta": {
     "inputPerMillion": 5,
@@ -10955,15 +11922,15 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
-  "zai.glm-4.7-flash": {
-    "inputPerMillion": 0.07,
-    "outputPerMillion": 0.4,
-    "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
-  },
   "zai.glm-5": {
     "inputPerMillion": 1,
     "outputPerMillion": 3.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "zai.glm-4.7-flash": {
+    "inputPerMillion": 0.07,
+    "outputPerMillion": 0.4,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -13143,13 +14110,21 @@
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 2.5,
+    "outputPerMillionAboveThreshold": 15,
+    "cacheReadPerMillionAboveThreshold": 0.25
   },
   "gemini/gemini-pro-latest": {
     "inputPerMillion": 1.25,
     "outputPerMillion": 10,
     "cacheReadPerMillion": 0.125,
-    "cacheWritePerMillion": 0
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 2.5,
+    "outputPerMillionAboveThreshold": 15,
+    "cacheReadPerMillionAboveThreshold": 0.25
   },
   "gemini-exp-1206": {
     "inputPerMillion": 0.3,
@@ -13184,6 +14159,18 @@
   "bedrock_mantle/openai.gpt-oss-safeguard-20b": {
     "inputPerMillion": 0.075,
     "outputPerMillion": 0.3,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "bedrock/us-east-1/zai.glm-5": {
+    "inputPerMillion": 1,
+    "outputPerMillion": 3.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "bedrock/us-west-2/zai.glm-5": {
+    "inputPerMillion": 1,
+    "outputPerMillion": 3.2,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },

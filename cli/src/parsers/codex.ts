@@ -1,6 +1,6 @@
 import { readFile, stat } from 'fs/promises'
 import type { Session, ParseResult, ExtendedParseResult, ParsedMessage, ParsedToolCall } from '../types.js'
-import { calculateCostMillicents } from '../services/cost-calculator.js'
+import { priceSession } from '../services/cost-calculator.js'
 
 interface CodexSessionMeta {
   id: string
@@ -60,18 +60,20 @@ export async function parseCodex(filePath: string, fromOffset: number): Promise<
       const usage = parsed.payload.info?.last_token_usage
       if (!usage) continue
       const id = `${filePath.length}-${sessions.length}-${parsed.timestamp}`
+      const { costMillicents, priced } = priceSession({
+        model: currentModel,
+        inputTokens: usage.input_tokens - usage.cached_input_tokens,
+        outputTokens: usage.output_tokens,
+        cacheReadTokens: usage.cached_input_tokens, cacheWriteTokens: 0,
+      })
       sessions.push({
         id: `codex-${id}`, tool: 'codex', model: currentModel,
         provider: meta?.model_provider ?? 'openai',
         inputTokens: usage.input_tokens, outputTokens: usage.output_tokens,
         cacheReadTokens: usage.cached_input_tokens, cacheWriteTokens: 0,
         reasoningTokens: usage.reasoning_output_tokens,
-        costMillicents: calculateCostMillicents({
-          model: currentModel,
-          inputTokens: usage.input_tokens - usage.cached_input_tokens,
-          outputTokens: usage.output_tokens,
-          cacheReadTokens: usage.cached_input_tokens, cacheWriteTokens: 0,
-        }),
+        costMillicents,
+        unpriced: !priced,
         cwd: meta?.cwd, gitRepo: extractRepoFromUrl(meta?.git?.repository_url),
         gitBranch: meta?.git?.branch, startedAt: new Date(parsed.timestamp),
       })

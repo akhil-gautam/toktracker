@@ -1,11 +1,23 @@
 #!/usr/bin/env node
-import { writeFileSync } from 'node:fs'
+import { writeFileSync, readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { createHash } from 'node:crypto'
 
-const SOURCE = 'https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json'
+// Pinned to an immutable commit (NOT a moving `main`) so builds are reproducible
+// and any change to the pricing source is a reviewable diff to this SHA. The
+// optional runtime refresh (src/services/pricing-cache.ts) is what tracks newer
+// models between releases — see its anti-corruption guard.
+const SOURCE_REPO = 'BerriAI/litellm'
+const SOURCE_COMMIT = 'a021a5be86b00397c8c705e63fb7117f0850c036'
+const SOURCE_FILE = 'model_prices_and_context_window.json'
+const SOURCE = `https://raw.githubusercontent.com/${SOURCE_REPO}/${SOURCE_COMMIT}/${SOURCE_FILE}`
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT = join(__dirname, '..', 'src', 'data', 'pricing.json')
+const PROVENANCE = join(__dirname, '..', 'src', 'data', 'pricing-source.json')
+// Keep the macOS app's bundled copy in lockstep so the two cost engines price
+// identically (see the TS↔Swift parity guard in cost-calculator.test.ts).
+const MAC_OUT = join(__dirname, '..', '..', 'menubar-app', 'Sources', 'Core', 'Resources', 'pricing.json')
 
 const ALIAS_PATTERNS = {
   opus:   /^claude-opus-(\d{1,2})-(\d{1,2})$/,
@@ -57,7 +69,20 @@ function pickLatest(out, pattern) {
 
 const res = await fetch(SOURCE)
 if (!res.ok) throw new Error(`fetch ${SOURCE} failed: ${res.status}`)
-const upstream = await res.json()
+const rawText = await res.text()
+const sha256 = createHash('sha256').update(rawText).digest('hex')
+
+// Tamper-evidence: once pricing-source.json is committed, the pinned commit is
+// immutable, so re-running MUST reproduce the same content hash. A mismatch means
+// the source bytes changed under us — fail loudly rather than bake new numbers.
+if (existsSync(PROVENANCE)) {
+  const prev = JSON.parse(readFileSync(PROVENANCE, 'utf8'))
+  if (prev.sourceCommit === SOURCE_COMMIT && prev.sourceSha256 && prev.sourceSha256 !== sha256) {
+    throw new Error(`checksum mismatch for ${SOURCE_COMMIT}: expected ${prev.sourceSha256}, got ${sha256}`)
+  }
+}
+
+const upstream = JSON.parse(rawText)
 
 const out = {}
 let kept = 0
@@ -90,7 +115,17 @@ for (const [alias, pattern] of Object.entries(ALIAS_PATTERNS)) {
 const tiered = Object.values(out).filter((e) => e.thresholdTokens != null).length
 const priority = Object.values(out).filter((e) => e.priorityInputPerMillion != null).length
 
-writeFileSync(OUT, JSON.stringify(out, null, 2) + '\n')
+const serialized = JSON.stringify(out, null, 2) + '\n'
+writeFileSync(OUT, serialized)
+try { writeFileSync(MAC_OUT, serialized) } catch (e) { console.warn(`warn: could not write mac copy ${MAC_OUT}: ${e.message}`) }
+writeFileSync(PROVENANCE, JSON.stringify({
+  sourceRepo: SOURCE_REPO,
+  sourceCommit: SOURCE_COMMIT,
+  sourceFile: SOURCE_FILE,
+  sourceSha256: sha256,
+  modelCount: kept,
+}, null, 2) + '\n')
 console.log(`wrote ${OUT} — ${kept} upstream models (${skipped} skipped)`)
 console.log(`tiered (long-context): ${tiered}, priority-tier: ${priority}`)
 console.log(`aliases: ${aliasLog.join(', ')}`)
+console.log(`provenance: ${SOURCE_REPO}@${SOURCE_COMMIT.slice(0, 10)} sha256=${sha256.slice(0, 12)}…`)
