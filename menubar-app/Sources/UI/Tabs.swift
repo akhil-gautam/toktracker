@@ -21,6 +21,9 @@ public struct OverviewTab: View {
                 Spacer()
             }
             kpis(agg: agg)
+            if agg.allTime.unpricedSessionCount > 0 {
+                UnpricedBanner(count: agg.allTime.unpricedSessionCount)
+            }
             ActivityHeroSection(range: range)
             tokensPanel(agg: agg)
             HStack(alignment: .top, spacing: 12) {
@@ -293,6 +296,28 @@ public struct OverviewTab: View {
                 }
             }
         }
+    }
+}
+
+/// Quiet aggregate notice: some sessions ran on models with no known price, so
+/// their cost is a $0 placeholder and totals may be understated. Mirrors the CLI
+/// TUI's UnpricedBanner.
+private struct UnpricedBanner: View {
+    let count: Int
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 11))
+                .foregroundStyle(Linear.warn)
+            Text("\(count) \(count == 1 ? "session" : "sessions") on unpriced models — totals may be understated")
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundStyle(Linear.ink3)
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(RoundedRectangle(cornerRadius: 8).fill(Linear.warn.opacity(0.10)))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Linear.warn.opacity(0.25), lineWidth: 1))
     }
 }
 
