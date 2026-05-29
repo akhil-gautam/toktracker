@@ -7,6 +7,8 @@ import { registerRulesCommands } from './rules-commands.js'
 import { registerExportCommands } from './export-commands.js'
 import { registerPrivacyCommands } from './privacy-commands.js'
 import { registerPricingCommands } from './pricing-commands.js'
+import { registerServeCommands } from './serve-commands.js'
+import { registerStatusCommands } from './status-commands.js'
 
 const program = new Command()
 program.name('toktracker').description('AI coding tool tracker').version('0.2.2')
@@ -17,6 +19,8 @@ registerRulesCommands(program)
 registerExportCommands(program)
 registerPrivacyCommands(program)
 registerPricingCommands(program)
+registerServeCommands(program)
+registerStatusCommands(program)
 program.parseAsync(process.argv).catch(err => {
   process.stderr.write(`error: ${err.message}\n`)
   process.exit(1)

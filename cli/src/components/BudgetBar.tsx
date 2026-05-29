@@ -2,9 +2,12 @@ import React from 'react'
 import { Box, Text } from 'ink'
 import { budgetColor, formatCost, BAR_FULL, BAR_EMPTY } from '../theme.js'
 import { useAnimatedValue } from '../hooks/useAnimatedValue.js'
+import { projectBudget } from '../services/pace.js'
 import type { BudgetResult } from '../hooks/useBudget.js'
 
 interface BudgetBarProps { result: BudgetResult }
+
+const PACE_COLOR = { over: '#FF5252', on_track: '#FFC107', under: '#4CAF50' } as const
 
 export function BudgetBar({ result }: BudgetBarProps) {
   const barWidth = 25
@@ -15,6 +18,10 @@ export function BudgetBar({ result }: BudgetBarProps) {
   const empty = BAR_EMPTY.repeat(Math.max(0, barWidth - animatedFill))
   const label = result.budget.scope === 'global' ? `Global ${result.budget.period}` : `${result.budget.scopeValue} ${result.budget.period}`
 
+  // Forward-looking projection: where this period lands at the current rate.
+  const pace = projectBudget(result)
+  const paceMark = pace.status === 'over' ? '▲' : pace.status === 'on_track' ? '◆' : '▾'
+
   return (
     <Box flexDirection="column">
       <Box>
@@ -22,7 +29,8 @@ export function BudgetBar({ result }: BudgetBarProps) {
         <Text color={color}>{filled}</Text><Text color="gray">{empty}</Text>
         <Text color={color} bold> {result.pct}%</Text>
       </Box>
-      <Box><Text color="gray">{'  '}{formatCost(result.spentCents * 1000)} / {formatCost(result.budget.limitCents * 1000)}</Text></Box>
+      <Box><Text color="gray">{'  '}{formatCost(result.spentCents * 1000)} / {formatCost(result.budget.limitCents * 1000)}{'  ·  '}{pace.elapsedPct}% of period elapsed</Text></Box>
+      <Box><Text color={PACE_COLOR[pace.status]}>{'  '}{paceMark} {pace.summary}</Text></Box>
     </Box>
   )
 }

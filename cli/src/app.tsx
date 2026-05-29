@@ -16,6 +16,7 @@ import { RulesTab } from './components/RulesTab.js'
 import { AttributionTab } from './components/AttributionTab.js'
 import { HooksTab } from './components/HooksTab.js'
 import { ContextHud } from './components/ContextHud.js'
+import { IncidentBadge } from './components/IncidentBadge.js'
 import { ClaudeMdOverlay } from './components/ClaudeMdOverlay.js'
 import { SavedCommandOverlay } from './components/SavedCommandOverlay.js'
 import { useTabNavigation } from './hooks/useTabNavigation.js'
@@ -117,7 +118,10 @@ export function App({ onExit }: AppProps) {
     <Box flexDirection="column" height={rows} width={columns}>
       <Box justifyContent="space-between" width={columns}>
         <TabBar activeTab={activeTab} unreadDetections={unread} />
-        <ContextHud store={store} />
+        <Box>
+          <IncidentBadge />
+          <ContextHud store={store} />
+        </Box>
       </Box>
       {alerts.map(r => <BudgetAlert key={r.budget.id} result={r} />)}
       <Box flexGrow={1} flexDirection="column">

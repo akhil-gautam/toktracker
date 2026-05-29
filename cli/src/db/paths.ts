@@ -26,3 +26,7 @@ export function pidFilePath(): string {
 export function pricingCachePath(): string {
   return join(configDir(), 'pricing-cache.json')
 }
+
+export function statusCachePath(): string {
+  return join(configDir(), 'status-cache.json')
+}
