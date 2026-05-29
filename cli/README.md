@@ -93,6 +93,43 @@ strips secrets and PII from payloads before they reach the database. Run
 `tokscale privacy audit` to inspect what is stored, and `tokscale privacy wipe`
 to delete everything.
 
+## Pricing
+
+Model prices ship bundled in the binary (`src/data/pricing.json`), generated at
+build time from a **pinned** commit of LiteLLM's public pricing catalog and
+recorded in `src/data/pricing-source.json` (commit + SHA-256) so any source
+change is a reviewable diff. With this baseline, costing works **fully offline** —
+there are no runtime network calls by default.
+
+Unknown models are never silently mis-priced: lookup is exact-match (with
+deterministic date/version-suffix normalization), and a model with no known price
+is marked **unpriced** (`$0` placeholder) and surfaced in the dashboard rather
+than guessed from a similarly-named model.
+
+### Optional pricing refresh (off by default)
+
+To pick up newly-launched models between releases, you can opt into a best-effort
+background refresh:
+
+```bash
+tokscale pricing enable      # opt into the nightly refresh
+tokscale pricing refresh     # or fetch once, right now
+tokscale pricing status      # show state, source, cache age
+tokscale pricing disable     # opt back out
+```
+
+When enabled, the **daemon's nightly job** (never the parse path, never on
+startup) fetches the latest catalog into `~/.config/tokscale/pricing-cache.json`,
+which overlays — but never replaces — the bundled baseline. Safeguards:
+
+- **Anti-corruption guard** — a fetched catalog missing sentinel models or >5% of
+  previously-known models is rejected; the last-good cache (and bundled floor) stay.
+- **Keep-last-good** — any fetch/parse error leaves existing pricing untouched.
+- **Disclosed** — `tokscale privacy audit` reports whether refresh is enabled, the
+  endpoint, last-fetch time, and cache age; `tokscale privacy wipe` deletes the cache.
+
+No session data is ever sent — the refresh is a plain `GET` of a public JSON file.
+
 ## Requirements
 
 - Node 20+

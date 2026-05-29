@@ -53,6 +53,7 @@ export class SessionStore {
     let allTimeCacheWrite = 0, allTimeReasoning = 0
     let todayCost = 0, todayIn = 0, todayOut = 0, todayCount = 0
     let todayCacheRead = 0, todayCacheWrite = 0, todayReasoning = 0
+    let allTimeUnpriced = 0, todayUnpriced = 0
     let todayFirst: Date | undefined, todayLast: Date | undefined
     let thisWeekTotal = 0, lastWeekTotal = 0
 
@@ -101,10 +102,12 @@ export class SessionStore {
       allTimeCacheRead += s.cacheReadTokens
       allTimeCacheWrite += s.cacheWriteTokens
       allTimeReasoning += s.reasoningTokens
+      if (s.unpriced) allTimeUnpriced++
       const dk = dateKey(s.startedAt)
 
       // Today
       if (dk === today) {
+        if (s.unpriced) todayUnpriced++
         todayCost += s.costMillicents
         todayIn += s.inputTokens
         todayOut += s.outputTokens
@@ -363,6 +366,7 @@ export class SessionStore {
       uniqueRepos: repoMap.size,
       activeDays: dailyMap.size,
       cacheReuseRatio,
+      unpricedSessionCount: allTimeUnpriced,
     }
 
     const todayDetail: TodayDetailStats = {
@@ -373,6 +377,7 @@ export class SessionStore {
       cacheReadTokens: todayCacheRead,
       cacheWriteTokens: todayCacheWrite,
       reasoningTokens: todayReasoning,
+      unpricedSessionCount: todayUnpriced,
       models: Array.from(todayModelMap.values()).sort((a, b) => b.costMillicents - a.costMillicents),
       tools: Array.from(todayToolMap.values()).sort((a, b) => b.costMillicents - a.costMillicents),
       repos: Array.from(todayRepoMap.values()).sort((a, b) => b.costMillicents - a.costMillicents),

@@ -26,7 +26,8 @@ public struct Session: Sendable, Identifiable, Hashable {
     public var gitBranch: String?
     public var startedAt: Date
     public var endedAt: Date?
-    public var estimated: Bool
+    public var estimated: Bool   // tokens estimated (not reported) — distinct from `unpriced`
+    public var unpriced: Bool    // model has no known price; cost is a $0 placeholder
     public var toolUses: [String: Int]
 
     public init(
@@ -36,7 +37,7 @@ public struct Session: Sendable, Identifiable, Hashable {
         reasoningTokens: Int = 0, costMillicents: Int = 0,
         cwd: String? = nil, gitRepo: String? = nil, gitBranch: String? = nil,
         startedAt: Date, endedAt: Date? = nil,
-        estimated: Bool = false, toolUses: [String: Int] = [:]
+        estimated: Bool = false, unpriced: Bool = false, toolUses: [String: Int] = [:]
     ) {
         self.id = id
         self.conversationId = conversationId
@@ -55,6 +56,7 @@ public struct Session: Sendable, Identifiable, Hashable {
         self.startedAt = startedAt
         self.endedAt = endedAt
         self.estimated = estimated
+        self.unpriced = unpriced
         self.toolUses = toolUses
     }
 }

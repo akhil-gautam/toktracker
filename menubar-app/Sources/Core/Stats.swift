@@ -76,6 +76,7 @@ public struct AllTimeStats: Sendable, Hashable {
     public var uniqueRepos: Int
     public var activeDays: Int
     public var cacheReuseRatio: Double
+    public var unpricedSessionCount: Int   // conversations with a model that has no known price
     public init() {
         self.costMillicents = 0
         self.sessionCount = 0
@@ -87,6 +88,7 @@ public struct AllTimeStats: Sendable, Hashable {
         self.uniqueRepos = 0
         self.activeDays = 0
         self.cacheReuseRatio = 0
+        self.unpricedSessionCount = 0
     }
 }
 

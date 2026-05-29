@@ -16,7 +16,8 @@ export interface Session {
   gitBranch?: string
   startedAt: Date
   endedAt?: Date
-  estimated?: boolean
+  estimated?: boolean   // tokens were estimated (not reported by the tool) — distinct from `unpriced`
+  unpriced?: boolean    // model has no known price; cost is $0 as a fallback, not a real $0
   toolUses?: Record<string, number>  // e.g. { Read: 2, Grep: 1, Bash: 3 }
 }
 
@@ -37,6 +38,19 @@ export interface ModelPricing {
   outputPerMillion: number
   cacheReadPerMillion: number
   cacheWritePerMillion: number
+  // Long-context tiered pricing. When a request's input context exceeds
+  // `thresholdTokens`, the whole request bills at the *AboveThreshold rates
+  // (e.g. Anthropic >200K, Gemini >128K, OpenAI >272K). Mirrors CodexBar's
+  // thresholdTokens / *CostPerTokenAboveThreshold fields.
+  thresholdTokens?: number
+  inputPerMillionAboveThreshold?: number
+  outputPerMillionAboveThreshold?: number
+  cacheReadPerMillionAboveThreshold?: number
+  cacheWritePerMillionAboveThreshold?: number
+  // Priority service-tier rates (OpenAI). Mirrors CodexBar's priority* fields.
+  priorityInputPerMillion?: number
+  priorityOutputPerMillion?: number
+  priorityCacheReadPerMillion?: number
 }
 
 export interface PricingMap {
@@ -94,6 +108,7 @@ export interface TodayDetailStats {
   cacheReadTokens: number
   cacheWriteTokens: number
   reasoningTokens: number
+  unpricedSessionCount: number       // sessions on models with no known price
   models: ModelStats[]
   tools: ToolStats[]
   repos: RepoStats[]
@@ -151,6 +166,7 @@ export interface AllTimeStats {
   uniqueRepos: number
   activeDays: number  // days with at least one session
   cacheReuseRatio: number  // 0-1
+  unpricedSessionCount: number  // sessions on models with no known price
 }
 
 export interface ParsedMessage {

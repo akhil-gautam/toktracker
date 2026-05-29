@@ -77,6 +77,7 @@ public final class SessionStore: @unchecked Sendable {
         var allTimeConvos: Set<String> = []
         var todayConvos: Set<String> = []
         var dailyConvoSets: [String: Set<String>] = [:]
+        var unpricedConvos: Set<String> = []
 
         for s in sessions.values {
             allTimeCost += s.costMillicents
@@ -85,6 +86,7 @@ public final class SessionStore: @unchecked Sendable {
             allTimeCacheRead += s.cacheReadTokens
             allTimeCacheWrite += s.cacheWriteTokens
             allTimeConvos.insert(s.conversationId)
+            if s.unpriced { unpricedConvos.insert(s.conversationId) }
             let startDay = cal.startOfDay(for: s.startedAt)
             let key = dk(startDay)
             dailyConvoSets[key, default: []].insert(s.conversationId)
@@ -166,6 +168,7 @@ public final class SessionStore: @unchecked Sendable {
         agg.allTime.uniqueRepos = repoMap.count
         agg.allTime.activeDays = dailyMap.count
         agg.allTime.cacheReuseRatio = reuse
+        agg.allTime.unpricedSessionCount = unpricedConvos.count
 
         var todayDetail = TodayDetail()
         todayDetail.costMillicents = todayCost

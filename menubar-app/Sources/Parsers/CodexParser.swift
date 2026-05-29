@@ -88,7 +88,8 @@ public struct CodexParser: SessionParser {
                     cacheReadTokens: cached, cacheWriteTokens: 0,
                     reasoningTokens: reasoning, costMillicents: cost,
                     cwd: cwd, gitRepo: gitRepo, gitBranch: gitBranch,
-                    startedAt: timestamp))
+                    startedAt: timestamp,
+                    unpriced: !calculator.isPriced(currentModel)))
             }
         }
 

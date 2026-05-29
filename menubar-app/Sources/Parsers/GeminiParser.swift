@@ -56,7 +56,8 @@ public struct GeminiParser: SessionParser {
                 inputTokens: inputTokens, outputTokens: outputTokens,
                 costMillicents: cost,
                 startedAt: timestamp,
-                estimated: true))
+                estimated: true,
+                unpriced: !calculator.isPriced(model)))
         }
 
         return ParseResult(sessions: sessions, newOffset: size)

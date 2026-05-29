@@ -3,6 +3,11 @@ import Foundation
 public final class CostCalculator: @unchecked Sendable {
     public static let shared = CostCalculator()
 
+    /// Bump when the lookup/pricing logic changes in a way that should re-cost
+    /// already-stored rows. Rows with a lower pricing_version are recomputed once
+    /// by SessionsRepo.backfillPricing. v1 = exact-match lookup (no fuzzy fallback).
+    public static let currentPricingVersion = 1
+
     private let pricing: [String: ModelPricing]
 
     public convenience init() {
@@ -32,16 +37,41 @@ public final class CostCalculator: @unchecked Sendable {
         return (try? JSONDecoder().decode([String: ModelPricing].self, from: data)) ?? [:]
     }
 
-    public func lookup(_ model: String) -> ModelPricing? {
-        if let exact = pricing[model] { return exact }
-        let lower = model.lowercased()
-        if let match = pricing.first(where: { $0.key.lowercased() == lower })?.value {
-            return match
+    /// Deterministic normalization candidates: from the most specific id, strip
+    /// recognized trailing markers one at a time (@YYYYMMDD, :N, -vN, -YYYYMMDD)
+    /// and match each EXACTLY. Never a substring scan — that silently mis-priced
+    /// new models against unrelated siblings (e.g. gemini-3-pro -> *-image-preview).
+    /// Mirrors candidateKeys() in cli/src/services/cost-calculator.ts.
+    static func candidateKeys(_ model: String) -> [String] {
+        var out: [String] = []
+        var seen = Set<String>()
+        func push(_ k: String) { if !k.isEmpty && !seen.contains(k) { seen.insert(k); out.append(k) } }
+        push(model)
+        var cur = model
+        for _ in 0..<8 {
+            var next = cur
+            if let r = next.range(of: #"@\d{8}$"#, options: .regularExpression) { next.removeSubrange(r) }
+            else if let r = next.range(of: #":\d+$"#, options: .regularExpression) { next.removeSubrange(r) }
+            else if let r = next.range(of: #"-v\d+$"#, options: .regularExpression) { next.removeSubrange(r) }
+            else if let r = next.range(of: #"-\d{8}$"#, options: .regularExpression) { next.removeSubrange(r) }
+            if next == cur { break }
+            push(next)
+            cur = next
         }
-        return pricing
-            .filter { lower.contains($0.key.lowercased()) || $0.key.lowercased().contains(lower) }
-            .sorted { $0.key.count > $1.key.count }
-            .first?.value
+        return out
+    }
+
+    public func lookup(_ model: String) -> ModelPricing? {
+        for key in Self.candidateKeys(model) {
+            if let p = pricing[key] { return p }
+        }
+        return nil
+    }
+
+    /// Whether the model has a known price. Unknown models are "unpriced" (cost $0
+    /// as a placeholder), distinct from a genuine $0 — callers should flag them.
+    public func isPriced(_ model: String) -> Bool {
+        lookup(model) != nil
     }
 
     /// Returns cost in millicents (1/1000 of a cent).

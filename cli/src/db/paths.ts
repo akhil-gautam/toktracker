@@ -22,3 +22,7 @@ export function modelsDir(): string {
 export function pidFilePath(): string {
   return join(configDir(), 'daemon.pid')
 }
+
+export function pricingCachePath(): string {
+  return join(configDir(), 'pricing-cache.json')
+}

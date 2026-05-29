@@ -106,6 +106,7 @@ public struct ClaudeCodeParser: SessionParser {
                     gitRepo: GitRepoResolver.shared.slug(forCwd: cwdStr),
                     gitBranch: obj["gitBranch"] as? String,
                     startedAt: timestamp,
+                    unpriced: !calculator.isPriced(model),
                     toolUses: toolUses))
             }
 
