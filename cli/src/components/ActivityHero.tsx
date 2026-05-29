@@ -10,12 +10,26 @@ function formatHour(h: number | null): string {
   return h < 12 ? `${h} AM` : `${h - 12} PM`
 }
 
-function mobyDickFact(tokens: number): string {
+// A rotating pool of "how many of X is that?" comparisons (token estimates are
+// rough, just for fun). One is picked at random each time the Overview mounts.
+const TOKEN_FACTS: Array<{ name: string; tokens: number }> = [
+  { name: 'Moby-Dick', tokens: 320_000 },
+  { name: 'War and Peace', tokens: 780_000 },
+  { name: 'the King James Bible', tokens: 1_010_000 },
+  { name: 'the Lord of the Rings trilogy', tokens: 760_000 },
+  { name: 'the Harry Potter series', tokens: 1_500_000 },
+  { name: "Hitchhiker's Guide to the Galaxy", tokens: 60_000 },
+  { name: 'the original Star Wars trilogy scripts', tokens: 120_000 },
+  { name: 'a typical PhD thesis', tokens: 110_000 },
+]
+
+function tokenFact(tokens: number, idx: number): string {
   if (tokens <= 0) return '—'
-  const mobyDick = 210_000
-  const ratio = tokens / mobyDick
-  if (ratio < 1) return `≈ ${Math.round(ratio * 100)}% of Moby-Dick.`
-  return `You've used ~${Math.round(ratio)}× more tokens than Moby-Dick.`
+  const f = TOKEN_FACTS[idx % TOKEN_FACTS.length]!
+  const ratio = tokens / f.tokens
+  if (ratio < 1) return `≈ ${Math.round(ratio * 100)}% of ${f.name} in tokens.`
+  if (ratio < 2) return `≈ ${ratio.toFixed(1)}× ${f.name} in tokens.`
+  return `~${Math.round(ratio).toLocaleString()}× ${f.name} in tokens.`
 }
 
 // Four-stop ramp using Unicode block chars.
@@ -75,6 +89,9 @@ interface Props { store: SessionStore; columns?: number }
 
 export function ActivityHero({ store, columns = 80 }: Props) {
   const [range, setRange] = React.useState<ActivityRange>('ALL')
+  // Pick a fun-fact comparison once per mount so it varies between views but
+  // doesn't flicker on every re-render.
+  const [factIdx] = React.useState(() => Math.floor(Math.random() * TOKEN_FACTS.length))
   useInput(input => {
     if (input === 'a' || input === 'A') setRange('ALL')
     else if (input === '3') setRange('30D')
@@ -116,7 +133,7 @@ export function ActivityHero({ store, columns = 80 }: Props) {
           : <Text dimColor>No activity in this range yet — start a session to see your heatmap.</Text>}
       </Box>
       <Box marginTop={1}>
-        <Text dimColor>{mobyDickFact(stats.totalTokens)}</Text>
+        <Text dimColor>{tokenFact(stats.totalTokens, factIdx)}</Text>
       </Box>
     </Box>
   )
