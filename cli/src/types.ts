@@ -37,6 +37,19 @@ export interface ModelPricing {
   outputPerMillion: number
   cacheReadPerMillion: number
   cacheWritePerMillion: number
+  // Long-context tiered pricing. When a request's input context exceeds
+  // `thresholdTokens`, the whole request bills at the *AboveThreshold rates
+  // (e.g. Anthropic >200K, Gemini >128K, OpenAI >272K). Mirrors CodexBar's
+  // thresholdTokens / *CostPerTokenAboveThreshold fields.
+  thresholdTokens?: number
+  inputPerMillionAboveThreshold?: number
+  outputPerMillionAboveThreshold?: number
+  cacheReadPerMillionAboveThreshold?: number
+  cacheWritePerMillionAboveThreshold?: number
+  // Priority service-tier rates (OpenAI). Mirrors CodexBar's priority* fields.
+  priorityInputPerMillion?: number
+  priorityOutputPerMillion?: number
+  priorityCacheReadPerMillion?: number
 }
 
 export interface PricingMap {
