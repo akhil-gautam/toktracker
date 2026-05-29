@@ -12,17 +12,18 @@ interface OverviewTabProps {
   store: SessionStore
   budgetResults: BudgetResult[]
   db: Database.Database
+  columns?: number
 }
 
-export function OverviewTab({ store, budgetResults, db }: OverviewTabProps) {
+export function OverviewTab({ store, budgetResults, columns = 80 }: OverviewTabProps) {
   const todayDetail = store.getTodayDetail()
   const unpricedCount = store.getAllTimeStats().unpricedSessionCount
   return (
     <Box flexDirection="column" paddingX={1}>
-      <ActivityHero db={db} store={store} />
-      <HeroMetrics store={store} budgetResults={budgetResults} />
+      <ActivityHero store={store} columns={columns} />
+      <HeroMetrics store={store} budgetResults={budgetResults} columns={columns} />
       <UnpricedBanner count={unpricedCount} />
-      <TodayDetail detail={todayDetail} />
+      <TodayDetail detail={todayDetail} columns={columns} />
     </Box>
   )
 }

@@ -1,157 +1,13 @@
 import React from 'react'
 import { Box, Text, useInput } from 'ink'
-import type Database from 'better-sqlite3'
-import type { SessionStore } from '../services/session-store.js'
-
-export type ActivityRange = 'ALL' | '30D' | '7D'
-
-interface YearCell { value: number; isFuture: boolean }
-
-interface Stats {
-  sessions: number
-  messages: number
-  totalTokens: number
-  activeDays: number
-  currentStreak: number
-  longestStreak: number
-  peakHour: number | null
-  favoriteModel: string | null
-  yearCells: YearCell[]   // Jan 1 → Dec 31 of current year
-}
-
-function heatmapDaysFor(range: ActivityRange): number {
-  switch (range) {
-    case 'ALL': return 140
-    case '30D': return 30
-    case '7D': return 7
-  }
-}
-
-function cutoffMs(range: ActivityRange): number {
-  if (range === 'ALL') return 0
-  const days = range === '30D' ? 30 : 7
-  return Date.now() - days * 86_400_000
-}
-
-function buildYearCells(db: Database.Database): YearCell[] {
-  const now = new Date()
-  const year = now.getFullYear()
-  const jan1 = new Date(year, 0, 1)
-  const nextJan1 = new Date(year + 1, 0, 1)
-  const today = new Date(year, now.getMonth(), now.getDate())
-
-  const rows = db.prepare(`
-    SELECT strftime('%Y-%m-%d', started_at / 1000, 'unixepoch', 'localtime') AS d,
-           COALESCE(SUM(cost_millicents), 0) AS c
-    FROM sessions WHERE started_at >= ? AND started_at < ?
-    GROUP BY d
-  `).all(jan1.getTime(), nextJan1.getTime()) as Array<{ d: string; c: number }>
-  const byDay = new Map<string, number>()
-  for (const r of rows) byDay.set(r.d, r.c)
-
-  const cells: YearCell[] = []
-  const cursor = new Date(jan1)
-  while (cursor < nextJan1) {
-    const key = cursor.toISOString().slice(0, 10)
-    const isFuture = cursor.getTime() > today.getTime()
-    cells.push({
-      value: isFuture ? 0 : (byDay.get(key) ?? 0),
-      isFuture,
-    })
-    cursor.setDate(cursor.getDate() + 1)
-  }
-  return cells
-}
-
-function compute(db: Database.Database, store: SessionStore, range: ActivityRange): Stats {
-  const yearCells = buildYearCells(db)
-  const pastCells = yearCells.filter(c => !c.isFuture)
-  const windowValues: number[] = (() => {
-    if (range === 'ALL') return pastCells.map(c => c.value)
-    const days = heatmapDaysFor(range)
-    return pastCells.map(c => c.value).slice(-days)
-  })()
-
-  const activeDays = windowValues.filter(v => v > 0).length
-  const currentStreak = currentStreakOf(pastCells.map(c => c.value))
-  const longestStreak = longestStreakOf(yearCells.map(c => c.value))
-
-  const cutoff = cutoffMs(range)
-  const sessions = (db.prepare(`
-    SELECT COUNT(DISTINCT id) AS c FROM sessions WHERE started_at >= ?
-  `).get(cutoff) as { c: number }).c
-  const messages = (db.prepare(`
-    SELECT COUNT(*) AS c FROM messages WHERE created_at >= ?
-  `).get(cutoff) as { c: number }).c
-  const tokens = (db.prepare(`
-    SELECT COALESCE(SUM(input_tokens + output_tokens + cache_read + cache_write), 0) AS t
-    FROM sessions WHERE started_at >= ?
-  `).get(cutoff) as { t: number }).t
-
-  const peakRow = db.prepare(`
-    SELECT CAST((started_at / 1000) % 86400 / 3600 AS INTEGER) AS h,
-           SUM(cost_millicents) AS cost
-    FROM sessions WHERE started_at >= ? GROUP BY h ORDER BY cost DESC LIMIT 1
-  `).get(cutoff) as { h: number } | undefined
-  const peakHour = peakRow?.h ?? null
-
-  const favRow = db.prepare(`
-    SELECT model FROM sessions WHERE started_at >= ?
-    GROUP BY model ORDER BY SUM(cost_millicents) DESC LIMIT 1
-  `).get(cutoff) as { model: string } | undefined
-  const favoriteModel = favRow?.model ?? null
-
-  return {
-    sessions, messages, totalTokens: tokens,
-    activeDays, currentStreak, longestStreak,
-    peakHour, favoriteModel,
-    yearCells,
-  }
-}
-
-function currentStreakOf(daily: number[]): number {
-  let count = 0
-  for (let i = daily.length - 1; i >= 0; i--) {
-    if (daily[i]! > 0) count++
-    else break
-  }
-  return count
-}
-
-function longestStreakOf(daily: number[]): number {
-  let best = 0, cur = 0
-  for (const v of daily) {
-    if (v > 0) { cur++; best = Math.max(best, cur) }
-    else cur = 0
-  }
-  return best
-}
-
-function formatTokens(n: number): string {
-  if (n >= 1e12) return `${(n / 1e12).toFixed(2)}T`
-  if (n >= 1e9) return `${(n / 1e9).toFixed(2)}B`
-  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`
-  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`
-  return String(n)
-}
+import type { SessionStore, ActivityRange, YearCell } from '../services/session-store.js'
+import { formatTokens, shortModel } from '../theme.js'
 
 function formatHour(h: number | null): string {
   if (h == null) return '—'
   if (h === 0) return '12 AM'
   if (h === 12) return '12 PM'
   return h < 12 ? `${h} AM` : `${h - 12} PM`
-}
-
-function shortModel(m: string | null): string {
-  if (!m) return '—'
-  const trimmed = m.replace(/^claude-/, '').replace(/^gpt-/, '')
-  const parts = trimmed.split('-')
-  if (parts.length >= 2) {
-    const head = parts[0]!
-    const rest = parts.slice(1, 3).join('.')
-    return `${head.charAt(0).toUpperCase() + head.slice(1)} ${rest}`
-  }
-  return trimmed
 }
 
 function mobyDickFact(tokens: number): string {
@@ -162,8 +18,7 @@ function mobyDickFact(tokens: number): string {
   return `You've used ~${Math.round(ratio)}× more tokens than Moby-Dick.`
 }
 
-// Four-stop ramp using Unicode block chars. Chalk-via-Ink color prop gives
-// the visual intensity in a terminal without requiring truecolor.
+// Four-stop ramp using Unicode block chars.
 function heatmapCell(cell: YearCell | null, peak: number): { char: string; color: string; dim: boolean } {
   if (cell === null) return { char: ' ', color: 'gray', dim: true }
   if (cell.isFuture) return { char: '·', color: 'gray', dim: true }
@@ -175,9 +30,7 @@ function heatmapCell(cell: YearCell | null, peak: number): { char: string; color
   return { char: '█', color: 'cyanBright', dim: false }
 }
 
-/// GitHub-style contribution grid. Column 0, row 0 is the Monday of the week
-/// containing Jan 1 — days before Jan 1 render as blanks so the grid stays
-/// rectangular.
+/// GitHub-style contribution grid for the current year.
 function Heatmap({ cells }: { cells: YearCell[] }) {
   const rows = 7
   const year = new Date().getFullYear()
@@ -204,25 +57,34 @@ function Heatmap({ cells }: { cells: YearCell[] }) {
   return <Box flexDirection="column">{lines}</Box>
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+// Each stat is a fixed-width column: label on row 1, value on row 2. The explicit
+// width + truncation keeps label and value from ever colliding (the old layout let
+// adjacent columns overrun each other on some terminals → "0ESSIONS").
+function Stat({ label, value, width }: { label: string; value: string; width: number }) {
+  const w = Math.max(8, width - 1)
+  const clip = (s: string) => (s.length > w ? s.slice(0, w - 1) + '…' : s)
   return (
-    <Box flexDirection="column" width={20} marginRight={1}>
-      <Text dimColor>{label.toUpperCase()}</Text>
-      <Text bold>{value}</Text>
+    <Box flexDirection="column" width={width}>
+      <Text color="#6B7280">{clip(label.toUpperCase())}</Text>
+      <Text bold>{clip(value)}</Text>
     </Box>
   )
 }
 
-interface Props { db: Database.Database; store: SessionStore }
+interface Props { store: SessionStore; columns?: number }
 
-export function ActivityHero({ db, store }: Props) {
+export function ActivityHero({ store, columns = 80 }: Props) {
   const [range, setRange] = React.useState<ActivityRange>('ALL')
   useInput(input => {
     if (input === 'a' || input === 'A') setRange('ALL')
     else if (input === '3') setRange('30D')
     else if (input === '7') setRange('7D')
   })
-  const stats = React.useMemo(() => compute(db, store, range), [db, store, range])
+  const stats = React.useMemo(() => store.getActivity(range), [store, range])
+
+  // Four columns sized to the terminal width (panel has border + padding ≈ 4 cols).
+  const colWidth = Math.max(14, Math.min(28, Math.floor((columns - 6) / 4)))
+
   return (
     <Box flexDirection="column" borderStyle="round" paddingX={1} paddingY={0} marginBottom={1}>
       <Box justifyContent="space-between" marginBottom={1}>
@@ -237,19 +99,21 @@ export function ActivityHero({ db, store }: Props) {
         </Box>
       </Box>
       <Box>
-        <Stat label="Sessions"       value={String(stats.sessions)} />
-        <Stat label="Messages"       value={formatTokens(stats.messages)} />
-        <Stat label="Total tokens"   value={formatTokens(stats.totalTokens)} />
-        <Stat label="Active days"    value={String(stats.activeDays)} />
-      </Box>
-      <Box>
-        <Stat label="Current streak" value={`${stats.currentStreak}d`} />
-        <Stat label="Longest streak" value={`${stats.longestStreak}d`} />
-        <Stat label="Peak hour"      value={formatHour(stats.peakHour)} />
-        <Stat label="Favorite model" value={shortModel(stats.favoriteModel)} />
+        <Stat label="Sessions"       value={String(stats.sessions)}        width={colWidth} />
+        <Stat label="Total tokens"   value={formatTokens(stats.totalTokens)} width={colWidth} />
+        <Stat label="Active days"    value={String(stats.activeDays)}      width={colWidth} />
+        <Stat label="Current streak" value={`${stats.currentStreak}d`}     width={colWidth} />
       </Box>
       <Box marginTop={1}>
-        <Heatmap cells={stats.yearCells} />
+        <Stat label="Longest streak" value={`${stats.longestStreak}d`}     width={colWidth} />
+        <Stat label="Peak hour"      value={formatHour(stats.peakHour)}    width={colWidth} />
+        <Stat label="Favorite model" value={shortModel(stats.favoriteModel)} width={colWidth} />
+        <Stat label="" value="" width={colWidth} />
+      </Box>
+      <Box marginTop={1}>
+        {stats.sessions > 0
+          ? <Heatmap cells={stats.yearCells} />
+          : <Text dimColor>No activity in this range yet — start a session to see your heatmap.</Text>}
       </Box>
       <Box marginTop={1}>
         <Text dimColor>{mobyDickFact(stats.totalTokens)}</Text>

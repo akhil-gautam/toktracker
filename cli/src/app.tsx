@@ -100,7 +100,7 @@ export function App({ onExit }: AppProps) {
 
   function renderTab() {
     switch (activeTab) {
-      case 'overview': return <OverviewTab store={store} budgetResults={budgetResults} db={db} />
+      case 'overview': return <OverviewTab store={store} budgetResults={budgetResults} db={db} columns={columns} />
       case 'models': return <ModelsTab store={store} />
       case 'daily': return <DailyTab store={store} />
       case 'repos': return <ReposTab store={store} />
@@ -115,9 +115,9 @@ export function App({ onExit }: AppProps) {
 
   return (
     <Box flexDirection="column" height={rows} width={columns}>
-      <Box justifyContent="space-between">
+      <Box justifyContent="space-between" width={columns}>
         <TabBar activeTab={activeTab} unreadDetections={unread} />
-        <ContextHud db={db} sessionId={undefined} />
+        <ContextHud store={store} />
       </Box>
       {alerts.map(r => <BudgetAlert key={r.budget.id} result={r} />)}
       <Box flexGrow={1} flexDirection="column">

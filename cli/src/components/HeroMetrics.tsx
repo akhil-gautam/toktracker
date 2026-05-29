@@ -10,9 +10,12 @@ import type { BudgetResult } from '../hooks/useBudget.js'
 interface HeroMetricsProps {
   store: SessionStore
   budgetResults: BudgetResult[]
+  columns?: number
 }
 
-export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
+export function HeroMetrics({ store, budgetResults, columns = 80 }: HeroMetricsProps) {
+  // Four cards per row, sized to the terminal (gap of 1 between them).
+  const cardWidth = Math.max(18, Math.min(30, Math.floor((columns - 5) / 4)))
   const today = store.getTodayStats()
   const weekTotal = store.getWeekTotal()
   const weekDelta = store.getWeekOverWeekDelta()
@@ -47,24 +50,28 @@ export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
       {/* Row 1: All-time stats */}
       <Box marginBottom={0} gap={1}>
         <StatCard
+          width={cardWidth}
           label="Total Spend"
           value={formatCost(allTime.costMillicents)}
           valueColor="#4CAF50"
           caption={`${(allTime.costMillicents / 100_000).toFixed(2)} USD all-time`}
         />
         <StatCard
+          width={cardWidth}
           label="Total Sessions"
           value={allTime.sessionCount.toLocaleString()}
           valueColor="#42A5F5"
           caption={dateRange}
         />
         <StatCard
+          width={cardWidth}
           label="Output Tokens"
           value={formatTokens(allTime.outputTokens)}
           valueColor="#CE93D8"
           caption={`${formatTokens(Math.round(allTime.outputTokens / Math.max(1, allTime.sessionCount)))} avg/session`}
         />
         <StatCard
+          width={cardWidth}
           label="Cache Reuse Ratio"
           value={`${(allTime.cacheReuseRatio * 100).toFixed(1)}%`}
           valueColor="#29B6F6"
@@ -75,18 +82,21 @@ export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
       {/* Row 2: Week / today stats */}
       <Box gap={1}>
         <StatCard
+          width={cardWidth}
           label="This Week"
           value={formatCost(weekTotal)}
           valueColor="#64B5F6"
           delta={{ value: weekDelta, positiveBad: true }}
         />
         <StatCard
+          width={cardWidth}
           label="Input Tokens"
           value={formatTokens(allTime.inputTokens)}
           valueColor="#FFC107"
           caption={`${formatTokens(allTime.cacheReadTokens)} from cache`}
         />
         <StatCard
+          width={cardWidth}
           label="Active Days"
           value={String(allTime.activeDays)}
           valueColor="#FF9800"
@@ -94,6 +104,7 @@ export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
         />
         {topBudget ? (
           <StatCard
+          width={cardWidth}
             label="Top Budget"
             value={`${topBudget.pct}%`}
             valueColor={topBudget.pct >= 80 ? '#FF5252' : topBudget.pct >= 50 ? '#FFC107' : '#4CAF50'}
@@ -101,6 +112,7 @@ export function HeroMetrics({ store, budgetResults }: HeroMetricsProps) {
           />
         ) : (
           <StatCard
+          width={cardWidth}
             label="Avg / Session"
             value={formatCost(avgPerSession)}
             valueColor="#FF7043"
