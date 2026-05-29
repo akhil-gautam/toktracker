@@ -10,14 +10,20 @@ export function BudgetTab({ results }: BudgetTabProps) {
     return (
       <Box flexDirection="column" paddingX={1}>
         <Box marginBottom={1}><Text color="cyan" bold>Budgets</Text></Box>
-        <Text color="gray">No budgets configured.</Text>
-        <Text color="gray" dimColor>Use <Text color="cyan">/budget set</Text> to create one.</Text>
+        <Text color="gray">No budgets configured. Press <Text color="cyan">/</Text> and type:</Text>
+        <Box marginTop={1} flexDirection="column">
+          <Text><Text color="cyan">  /budget set 50 weekly</Text><Text color="gray" dimColor>    $50 per week</Text></Text>
+          <Text><Text color="cyan">  /budget set 500 monthly</Text><Text color="gray" dimColor>  $500 per month</Text></Text>
+          <Text><Text color="cyan">  /budget set 20 daily</Text><Text color="gray" dimColor>     $20 per day</Text></Text>
+          <Text><Text color="cyan">  /budget clear</Text><Text color="gray" dimColor>            remove all budgets</Text></Text>
+        </Box>
+        <Box marginTop={1}><Text color="gray" dimColor>Once set, each shows a pace projection — when you'll hit the limit.</Text></Box>
       </Box>
     )
   }
   return (
     <Box flexDirection="column" paddingX={1}>
-      <Box marginBottom={1}><Text color="cyan" bold>Budgets</Text></Box>
+      <Box marginBottom={1}><Text color="cyan" bold>Budgets</Text><Text color="gray" dimColor>{'   /budget set <amount> [daily|weekly|monthly]  ·  /budget clear'}</Text></Box>
       {results.map(r => <Box key={r.budget.id} marginBottom={1}><BudgetBar result={r} /></Box>)}
     </Box>
   )

@@ -5,9 +5,12 @@ import { SessionStore } from '../services/session-store.js'
 import { StateManager } from '../services/state-manager.js'
 import { loadAllSessions, parseChangedFile, WATCH_PATHS } from '../parsers/index.js'
 import { checkBudgets, type BudgetResult } from './useBudget.js'
+import type { Budget } from '../types.js'
 
 interface UseSessionsResult {
   store: SessionStore; budgetResults: BudgetResult[]; loading: boolean; error: string | null; serverMode: boolean
+  saveBudget: (b: Budget) => void
+  clearBudgets: () => void
 }
 
 export function useSessions(): UseSessionsResult {
@@ -22,10 +25,24 @@ export function useSessions(): UseSessionsResult {
 
   const refreshBudgets = useCallback(() => {
     const budgets = stateManager.loadBudgets()
-    if (budgets.length > 0) {
-      setBudgetResults(checkBudgets(budgets, store.getAllSessions()))
-    }
+    setBudgetResults(checkBudgets(budgets, store.getAllSessions()))
   }, [store, stateManager])
+
+  // Create/replace a budget (same scope+scopeValue+period is overwritten) and re-check.
+  const saveBudget = useCallback((b: Budget) => {
+    const existing = stateManager.loadBudgets().filter(
+      x => !(x.scope === b.scope && x.scopeValue === b.scopeValue && x.period === b.period),
+    )
+    stateManager.saveBudgets([...existing, b])
+    refreshBudgets()
+    setUpdateTick(t => t + 1)
+  }, [stateManager, refreshBudgets])
+
+  const clearBudgets = useCallback(() => {
+    stateManager.saveBudgets([])
+    setBudgetResults([])
+    setUpdateTick(t => t + 1)
+  }, [stateManager])
 
   useEffect(() => {
     let watcher: ReturnType<typeof watch> | null = null
@@ -75,5 +92,5 @@ export function useSessions(): UseSessionsResult {
     return () => { watcher?.close() }
   }, [])
 
-  return { store, budgetResults, loading, error, serverMode }
+  return { store, budgetResults, loading, error, serverMode, saveBudget, clearBudgets }
 }

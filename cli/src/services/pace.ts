@@ -76,3 +76,24 @@ export function projectBudget(result: BudgetResult, now: Date = new Date()): Bud
 
   return { elapsedPct: Math.round(elapsedFrac * 100), projectedEndCents, projectedPct, status, breachAt, summary }
 }
+
+export interface SpendProjection {
+  period: 'daily' | 'weekly' | 'monthly'
+  spentCents: number
+  projectedEndCents: number
+  elapsedPct: number
+}
+
+/**
+ * Budget-independent run-rate projection: given spend so far in the period,
+ * project where it lands by period end at the current rate. Used on the Overview
+ * even when no budget is configured.
+ */
+export function projectSpend(spentCents: number, period: SpendProjection['period'], now: Date = new Date()): SpendProjection {
+  const { start, end } = periodBounds(period, now)
+  const total = end.getTime() - start.getTime()
+  const elapsed = Math.min(total, Math.max(0, now.getTime() - start.getTime()))
+  const elapsedFrac = total > 0 ? elapsed / total : 0
+  const projectedEndCents = elapsedFrac > 0 ? Math.round(spentCents / elapsedFrac) : spentCents
+  return { period, spentCents, projectedEndCents, elapsedPct: Math.round(elapsedFrac * 100) }
+}

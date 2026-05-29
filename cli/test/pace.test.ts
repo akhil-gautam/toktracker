@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { projectBudget } from '../src/services/pace.js'
+import { projectBudget, projectSpend } from '../src/services/pace.js'
 import type { BudgetResult } from '../src/hooks/useBudget.js'
 
 function result(over: Partial<BudgetResult['budget']> & { spentCents: number }): BudgetResult {
@@ -37,5 +37,17 @@ describe('projectBudget', () => {
     const p = projectBudget(result({ period: 'daily', limitCents: 1000, spentCents: 1500 }), now)
     expect(p.status).toBe('over')
     expect(p.summary).toMatch(/over budget/)
+  })
+})
+
+describe('projectSpend (budget-independent)', () => {
+  it('projects month-end spend from the run rate so far', () => {
+    // June has 30 days; on the 15th end-of-day = 15/30 = 50% elapsed, $300 spent → $600
+    const now = new Date('2026-06-15T23:59:59')
+    const p = projectSpend(30000, 'monthly', now) // $300 in cents
+    expect(p.elapsedPct).toBeGreaterThanOrEqual(46)
+    expect(p.elapsedPct).toBeLessThanOrEqual(50)
+    expect(p.projectedEndCents).toBeGreaterThan(58000)
+    expect(p.projectedEndCents).toBeLessThan(66000)
   })
 })

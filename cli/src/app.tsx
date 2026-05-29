@@ -22,6 +22,7 @@ import { SavedCommandOverlay } from './components/SavedCommandOverlay.js'
 import { useTabNavigation } from './hooks/useTabNavigation.js'
 import { useSessions } from './hooks/useSessions.js'
 import { bootDb } from './db/boot.js'
+import type { Budget } from './types.js'
 
 function useTerminalSize() {
   const [size, setSize] = useState({
@@ -40,8 +41,8 @@ interface AppProps { onExit: () => void }
 
 export function App({ onExit }: AppProps) {
   const { rows, columns } = useTerminalSize()
-  const { store, budgetResults, loading, error, serverMode } = useSessions()
-  const { activeTab, commandMode, commandInput, showHelp, handleInput } = useTabNavigation()
+  const { store, budgetResults, loading, error, serverMode, saveBudget, clearBudgets } = useSessions()
+  const { activeTab, setActiveTab, commandMode, commandInput, showHelp, handleInput } = useTabNavigation()
   const db = React.useMemo(() => bootDb(), [])
   const [overlay, setOverlay] = React.useState<'claude_md' | 'saved_cmd' | null>(null)
 
@@ -53,11 +54,26 @@ export function App({ onExit }: AppProps) {
     }
   }, [db, activeTab])
 
+  // Slash-command handler. Currently: /budget set <amount> [daily|weekly|monthly], /budget clear.
+  const onCommand = React.useCallback((cmd: string) => {
+    const parts = cmd.replace(/^\//, '').trim().split(/\s+/)
+    if (parts[0] !== 'budget') return
+    if (parts[1] === 'clear') { clearBudgets(); setActiveTab('budget'); return }
+    if (parts[1] === 'set') {
+      const amount = parseFloat(parts[2] ?? '')
+      if (!isFinite(amount) || amount <= 0) return
+      const period: Budget['period'] =
+        parts[3] === 'daily' || parts[3] === 'weekly' || parts[3] === 'monthly' ? parts[3] : 'monthly'
+      saveBudget({ id: `global-${period}`, scope: 'global', period, limitCents: Math.round(amount * 100), alertAtPct: 80 })
+      setActiveTab('budget')
+    }
+  }, [saveBudget, clearBudgets, setActiveTab])
+
   useInput((input, key) => {
     if (overlay) return
     if (input === '!') { setOverlay('claude_md'); return }
     if (input === '@') { setOverlay('saved_cmd'); return }
-    handleInput(input, key, onExit)
+    handleInput(input, key, onExit, onCommand)
   })
 
   if (loading) return (
