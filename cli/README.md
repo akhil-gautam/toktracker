@@ -105,7 +105,7 @@ custom dashboards or CI gates:
 
 ```bash
 tokscale serve --port 4317
-# GET /stats /models /repos /daily?days=30 /sessions?limit=100 /budgets
+# GET /stats /models /repos /daily?days=30 /sessions?limit=100 /budgets /projection
 # append ?fresh=1 to re-scan logs
 ```
 

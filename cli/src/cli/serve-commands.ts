@@ -4,9 +4,9 @@ import { SessionStore } from '../services/session-store.js'
 import { StateManager } from '../services/state-manager.js'
 import { loadAllSessions } from '../parsers/index.js'
 import { checkBudgets } from '../hooks/useBudget.js'
-import { projectBudget } from '../services/pace.js'
+import { projectBudget, projectSpend } from '../services/pace.js'
 
-const ENDPOINTS = ['/health', '/stats', '/models', '/repos', '/daily?days=30', '/sessions?limit=100', '/budgets']
+const ENDPOINTS = ['/health', '/stats', '/models', '/repos', '/daily?days=30', '/sessions?limit=100', '/budgets', '/projection']
 
 function send(res: ServerResponse, status: number, body: unknown): void {
   const json = JSON.stringify(body, null, 2)
@@ -33,6 +33,21 @@ export function registerServeCommands(program: Command): void {
         return checkBudgets(budgets, store.getAllSessions()).map(r => ({
           ...r, pace: projectBudget(r),
         }))
+      }
+
+      // Forward-looking run-rate projection (cents), mirroring the Overview line.
+      const projectionJSON = () => {
+        const now = new Date()
+        const ym = now.toISOString().slice(0, 7)
+        const monthMillicents = store.getDailyStats(31)
+          .filter(d => d.date.startsWith(ym))
+          .reduce((s, d) => s + d.costMillicents, 0)
+        return {
+          unit: 'cents',
+          month: projectSpend(Math.round(monthMillicents / 1000), 'monthly', now),
+          week: projectSpend(Math.round(store.getWeekTotal() / 1000), 'weekly', now),
+          budgets: budgetsJSON().map(b => ({ id: b.budget.id, period: b.budget.period, limitCents: b.budget.limitCents, ...b.pace })),
+        }
       }
 
       const server = createServer(async (req, res) => {
@@ -65,6 +80,8 @@ export function registerServeCommands(program: Command): void {
               })))
             case '/budgets':
               return send(res, 200, budgetsJSON())
+            case '/projection':
+              return send(res, 200, projectionJSON())
             default:
               return send(res, 404, { error: 'not found', endpoints: ENDPOINTS })
           }
