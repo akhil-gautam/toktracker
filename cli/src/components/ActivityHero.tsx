@@ -71,23 +71,21 @@ function Heatmap({ cells }: { cells: YearCell[] }) {
   return <Box flexDirection="column">{lines}</Box>
 }
 
-// Each stat is a fixed-width column: label on row 1, value on row 2. The explicit
-// width + truncation keeps label and value from ever colliding (the old layout let
-// adjacent columns overrun each other on some terminals → "0ESSIONS").
-function Stat({ label, value, width }: { label: string; value: string; width: number }) {
-  const w = Math.max(8, width - 1)
-  const clip = (s: string) => (s.length > w ? s.slice(0, w - 1) + '…' : s)
+// Value + label on a SINGLE line ("33,349 sessions"). Each stat is its own row
+// Box of two inline Texts, so there is no column-stacking for the terminal to
+// collapse — which is what produced the "0ESSIONS" overlap. Also half the height.
+function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <Box flexDirection="column" width={width}>
-      <Text color="#6B7280">{clip(label.toUpperCase())}</Text>
-      <Text bold>{clip(value)}</Text>
+    <Box marginRight={3}>
+      <Text bold>{value}</Text>
+      <Text color="#6B7280">{' ' + label}</Text>
     </Box>
   )
 }
 
-interface Props { store: SessionStore; columns?: number }
+interface Props { store: SessionStore }
 
-export function ActivityHero({ store, columns = 80 }: Props) {
+export function ActivityHero({ store }: Props) {
   const [range, setRange] = React.useState<ActivityRange>('ALL')
   // Pick a fun-fact comparison once per mount so it varies between views but
   // doesn't flicker on every re-render.
@@ -98,9 +96,6 @@ export function ActivityHero({ store, columns = 80 }: Props) {
     else if (input === '7') setRange('7D')
   })
   const stats = React.useMemo(() => store.getActivity(range), [store, range])
-
-  // Four columns sized to the terminal width (panel has border + padding ≈ 4 cols).
-  const colWidth = Math.max(14, Math.min(28, Math.floor((columns - 6) / 4)))
 
   return (
     <Box flexDirection="column" borderStyle="round" paddingX={1} paddingY={0} marginBottom={1}>
@@ -116,16 +111,14 @@ export function ActivityHero({ store, columns = 80 }: Props) {
         </Box>
       </Box>
       <Box>
-        <Stat label="Sessions"       value={String(stats.sessions)}        width={colWidth} />
-        <Stat label="Total tokens"   value={formatTokens(stats.totalTokens)} width={colWidth} />
-        <Stat label="Active days"    value={String(stats.activeDays)}      width={colWidth} />
-        <Stat label="Current streak" value={`${stats.currentStreak}d`}     width={colWidth} />
+        <Stat value={stats.sessions.toLocaleString()} label="sessions" />
+        <Stat value={formatTokens(stats.totalTokens)} label="tokens" />
+        <Stat value={String(stats.activeDays)} label="active days" />
+        <Stat value={`${stats.currentStreak}d / ${stats.longestStreak}d`} label="streak / best" />
       </Box>
-      <Box marginTop={1}>
-        <Stat label="Longest streak" value={`${stats.longestStreak}d`}     width={colWidth} />
-        <Stat label="Peak hour"      value={formatHour(stats.peakHour)}    width={colWidth} />
-        <Stat label="Favorite model" value={shortModel(stats.favoriteModel)} width={colWidth} />
-        <Stat label="" value="" width={colWidth} />
+      <Box>
+        <Stat value={formatHour(stats.peakHour)} label="peak hour" />
+        <Stat value={shortModel(stats.favoriteModel)} label="top model" />
       </Box>
       <Box marginTop={1}>
         {stats.sessions > 0

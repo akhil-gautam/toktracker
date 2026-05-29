@@ -17,9 +17,10 @@ import { AttributionTab } from './components/AttributionTab.js'
 import { HooksTab } from './components/HooksTab.js'
 import { ContextHud } from './components/ContextHud.js'
 import { IncidentBadge } from './components/IncidentBadge.js'
+import { SlashSuggestions } from './components/SlashSuggestions.js'
 import { ClaudeMdOverlay } from './components/ClaudeMdOverlay.js'
 import { SavedCommandOverlay } from './components/SavedCommandOverlay.js'
-import { useTabNavigation } from './hooks/useTabNavigation.js'
+import { useTabNavigation, TABS, type TabName } from './hooks/useTabNavigation.js'
 import { useSessions } from './hooks/useSessions.js'
 import { bootDb } from './db/boot.js'
 import type { Budget } from './types.js'
@@ -42,7 +43,7 @@ interface AppProps { onExit: () => void }
 export function App({ onExit }: AppProps) {
   const { rows, columns } = useTerminalSize()
   const { store, budgetResults, loading, error, serverMode, saveBudget, clearBudgets } = useSessions()
-  const { activeTab, setActiveTab, commandMode, commandInput, showHelp, handleInput } = useTabNavigation()
+  const { activeTab, setActiveTab, commandMode, commandInput, commandSuggestions, commandSelected, showHelp, setShowHelp, handleInput } = useTabNavigation()
   const db = React.useMemo(() => bootDb(), [])
   const [overlay, setOverlay] = React.useState<'claude_md' | 'saved_cmd' | null>(null)
 
@@ -57,7 +58,10 @@ export function App({ onExit }: AppProps) {
   // Slash-command handler. Currently: /budget set <amount> [daily|weekly|monthly], /budget clear.
   const onCommand = React.useCallback((cmd: string) => {
     const parts = cmd.replace(/^\//, '').trim().split(/\s+/)
-    if (parts[0] !== 'budget') return
+    const head = parts[0]
+    if (head === 'help') { setShowHelp(true); return }
+    if ((TABS as readonly string[]).includes(head)) { setActiveTab(head as TabName); return }
+    if (head !== 'budget') return
     if (parts[1] === 'clear') { clearBudgets(); setActiveTab('budget'); return }
     if (parts[1] === 'set') {
       const amount = parseFloat(parts[2] ?? '')
@@ -67,7 +71,7 @@ export function App({ onExit }: AppProps) {
       saveBudget({ id: `global-${period}`, scope: 'global', period, limitCents: Math.round(amount * 100), alertAtPct: 80 })
       setActiveTab('budget')
     }
-  }, [saveBudget, clearBudgets, setActiveTab])
+  }, [saveBudget, clearBudgets, setActiveTab, setShowHelp])
 
   useInput((input, key) => {
     if (overlay) return
@@ -143,6 +147,7 @@ export function App({ onExit }: AppProps) {
       <Box flexGrow={1} flexDirection="column">
         {renderTab()}
       </Box>
+      {commandMode && <SlashSuggestions commands={commandSuggestions} selected={commandSelected} />}
       <StatusBar tab={activeTab} commandMode={commandMode} commandInput={commandInput} />
     </Box>
   )

@@ -59,7 +59,7 @@ export function OverviewTab({ store, budgetResults, columns = 80 }: OverviewTabP
   const unpricedCount = store.getAllTimeStats().unpricedSessionCount
   return (
     <Box flexDirection="column" paddingX={1}>
-      <ActivityHero store={store} columns={columns} />
+      <ActivityHero store={store} />
       <HeroMetrics store={store} budgetResults={budgetResults} columns={columns} />
       <ProjectionLine store={store} budgetResults={budgetResults} />
       <UnpricedBanner count={unpricedCount} />

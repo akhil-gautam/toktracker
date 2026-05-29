@@ -5,6 +5,8 @@ import { SessionStore } from '../src/services/session-store.js'
 import { ActivityHero } from '../src/components/ActivityHero.js'
 import { HeroMetrics } from '../src/components/HeroMetrics.js'
 import { OverviewTab } from '../src/components/OverviewTab.js'
+import { SlashSuggestions } from '../src/components/SlashSuggestions.js'
+import { filterSlashCommands } from '../src/commands.js'
 import { checkBudgets } from '../src/hooks/useBudget.js'
 import type { Session } from '../src/types.js'
 
@@ -26,14 +28,13 @@ describe('TUI rendering (store-backed, post split-brain fix)', () => {
       mkSession({ startedAt: today, model: 'gpt-5', costMillicents: 1000 }),
       mkSession({ startedAt: new Date(today.getTime() - 86_400_000), costMillicents: 5000 }),
     ])
-    const f = render(<ActivityHero store={store} columns={120} />).lastFrame()!
+    const f = render(<ActivityHero store={store} />).lastFrame()!
     // eslint-disable-next-line no-console
     console.log('\n--- ActivityHero ---\n' + f)
-    expect(f).toContain('SESSIONS')
-    expect(f).toContain('TOTAL TOKENS')
-    expect(f).not.toMatch(/\dESSIONS/)        // value not glued onto the label
-    expect(f).not.toMatch(/\dCTIVE/)          // "0CTIVE DAYS" overlap gone
-    expect(f).toMatch(/SESSIONS[\s\S]*\b3\b/) // the real session count (3) renders
+    expect(f).toMatch(/3 sessions/)           // value + label inline, with a space (no overlap)
+    expect(f).toContain('tokens')
+    expect(f).toContain('active days')
+    expect(f).not.toMatch(/\d(sessions|tokens|active)/) // value never glued onto the label
   })
 
   it('Overview shows a forward-looking projection, and a budget pace when over', () => {
@@ -53,6 +54,14 @@ describe('TUI rendering (store-backed, post split-brain fix)', () => {
     expect(f).toMatch(/this month/)
     expect(f).toMatch(/projected/)
     expect(f).toMatch(/over budget|on pace to hit/) // budget pace surfaced on the overview
+  })
+
+  it('SlashSuggestions renders a command palette with the selected row highlighted', () => {
+    const cmds = filterSlashCommands('budget')
+    const f = render(<SlashSuggestions commands={cmds} selected={0} />).lastFrame()!
+    expect(f).toMatch(/\/budget set/)
+    expect(f).toMatch(/\/budget clear/)
+    expect(f).toMatch(/Tab complete · Enter run/)
   })
 
   it('HeroMetrics renders all-time card values, not blanks', () => {

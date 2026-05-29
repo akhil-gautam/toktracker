@@ -15,9 +15,8 @@ export function IncidentBadge() {
   const incidents = activeIncidents(loadStatusCache())
   if (incidents.length === 0) return null
   const worst = incidents[0]!
-  const label = incidents.length === 1
-    ? `${worst.provider}: ${worst.description || worst.indicator}`
-    : `${incidents.length} providers degraded (${worst.provider}…)`
+  // Terse so it never crowds the tab bar — full detail lives in `status show`.
+  const label = incidents.length === 1 ? worst.provider : `${incidents.length} providers`
   return (
     <Box marginRight={2}>
       <Text color={COLOR[worst.indicator]} bold>{'⚠ '}{label}</Text>

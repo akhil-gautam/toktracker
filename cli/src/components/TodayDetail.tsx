@@ -78,7 +78,7 @@ export function TodayDetail({ detail, columns = 80 }: TodayDetailProps) {
         <Text color="gray" dimColor>Hourly activity (24h):</Text>
         <VBarChart
           values={detail.hourly}
-          height={7}
+          height={5}
           stretch={4}
           colorScale
           labels={Array.from({ length: 24 }, (_, h) => (h % 3 === 0 ? String(h).padStart(2, '0') : ''))}
