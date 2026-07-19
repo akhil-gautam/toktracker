@@ -143,8 +143,14 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "amazon.titan-embed-g1-text-02": {
+    "inputPerMillion": 0.1,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "amazon.titan-embed-text-v2:0": {
-    "inputPerMillion": 0.2,
+    "inputPerMillion": 0.02,
     "outputPerMillion": 0,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
@@ -345,6 +351,30 @@
     "cacheReadPerMillion": 0.55,
     "cacheWritePerMillion": 6.875
   },
+  "anthropic.claude-fable-5": {
+    "inputPerMillion": 10,
+    "outputPerMillion": 50,
+    "cacheReadPerMillion": 1,
+    "cacheWritePerMillion": 12.5
+  },
+  "global.anthropic.claude-fable-5": {
+    "inputPerMillion": 10,
+    "outputPerMillion": 50,
+    "cacheReadPerMillion": 1,
+    "cacheWritePerMillion": 12.5
+  },
+  "us.anthropic.claude-fable-5": {
+    "inputPerMillion": 11,
+    "outputPerMillion": 55,
+    "cacheReadPerMillion": 1.1,
+    "cacheWritePerMillion": 13.75
+  },
+  "eu.anthropic.claude-fable-5": {
+    "inputPerMillion": 11,
+    "outputPerMillion": 55,
+    "cacheReadPerMillion": 1.1,
+    "cacheWritePerMillion": 13.75
+  },
   "anthropic.claude-opus-4-8": {
     "inputPerMillion": 5,
     "outputPerMillion": 25,
@@ -374,6 +404,54 @@
     "outputPerMillion": 27.5,
     "cacheReadPerMillion": 0.55,
     "cacheWritePerMillion": 6.875
+  },
+  "jp.anthropic.claude-opus-4-8": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 27.5,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 6.875
+  },
+  "jp.anthropic.claude-opus-4-7": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 27.5,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 6.875
+  },
+  "anthropic.claude-sonnet-5": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 2.5
+  },
+  "global.anthropic.claude-sonnet-5": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 2.5
+  },
+  "us.anthropic.claude-sonnet-5": {
+    "inputPerMillion": 2.2,
+    "outputPerMillion": 11,
+    "cacheReadPerMillion": 0.22,
+    "cacheWritePerMillion": 2.75
+  },
+  "eu.anthropic.claude-sonnet-5": {
+    "inputPerMillion": 2.2,
+    "outputPerMillion": 11,
+    "cacheReadPerMillion": 0.22,
+    "cacheWritePerMillion": 2.75
+  },
+  "au.anthropic.claude-sonnet-5": {
+    "inputPerMillion": 2.2,
+    "outputPerMillion": 11,
+    "cacheReadPerMillion": 0.22,
+    "cacheWritePerMillion": 2.75
+  },
+  "jp.anthropic.claude-sonnet-5": {
+    "inputPerMillion": 2.2,
+    "outputPerMillion": 11,
+    "cacheReadPerMillion": 0.22,
+    "cacheWritePerMillion": 2.75
   },
   "anthropic.claude-sonnet-4-6": {
     "inputPerMillion": 3,
@@ -629,6 +707,12 @@
     "cacheReadPerMillion": 0.5,
     "cacheWritePerMillion": 6.25
   },
+  "azure_ai/claude-fable-5": {
+    "inputPerMillion": 10,
+    "outputPerMillion": 50,
+    "cacheReadPerMillion": 1,
+    "cacheWritePerMillion": 12.5
+  },
   "azure_ai/claude-opus-4-8": {
     "inputPerMillion": 5,
     "outputPerMillion": 25,
@@ -647,6 +731,12 @@
     "cacheReadPerMillion": 0.3,
     "cacheWritePerMillion": 3.75
   },
+  "azure_ai/claude-sonnet-5": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 2.5
+  },
   "azure_ai/claude-sonnet-4-6": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
@@ -664,6 +754,32 @@
     "outputPerMillion": 0.6,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
+  },
+  "azure_ai/gpt-5.5": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 30,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 10,
+    "outputPerMillionAboveThreshold": 45,
+    "cacheReadPerMillionAboveThreshold": 1,
+    "priorityInputPerMillion": 10,
+    "priorityOutputPerMillion": 60,
+    "priorityCacheReadPerMillion": 1
+  },
+  "azure_ai/gpt-5.5-2026-04-23": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 30,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 10,
+    "outputPerMillionAboveThreshold": 45,
+    "cacheReadPerMillionAboveThreshold": 1,
+    "priorityInputPerMillion": 10,
+    "priorityOutputPerMillion": 60,
+    "priorityCacheReadPerMillion": 1
   },
   "azure_ai/gpt-5.4": {
     "inputPerMillion": 2.5,
@@ -1418,6 +1534,24 @@
     "priorityOutputPerMillion": 30,
     "priorityCacheReadPerMillion": 0.5
   },
+  "azure/us/gpt-5.4": {
+    "inputPerMillion": 2.75,
+    "outputPerMillion": 16.5,
+    "cacheReadPerMillion": 0.28,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 5.5,
+    "priorityOutputPerMillion": 33,
+    "priorityCacheReadPerMillion": 0.55
+  },
+  "azure/eu/gpt-5.4": {
+    "inputPerMillion": 2.75,
+    "outputPerMillion": 16.5,
+    "cacheReadPerMillion": 0.28,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 5.5,
+    "priorityOutputPerMillion": 33,
+    "priorityCacheReadPerMillion": 0.55
+  },
   "azure/gpt-5.4-2026-03-05": {
     "inputPerMillion": 2.5,
     "outputPerMillion": 15,
@@ -1430,6 +1564,24 @@
     "priorityInputPerMillion": 5,
     "priorityOutputPerMillion": 30,
     "priorityCacheReadPerMillion": 0.5
+  },
+  "azure/us/gpt-5.4-2026-03-05": {
+    "inputPerMillion": 2.75,
+    "outputPerMillion": 16.5,
+    "cacheReadPerMillion": 0.28,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 5.5,
+    "priorityOutputPerMillion": 33,
+    "priorityCacheReadPerMillion": 0.55
+  },
+  "azure/eu/gpt-5.4-2026-03-05": {
+    "inputPerMillion": 2.75,
+    "outputPerMillion": 16.5,
+    "cacheReadPerMillion": 0.28,
+    "cacheWritePerMillion": 0,
+    "priorityInputPerMillion": 5.5,
+    "priorityOutputPerMillion": 33,
+    "priorityCacheReadPerMillion": 0.55
   },
   "azure/gpt-5.4-pro": {
     "inputPerMillion": 30,
@@ -1451,6 +1603,162 @@
     "outputPerMillionAboveThreshold": 270,
     "cacheReadPerMillionAboveThreshold": 6
   },
+  "azure/gpt-5.6": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 30,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 10,
+    "outputPerMillionAboveThreshold": 45,
+    "cacheReadPerMillionAboveThreshold": 1,
+    "priorityInputPerMillion": 10,
+    "priorityOutputPerMillion": 60,
+    "priorityCacheReadPerMillion": 1
+  },
+  "azure/gpt-5.6-sol": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 30,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 10,
+    "outputPerMillionAboveThreshold": 45,
+    "cacheReadPerMillionAboveThreshold": 1,
+    "priorityInputPerMillion": 10,
+    "priorityOutputPerMillion": 60,
+    "priorityCacheReadPerMillion": 1
+  },
+  "azure/gpt-5.6-terra": {
+    "inputPerMillion": 2.5,
+    "outputPerMillion": 15,
+    "cacheReadPerMillion": 0.25,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 5,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.5,
+    "priorityInputPerMillion": 5,
+    "priorityOutputPerMillion": 30,
+    "priorityCacheReadPerMillion": 0.5
+  },
+  "azure/gpt-5.6-luna": {
+    "inputPerMillion": 1,
+    "outputPerMillion": 6,
+    "cacheReadPerMillion": 0.1,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 2,
+    "outputPerMillionAboveThreshold": 9,
+    "cacheReadPerMillionAboveThreshold": 0.2,
+    "priorityInputPerMillion": 2,
+    "priorityOutputPerMillion": 12,
+    "priorityCacheReadPerMillion": 0.2
+  },
+  "azure/us/gpt-5.6": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 33,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 11,
+    "outputPerMillionAboveThreshold": 49.5,
+    "cacheReadPerMillionAboveThreshold": 1.1,
+    "priorityInputPerMillion": 13.75,
+    "priorityOutputPerMillion": 82.5,
+    "priorityCacheReadPerMillion": 1.375
+  },
+  "azure/us/gpt-5.6-sol": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 33,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 11,
+    "outputPerMillionAboveThreshold": 49.5,
+    "cacheReadPerMillionAboveThreshold": 1.1,
+    "priorityInputPerMillion": 13.75,
+    "priorityOutputPerMillion": 82.5,
+    "priorityCacheReadPerMillion": 1.375
+  },
+  "azure/us/gpt-5.6-terra": {
+    "inputPerMillion": 2.75,
+    "outputPerMillion": 16.5,
+    "cacheReadPerMillion": 0.275,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 5.5,
+    "outputPerMillionAboveThreshold": 24.75,
+    "cacheReadPerMillionAboveThreshold": 0.55,
+    "priorityInputPerMillion": 6.875,
+    "priorityOutputPerMillion": 41.25,
+    "priorityCacheReadPerMillion": 0.6875
+  },
+  "azure/us/gpt-5.6-luna": {
+    "inputPerMillion": 1.1,
+    "outputPerMillion": 6.6,
+    "cacheReadPerMillion": 0.11,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 2.2,
+    "outputPerMillionAboveThreshold": 9.9,
+    "cacheReadPerMillionAboveThreshold": 0.22,
+    "priorityInputPerMillion": 2.75,
+    "priorityOutputPerMillion": 16.5,
+    "priorityCacheReadPerMillion": 0.275
+  },
+  "azure/eu/gpt-5.6": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 33,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 11,
+    "outputPerMillionAboveThreshold": 49.5,
+    "cacheReadPerMillionAboveThreshold": 1.1,
+    "priorityInputPerMillion": 13.75,
+    "priorityOutputPerMillion": 82.5,
+    "priorityCacheReadPerMillion": 1.375
+  },
+  "azure/eu/gpt-5.6-sol": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 33,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 11,
+    "outputPerMillionAboveThreshold": 49.5,
+    "cacheReadPerMillionAboveThreshold": 1.1,
+    "priorityInputPerMillion": 13.75,
+    "priorityOutputPerMillion": 82.5,
+    "priorityCacheReadPerMillion": 1.375
+  },
+  "azure/eu/gpt-5.6-terra": {
+    "inputPerMillion": 2.75,
+    "outputPerMillion": 16.5,
+    "cacheReadPerMillion": 0.275,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 5.5,
+    "outputPerMillionAboveThreshold": 24.75,
+    "cacheReadPerMillionAboveThreshold": 0.55,
+    "priorityInputPerMillion": 6.875,
+    "priorityOutputPerMillion": 41.25,
+    "priorityCacheReadPerMillion": 0.6875
+  },
+  "azure/eu/gpt-5.6-luna": {
+    "inputPerMillion": 1.1,
+    "outputPerMillion": 6.6,
+    "cacheReadPerMillion": 0.11,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 2.2,
+    "outputPerMillionAboveThreshold": 9.9,
+    "cacheReadPerMillionAboveThreshold": 0.22,
+    "priorityInputPerMillion": 2.75,
+    "priorityOutputPerMillion": 16.5,
+    "priorityCacheReadPerMillion": 0.275
+  },
   "azure/gpt-5.5": {
     "inputPerMillion": 5,
     "outputPerMillion": 30,
@@ -1464,6 +1772,32 @@
     "priorityOutputPerMillion": 60,
     "priorityCacheReadPerMillion": 1
   },
+  "azure/us/gpt-5.5": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 33,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 11,
+    "outputPerMillionAboveThreshold": 49.5,
+    "cacheReadPerMillionAboveThreshold": 1.1,
+    "priorityInputPerMillion": 13.75,
+    "priorityOutputPerMillion": 82.5,
+    "priorityCacheReadPerMillion": 1.38
+  },
+  "azure/eu/gpt-5.5": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 33,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 11,
+    "outputPerMillionAboveThreshold": 49.5,
+    "cacheReadPerMillionAboveThreshold": 1.1,
+    "priorityInputPerMillion": 13.75,
+    "priorityOutputPerMillion": 82.5,
+    "priorityCacheReadPerMillion": 1.38
+  },
   "azure/gpt-5.5-2026-04-23": {
     "inputPerMillion": 5,
     "outputPerMillion": 30,
@@ -1476,6 +1810,32 @@
     "priorityInputPerMillion": 10,
     "priorityOutputPerMillion": 60,
     "priorityCacheReadPerMillion": 1
+  },
+  "azure/us/gpt-5.5-2026-04-23": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 33,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 11,
+    "outputPerMillionAboveThreshold": 49.5,
+    "cacheReadPerMillionAboveThreshold": 1.1,
+    "priorityInputPerMillion": 13.75,
+    "priorityOutputPerMillion": 82.5,
+    "priorityCacheReadPerMillion": 1.38
+  },
+  "azure/eu/gpt-5.5-2026-04-23": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 33,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 11,
+    "outputPerMillionAboveThreshold": 49.5,
+    "cacheReadPerMillionAboveThreshold": 1.1,
+    "priorityInputPerMillion": 13.75,
+    "priorityOutputPerMillion": 82.5,
+    "priorityCacheReadPerMillion": 1.38
   },
   "azure/gpt-5.5-pro": {
     "inputPerMillion": 30,
@@ -2001,6 +2361,24 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "azure_ai/deepseek-v3.1": {
+    "inputPerMillion": 1.23,
+    "outputPerMillion": 4.94,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "azure_ai/deepseek-v4-pro": {
+    "inputPerMillion": 1.74,
+    "outputPerMillion": 3.48,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "azure_ai/deepseek-v4-flash": {
+    "inputPerMillion": 0.19,
+    "outputPerMillion": 0.51,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "azure_ai/embed-v-4-0": {
     "inputPerMillion": 0.12,
     "outputPerMillion": 0,
@@ -2082,6 +2460,12 @@
   "azure_ai/kimi-k2.5": {
     "inputPerMillion": 0.6,
     "outputPerMillion": 3,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "azure_ai/kimi-k2.6": {
+    "inputPerMillion": 0.95,
+    "outputPerMillion": 4,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -2686,16 +3070,16 @@
     "cacheWritePerMillion": 0.375
   },
   "bedrock/us-gov-east-1/anthropic.claude-sonnet-4-5-20250929-v1:0": {
-    "inputPerMillion": 3.3,
-    "outputPerMillion": 16.5,
-    "cacheReadPerMillion": 0.33,
-    "cacheWritePerMillion": 4.125
+    "inputPerMillion": 3.6,
+    "outputPerMillion": 18,
+    "cacheReadPerMillion": 0.36,
+    "cacheWritePerMillion": 4.5
   },
   "bedrock/us-gov-east-1/claude-sonnet-4-5-20250929-v1:0": {
-    "inputPerMillion": 3.3,
-    "outputPerMillion": 16.5,
-    "cacheReadPerMillion": 0.33,
-    "cacheWritePerMillion": 4.125
+    "inputPerMillion": 3.6,
+    "outputPerMillion": 18,
+    "cacheReadPerMillion": 0.36,
+    "cacheWritePerMillion": 4.5
   },
   "bedrock/us-gov-east-1/meta.llama3-70b-instruct-v1:0": {
     "inputPerMillion": 2.65,
@@ -2764,16 +3148,16 @@
     "cacheWritePerMillion": 0.375
   },
   "bedrock/us-gov-west-1/anthropic.claude-sonnet-4-5-20250929-v1:0": {
-    "inputPerMillion": 3.3,
-    "outputPerMillion": 16.5,
-    "cacheReadPerMillion": 0.33,
-    "cacheWritePerMillion": 4.125
+    "inputPerMillion": 3.6,
+    "outputPerMillion": 18,
+    "cacheReadPerMillion": 0.36,
+    "cacheWritePerMillion": 4.5
   },
   "bedrock/us-gov-west-1/claude-sonnet-4-5-20250929-v1:0": {
-    "inputPerMillion": 3.3,
-    "outputPerMillion": 16.5,
-    "cacheReadPerMillion": 0.33,
-    "cacheWritePerMillion": 4.125
+    "inputPerMillion": 3.6,
+    "outputPerMillion": 18,
+    "cacheReadPerMillion": 0.36,
+    "cacheWritePerMillion": 4.5
   },
   "bedrock/us-gov-west-1/meta.llama3-70b-instruct-v1:0": {
     "inputPerMillion": 2.65,
@@ -3006,6 +3390,12 @@
     "cacheReadPerMillionAboveThreshold": 0.6,
     "cacheWritePerMillionAboveThreshold": 7.5
   },
+  "claude-sonnet-5": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 2.5
+  },
   "claude-sonnet-4-6": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
@@ -3077,6 +3467,12 @@
     "cacheReadPerMillion": 0.5,
     "cacheWritePerMillion": 6.25
   },
+  "claude-fable-5": {
+    "inputPerMillion": 10,
+    "outputPerMillion": 50,
+    "cacheReadPerMillion": 1,
+    "cacheWritePerMillion": 12.5
+  },
   "claude-opus-4-8": {
     "inputPerMillion": 5,
     "outputPerMillion": 25,
@@ -3115,6 +3511,162 @@
   "cloudflare/@hf/thebloke/codellama-7b-instruct-awq": {
     "inputPerMillion": 1.923,
     "outputPerMillion": 1.923,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/openai/gpt-oss-120b": {
+    "inputPerMillion": 0.35,
+    "outputPerMillion": 0.75,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/google/gemma-2b-it-lora": {
+    "inputPerMillion": 0,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/meta/llama-3.2-3b-instruct": {
+    "inputPerMillion": 0.0509,
+    "outputPerMillion": 0.335,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/meta/llama-guard-3-8b": {
+    "inputPerMillion": 0.484,
+    "outputPerMillion": 0.03,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/mistral/mistral-7b-instruct-v0.2-lora": {
+    "inputPerMillion": 0,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/moonshotai/kimi-k2.7-code": {
+    "inputPerMillion": 0.95,
+    "outputPerMillion": 4,
+    "cacheReadPerMillion": 0.19,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": {
+    "inputPerMillion": 0.497,
+    "outputPerMillion": 4.881,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/meta/llama-3.1-8b-instruct-fp8": {
+    "inputPerMillion": 0.152,
+    "outputPerMillion": 0.287,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/meta/llama-3.2-1b-instruct": {
+    "inputPerMillion": 0.027,
+    "outputPerMillion": 0.201,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/moonshotai/kimi-k2.6": {
+    "inputPerMillion": 0.95,
+    "outputPerMillion": 4,
+    "cacheReadPerMillion": 0.16,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/zai-org/glm-4.7-flash": {
+    "inputPerMillion": 0.0605,
+    "outputPerMillion": 0.4,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/meta-llama/llama-2-7b-chat-hf-lora": {
+    "inputPerMillion": 0,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/meta/llama-3.3-70b-instruct-fp8-fast": {
+    "inputPerMillion": 0.293,
+    "outputPerMillion": 2.253,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/ibm-granite/granite-4.0-h-micro": {
+    "inputPerMillion": 0.017,
+    "outputPerMillion": 0.112,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/qwen/qwen2.5-coder-32b-instruct": {
+    "inputPerMillion": 0.66,
+    "outputPerMillion": 1,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/zai-org/glm-5.2": {
+    "inputPerMillion": 1.4,
+    "outputPerMillion": 4.4,
+    "cacheReadPerMillion": 0.26,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/nvidia/nemotron-3-120b-a12b": {
+    "inputPerMillion": 0.5,
+    "outputPerMillion": 1.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/aisingapore/gemma-sea-lion-v4-27b-it": {
+    "inputPerMillion": 0.351,
+    "outputPerMillion": 0.555,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/qwen/qwen3-30b-a3b-fp8": {
+    "inputPerMillion": 0.0509,
+    "outputPerMillion": 0.335,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/google/gemma-7b-it-lora": {
+    "inputPerMillion": 0,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/google/gemma-4-26b-a4b-it": {
+    "inputPerMillion": 0.1,
+    "outputPerMillion": 0.3,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/mistralai/mistral-small-3.1-24b-instruct": {
+    "inputPerMillion": 0.351,
+    "outputPerMillion": 0.555,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/meta/llama-3.2-11b-vision-instruct": {
+    "inputPerMillion": 0.0485,
+    "outputPerMillion": 0.676,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/openai/gpt-oss-20b": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 0.3,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/meta/llama-4-scout-17b-16e-instruct": {
+    "inputPerMillion": 0.27,
+    "outputPerMillion": 0.85,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "cloudflare/@cf/qwen/qwq-32b": {
+    "inputPerMillion": 0.66,
+    "outputPerMillion": 1,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -3239,8 +3791,8 @@
     "cacheWritePerMillion": 0
   },
   "command-r7b-12-2024": {
-    "inputPerMillion": 0.15,
-    "outputPerMillion": 0.0375,
+    "inputPerMillion": 0.0375,
+    "outputPerMillion": 0.15,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -4310,6 +4862,18 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "fireworks_ai/accounts/fireworks/models/deepseek-v4-flash": {
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.28,
+    "cacheReadPerMillion": 0.028,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/accounts/fireworks/models/deepseek-v4-pro": {
+    "inputPerMillion": 1.74,
+    "outputPerMillion": 3.48,
+    "cacheReadPerMillion": 0.145,
+    "cacheWritePerMillion": 0
+  },
   "fireworks_ai/accounts/fireworks/models/firefunction-v2": {
     "inputPerMillion": 0.9,
     "outputPerMillion": 0.9,
@@ -4346,16 +4910,22 @@
     "cacheReadPerMillion": 0.26,
     "cacheWritePerMillion": 0
   },
+  "fireworks_ai/accounts/fireworks/models/glm-5p2": {
+    "inputPerMillion": 1.4,
+    "outputPerMillion": 4.4,
+    "cacheReadPerMillion": 0.14,
+    "cacheWritePerMillion": 0
+  },
   "fireworks_ai/accounts/fireworks/models/gpt-oss-120b": {
     "inputPerMillion": 0.15,
     "outputPerMillion": 0.6,
-    "cacheReadPerMillion": 0,
+    "cacheReadPerMillion": 0.015,
     "cacheWritePerMillion": 0
   },
   "fireworks_ai/accounts/fireworks/models/gpt-oss-20b": {
-    "inputPerMillion": 0.05,
-    "outputPerMillion": 0.2,
-    "cacheReadPerMillion": 0,
+    "inputPerMillion": 0.07,
+    "outputPerMillion": 0.3,
+    "cacheReadPerMillion": 0.035,
     "cacheWritePerMillion": 0
   },
   "fireworks_ai/accounts/fireworks/models/kimi-k2-instruct": {
@@ -4380,6 +4950,18 @@
     "inputPerMillion": 0.6,
     "outputPerMillion": 3,
     "cacheReadPerMillion": 0.1,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/accounts/fireworks/models/kimi-k2p6": {
+    "inputPerMillion": 0.95,
+    "outputPerMillion": 4,
+    "cacheReadPerMillion": 0.16,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/accounts/fireworks/models/kimi-k2p7-code": {
+    "inputPerMillion": 0.95,
+    "outputPerMillion": 4,
+    "cacheReadPerMillion": 0.19,
     "cacheWritePerMillion": 0
   },
   "fireworks_ai/accounts/fireworks/models/llama-v3p1-405b-instruct": {
@@ -4436,6 +5018,18 @@
     "cacheReadPerMillion": 0.03,
     "cacheWritePerMillion": 0
   },
+  "fireworks_ai/accounts/fireworks/models/minimax-m2p7": {
+    "inputPerMillion": 0.3,
+    "outputPerMillion": 1.2,
+    "cacheReadPerMillion": 0.06,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/accounts/fireworks/models/minimax-m3": {
+    "inputPerMillion": 0.3,
+    "outputPerMillion": 1.2,
+    "cacheReadPerMillion": 0.06,
+    "cacheWritePerMillion": 0
+  },
   "fireworks_ai/accounts/fireworks/models/mixtral-8x22b-instruct-hf": {
     "inputPerMillion": 1.2,
     "outputPerMillion": 1.2,
@@ -4460,6 +5054,18 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "fireworks_ai/deepseek-v4-flash": {
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.28,
+    "cacheReadPerMillion": 0.028,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/deepseek-v4-pro": {
+    "inputPerMillion": 1.74,
+    "outputPerMillion": 3.48,
+    "cacheReadPerMillion": 0.145,
+    "cacheWritePerMillion": 0
+  },
   "fireworks_ai/glm-4p7": {
     "inputPerMillion": 0.6,
     "outputPerMillion": 2.2,
@@ -4472,16 +5078,82 @@
     "cacheReadPerMillion": 0.26,
     "cacheWritePerMillion": 0
   },
+  "fireworks_ai/glm-5p1-fast": {
+    "inputPerMillion": 2.8,
+    "outputPerMillion": 8.8,
+    "cacheReadPerMillion": 0.52,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/glm-5p2": {
+    "inputPerMillion": 1.4,
+    "outputPerMillion": 4.4,
+    "cacheReadPerMillion": 0.14,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/gpt-oss-120b": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.6,
+    "cacheReadPerMillion": 0.015,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/gpt-oss-20b": {
+    "inputPerMillion": 0.07,
+    "outputPerMillion": 0.3,
+    "cacheReadPerMillion": 0.035,
+    "cacheWritePerMillion": 0
+  },
   "fireworks_ai/kimi-k2p5": {
     "inputPerMillion": 0.6,
     "outputPerMillion": 3,
     "cacheReadPerMillion": 0.1,
     "cacheWritePerMillion": 0
   },
+  "fireworks_ai/kimi-k2p6": {
+    "inputPerMillion": 0.95,
+    "outputPerMillion": 4,
+    "cacheReadPerMillion": 0.16,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/kimi-k2p6-fast": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 8,
+    "cacheReadPerMillion": 0.3,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/kimi-k2p7-code": {
+    "inputPerMillion": 0.95,
+    "outputPerMillion": 4,
+    "cacheReadPerMillion": 0.19,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/kimi-k2p7-code-fast": {
+    "inputPerMillion": 1.9,
+    "outputPerMillion": 8,
+    "cacheReadPerMillion": 0.38,
+    "cacheWritePerMillion": 0
+  },
   "fireworks_ai/minimax-m2p1": {
     "inputPerMillion": 0.3,
     "outputPerMillion": 1.2,
     "cacheReadPerMillion": 0.03,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/minimax-m2p7": {
+    "inputPerMillion": 0.3,
+    "outputPerMillion": 1.2,
+    "cacheReadPerMillion": 0.06,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/minimax-m3": {
+    "inputPerMillion": 0.3,
+    "outputPerMillion": 1.2,
+    "cacheReadPerMillion": 0.06,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/qwen3p7-plus": {
+    "inputPerMillion": 0.4,
+    "outputPerMillion": 1.6,
+    "cacheReadPerMillion": 0.08,
     "cacheWritePerMillion": 0
   },
   "fireworks_ai/nomic-ai/nomic-embed-text-v1": {
@@ -4640,9 +5312,21 @@
     "cacheReadPerMillion": 0.03,
     "cacheWritePerMillion": 0
   },
+  "gemini-3-pro-image": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 12,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "gemini-3-pro-image-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "gemini-3.1-flash-image": {
+    "inputPerMillion": 0.5,
+    "outputPerMillion": 3,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -4942,9 +5626,21 @@
     "cacheReadPerMillion": 0.03,
     "cacheWritePerMillion": 0
   },
+  "gemini/gemini-3-pro-image": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 12,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "gemini/gemini-3-pro-image-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "gemini/gemini-3.1-flash-image": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 1.5,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -5069,6 +5765,12 @@
     "priorityOutputPerMillion": 16.2,
     "priorityCacheReadPerMillion": 0.27
   },
+  "gemini/gemini-omni-flash-preview": {
+    "inputPerMillion": 1.5,
+    "outputPerMillion": 9,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "gemini/gemini-3.1-pro-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
@@ -5103,6 +5805,12 @@
     "priorityInputPerMillion": 0.9,
     "priorityOutputPerMillion": 5.4,
     "priorityCacheReadPerMillion": 0.09
+  },
+  "gemini-omni-flash-preview": {
+    "inputPerMillion": 1.5,
+    "outputPerMillion": 9,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
   },
   "gemini-3.5-flash": {
     "inputPerMillion": 1.5,
@@ -5181,6 +5889,18 @@
     "inputPerMillion": 0,
     "outputPerMillion": 0,
     "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "github_copilot/mai-code-1-flash": {
+    "inputPerMillion": 0.75,
+    "outputPerMillion": 4.5,
+    "cacheReadPerMillion": 0.075,
+    "cacheWritePerMillion": 0
+  },
+  "github_copilot/mai-code-1-flash-internal": {
+    "inputPerMillion": 0.75,
+    "outputPerMillion": 4.5,
+    "cacheReadPerMillion": 0.075,
     "cacheWritePerMillion": 0
   },
   "gigachat/GigaChat-2-Lite": {
@@ -5858,6 +6578,62 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "gpt-5.6": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 30,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 6.25,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 10,
+    "outputPerMillionAboveThreshold": 45,
+    "cacheReadPerMillionAboveThreshold": 1,
+    "cacheWritePerMillionAboveThreshold": 12.5,
+    "priorityInputPerMillion": 10,
+    "priorityOutputPerMillion": 60,
+    "priorityCacheReadPerMillion": 1
+  },
+  "gpt-5.6-sol": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 30,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 6.25,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 10,
+    "outputPerMillionAboveThreshold": 45,
+    "cacheReadPerMillionAboveThreshold": 1,
+    "cacheWritePerMillionAboveThreshold": 12.5,
+    "priorityInputPerMillion": 10,
+    "priorityOutputPerMillion": 60,
+    "priorityCacheReadPerMillion": 1
+  },
+  "gpt-5.6-terra": {
+    "inputPerMillion": 2.5,
+    "outputPerMillion": 15,
+    "cacheReadPerMillion": 0.25,
+    "cacheWritePerMillion": 3.125,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 5,
+    "outputPerMillionAboveThreshold": 22.5,
+    "cacheReadPerMillionAboveThreshold": 0.5,
+    "cacheWritePerMillionAboveThreshold": 6.25,
+    "priorityInputPerMillion": 5,
+    "priorityOutputPerMillion": 30,
+    "priorityCacheReadPerMillion": 0.5
+  },
+  "gpt-5.6-luna": {
+    "inputPerMillion": 1,
+    "outputPerMillion": 6,
+    "cacheReadPerMillion": 0.1,
+    "cacheWritePerMillion": 1.25,
+    "thresholdTokens": 272000,
+    "inputPerMillionAboveThreshold": 2,
+    "outputPerMillionAboveThreshold": 9,
+    "cacheReadPerMillionAboveThreshold": 0.2,
+    "cacheWritePerMillionAboveThreshold": 2.5,
+    "priorityInputPerMillion": 2,
+    "priorityOutputPerMillion": 12,
+    "priorityCacheReadPerMillion": 0.2
+  },
   "gpt-5.5": {
     "inputPerMillion": 5,
     "outputPerMillion": 30,
@@ -6108,6 +6884,18 @@
     "inputPerMillion": 4,
     "outputPerMillion": 16,
     "cacheReadPerMillion": 0.4,
+    "cacheWritePerMillion": 0
+  },
+  "gpt-realtime-2.1": {
+    "inputPerMillion": 4,
+    "outputPerMillion": 24,
+    "cacheReadPerMillion": 0.4,
+    "cacheWritePerMillion": 0
+  },
+  "gpt-realtime-2.1-mini": {
+    "inputPerMillion": 0.6,
+    "outputPerMillion": 2.4,
+    "cacheReadPerMillion": 0.06,
     "cacheWritePerMillion": 0
   },
   "gpt-realtime-mini": {
@@ -6535,6 +7323,18 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "inception/mercury-2": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 0.75,
+    "cacheReadPerMillion": 0.025,
+    "cacheWritePerMillion": 0
+  },
+  "text-completion-inception/mercury-edit-2": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 0.75,
+    "cacheReadPerMillion": 0.025,
+    "cacheWritePerMillion": 0
+  },
   "lambda_ai/deepseek-llama3.3-70b": {
     "inputPerMillion": 0.2,
     "outputPerMillion": 0.6,
@@ -6739,6 +7539,12 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "meta/muse-spark-1.1": {
+    "inputPerMillion": 1.25,
+    "outputPerMillion": 4.25,
+    "cacheReadPerMillion": 0.15,
+    "cacheWritePerMillion": 0
+  },
   "minimax.minimax-m2": {
     "inputPerMillion": 0.3,
     "outputPerMillion": 1.2,
@@ -6786,6 +7592,16 @@
     "outputPerMillion": 1.2,
     "cacheReadPerMillion": 0.03,
     "cacheWritePerMillion": 0.375
+  },
+  "minimax/MiniMax-M3": {
+    "inputPerMillion": 0.3,
+    "outputPerMillion": 1.2,
+    "cacheReadPerMillion": 0.06,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 512000,
+    "inputPerMillionAboveThreshold": 0.6,
+    "outputPerMillionAboveThreshold": 2.4,
+    "cacheReadPerMillionAboveThreshold": 0.12
   },
   "mistral.devstral-2-123b": {
     "inputPerMillion": 0.4,
@@ -7033,15 +7849,33 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
-  "mistral/mistral-medium-latest": {
+  "mistral/mistral-medium-2508": {
     "inputPerMillion": 0.4,
     "outputPerMillion": 2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "mistral/mistral-medium-2604": {
+    "inputPerMillion": 1.5,
+    "outputPerMillion": 7.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "mistral/mistral-medium-latest": {
+    "inputPerMillion": 1.5,
+    "outputPerMillion": 7.5,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
   "mistral/mistral-medium-3-1-2508": {
     "inputPerMillion": 0.4,
     "outputPerMillion": 2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "mistral/mistral-medium-3-5": {
+    "inputPerMillion": 1.5,
+    "outputPerMillion": 7.5,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -7082,6 +7916,12 @@
     "cacheWritePerMillion": 0
   },
   "mistral/ministral-8b-2512": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.15,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "mistral/ministral-8b-latest": {
     "inputPerMillion": 0.15,
     "outputPerMillion": 0.15,
     "cacheReadPerMillion": 0,
@@ -8741,6 +9581,12 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "openrouter/z-ai/glm-5.1": {
+    "inputPerMillion": 1.05,
+    "outputPerMillion": 3.5,
+    "cacheReadPerMillion": 0.525,
+    "cacheWritePerMillion": 0
+  },
   "openrouter/minimax/minimax-m2.1": {
     "inputPerMillion": 0.27,
     "outputPerMillion": 1.2,
@@ -9450,8 +10296,8 @@
     "cacheWritePerMillion": 0
   },
   "sambanova/MiniMax-M2.7": {
-    "inputPerMillion": 0.3,
-    "outputPerMillion": 1.2,
+    "inputPerMillion": 0.6,
+    "outputPerMillion": 2.4,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -9546,8 +10392,68 @@
     "cacheWritePerMillion": 0
   },
   "sambanova/gpt-oss-120b": {
+    "inputPerMillion": 0.22,
+    "outputPerMillion": 0.59,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "sambanova/DeepSeek-V3.2": {
     "inputPerMillion": 3,
     "outputPerMillion": 4.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "sambanova/gemma-4-31B-it": {
+    "inputPerMillion": 0.38,
+    "outputPerMillion": 1.15,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/claude-3-5-sonnet": {
+    "inputPerMillion": 3,
+    "outputPerMillion": 15,
+    "cacheReadPerMillion": 0.3,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/deepseek-r1": {
+    "inputPerMillion": 1.35,
+    "outputPerMillion": 5.4,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/llama3.1-405b": {
+    "inputPerMillion": 1.2,
+    "outputPerMillion": 1.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/llama3.1-70b": {
+    "inputPerMillion": 0.72,
+    "outputPerMillion": 0.72,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/llama3.1-8b": {
+    "inputPerMillion": 0.24,
+    "outputPerMillion": 0.24,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/llama3.3-70b": {
+    "inputPerMillion": 0.72,
+    "outputPerMillion": 0.72,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/mistral-large2": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 6,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/snowflake-llama-3.3-70b": {
+    "inputPerMillion": 0.72,
+    "outputPerMillion": 0.72,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -9959,15 +10865,15 @@
     "cacheWritePerMillionAboveThreshold": 8.25
   },
   "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0": {
-    "inputPerMillion": 3.3,
-    "outputPerMillion": 16.5,
-    "cacheReadPerMillion": 0.33,
-    "cacheWritePerMillion": 4.125,
+    "inputPerMillion": 3.6,
+    "outputPerMillion": 18,
+    "cacheReadPerMillion": 0.36,
+    "cacheWritePerMillion": 4.5,
     "thresholdTokens": 200000,
-    "inputPerMillionAboveThreshold": 6.6,
-    "outputPerMillionAboveThreshold": 24.75,
-    "cacheReadPerMillionAboveThreshold": 0.66,
-    "cacheWritePerMillionAboveThreshold": 8.25
+    "inputPerMillionAboveThreshold": 7.2,
+    "outputPerMillionAboveThreshold": 27,
+    "cacheReadPerMillionAboveThreshold": 0.72,
+    "cacheWritePerMillionAboveThreshold": 9
   },
   "au.anthropic.claude-haiku-4-5-20251001-v1:0": {
     "inputPerMillion": 1.1,
@@ -10850,6 +11756,18 @@
     "cacheReadPerMillion": 0.5,
     "cacheWritePerMillion": 6.25
   },
+  "vertex_ai/claude-fable-5": {
+    "inputPerMillion": 10,
+    "outputPerMillion": 50,
+    "cacheReadPerMillion": 1,
+    "cacheWritePerMillion": 12.5
+  },
+  "vertex_ai/claude-fable-5@default": {
+    "inputPerMillion": 10,
+    "outputPerMillion": 50,
+    "cacheReadPerMillion": 1,
+    "cacheWritePerMillion": 12.5
+  },
   "vertex_ai/claude-opus-4-8": {
     "inputPerMillion": 5,
     "outputPerMillion": 25,
@@ -10872,6 +11790,12 @@
     "outputPerMillionAboveThreshold": 22.5,
     "cacheReadPerMillionAboveThreshold": 0.6,
     "cacheWritePerMillionAboveThreshold": 7.5
+  },
+  "vertex_ai/claude-sonnet-5": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 2.5
   },
   "vertex_ai/claude-sonnet-4-6": {
     "inputPerMillion": 3,
@@ -10984,9 +11908,21 @@
     "cacheReadPerMillion": 0.03,
     "cacheWritePerMillion": 0
   },
+  "vertex_ai/gemini-3-pro-image": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 12,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "vertex_ai/gemini-3-pro-image-preview": {
     "inputPerMillion": 2,
     "outputPerMillion": 12,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "vertex_ai/gemini-3.1-flash-image": {
+    "inputPerMillion": 0.5,
+    "outputPerMillion": 3,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -11212,6 +12148,12 @@
   "vertex_ai/deepseek-ai/deepseek-ocr-maas": {
     "inputPerMillion": 0.3,
     "outputPerMillion": 1.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "vertex_ai/google/gemma-4-26b-a4b-it-maas": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.6,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -11886,6 +12828,26 @@
     "outputPerMillionAboveThreshold": 5,
     "cacheReadPerMillionAboveThreshold": 0.4
   },
+  "xai/grok-4.5": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 6,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 12,
+    "cacheReadPerMillionAboveThreshold": 1
+  },
+  "xai/grok-4.5-latest": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 6,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0,
+    "thresholdTokens": 200000,
+    "inputPerMillionAboveThreshold": 4,
+    "outputPerMillionAboveThreshold": 12,
+    "cacheReadPerMillionAboveThreshold": 1
+  },
   "xai/grok-beta": {
     "inputPerMillion": 5,
     "outputPerMillion": 15,
@@ -11940,6 +12902,12 @@
     "cacheReadPerMillion": 0.2,
     "cacheWritePerMillion": 0
   },
+  "zai/glm-5.1": {
+    "inputPerMillion": 1.4,
+    "outputPerMillion": 4.4,
+    "cacheReadPerMillion": 0.26,
+    "cacheWritePerMillion": 0
+  },
   "zai/glm-5-code": {
     "inputPerMillion": 1.2,
     "outputPerMillion": 5,
@@ -11950,6 +12918,12 @@
     "inputPerMillion": 0.6,
     "outputPerMillion": 2.2,
     "cacheReadPerMillion": 0.11,
+    "cacheWritePerMillion": 0
+  },
+  "zai/glm-4.7-flash": {
+    "inputPerMillion": 0,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
   "zai/glm-4.6": {
@@ -13254,6 +14228,12 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "fireworks_ai/accounts/fireworks/models/qwen3p7-plus": {
+    "inputPerMillion": 0.4,
+    "outputPerMillion": 1.6,
+    "cacheReadPerMillion": 0.08,
+    "cacheWritePerMillion": 0
+  },
   "fireworks_ai/accounts/fireworks/models/qwq-32b": {
     "inputPerMillion": 0.9,
     "outputPerMillion": 0.9,
@@ -13320,18 +14300,6 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
-  "fireworks_ai/accounts/fireworks/models/whisper-v3": {
-    "inputPerMillion": 0,
-    "outputPerMillion": 0,
-    "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
-  },
-  "fireworks_ai/accounts/fireworks/models/whisper-v3-turbo": {
-    "inputPerMillion": 0,
-    "outputPerMillion": 0,
-    "cacheReadPerMillion": 0,
-    "cacheWritePerMillion": 0
-  },
   "fireworks_ai/accounts/fireworks/models/yi-34b": {
     "inputPerMillion": 0.9,
     "outputPerMillion": 0.9,
@@ -13359,6 +14327,120 @@
   "fireworks_ai/accounts/fireworks/models/zephyr-7b-beta": {
     "inputPerMillion": 0.2,
     "outputPerMillion": 0.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/accounts/fireworks/routers/glm-5p1-fast": {
+    "inputPerMillion": 2.8,
+    "outputPerMillion": 8.8,
+    "cacheReadPerMillion": 0.52,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/accounts/fireworks/routers/kimi-k2p6-fast": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 8,
+    "cacheReadPerMillion": 0.3,
+    "cacheWritePerMillion": 0
+  },
+  "fireworks_ai/accounts/fireworks/routers/kimi-k2p7-code-fast": {
+    "inputPerMillion": 1.9,
+    "outputPerMillion": 8,
+    "cacheReadPerMillion": 0.38,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/qwen/qwen3.5-397b-a17b": {
+    "inputPerMillion": 0.6,
+    "outputPerMillion": 3.6,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/qwen/qwen3.6-35b-a3b": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 1.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/qwen/qwen3-235b-a22b-instruct-2507": {
+    "inputPerMillion": 0.75,
+    "outputPerMillion": 2.25,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/qwen/qwen3-embedding-8b": {
+    "inputPerMillion": 0.1,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/qwen/qwen3-coder-30b-a3b-instruct": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 0.8,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/openai/gpt-oss-120b": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.6,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/google/gemma-4-26b-a4b-it": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 0.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/google/gemma-3-27b-it": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 0.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/hcompany/holo2-30b-a3b": {
+    "inputPerMillion": 0.3,
+    "outputPerMillion": 0.7,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/mistralai/mistral-medium-3.5-128b": {
+    "inputPerMillion": 1.5,
+    "outputPerMillion": 7.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/mistralai/devstral-2-123b-instruct-2512": {
+    "inputPerMillion": 0.4,
+    "outputPerMillion": 2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/mistralai/voxtral-small-24b-2507": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.35,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/mistralai/mistral-small-3.2-24b-instruct-2506": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.35,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/mistralai/pixtral-12b-2409": {
+    "inputPerMillion": 0.2,
+    "outputPerMillion": 0.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/BAAI/bge-multilingual-gemma2": {
+    "inputPerMillion": 0.1,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "scaleway/meta/llama-3.3-70b-instruct": {
+    "inputPerMillion": 0.9,
+    "outputPerMillion": 0.9,
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
@@ -13968,6 +15050,78 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "libertai/hermes-3-8b-tee": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.6,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/gemma-4-31b-it": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.4,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/gemma-4-31b-it-thinking": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.4,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/qwen3.6-27b": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/qwen3.6-27b-thinking": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/qwen3.6-35b-a3b": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/qwen3.6-35b-a3b-thinking": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.5,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/qwen3.5-122b-a10b": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 1.75,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/qwen3.5-122b-a10b-thinking": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 1.75,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/deepseek-v4-flash": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 1.75,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/deepseek-v4-flash-thinking": {
+    "inputPerMillion": 0.25,
+    "outputPerMillion": 1.75,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "libertai/bge-m3": {
+    "inputPerMillion": 0.01,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "sarvam/sarvam-m": {
     "inputPerMillion": 0,
     "outputPerMillion": 0,
@@ -14132,6 +15286,12 @@
     "cacheReadPerMillion": 0.03,
     "cacheWritePerMillion": 0
   },
+  "vertex_ai/claude-sonnet-5@default": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 2.5
+  },
   "vertex_ai/claude-sonnet-4-6@default": {
     "inputPerMillion": 3,
     "outputPerMillion": 15,
@@ -14162,6 +15322,60 @@
     "cacheReadPerMillion": 0,
     "cacheWritePerMillion": 0
   },
+  "bedrock_mantle/openai.gpt-5.6-sol": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 33,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 6.875
+  },
+  "bedrock_mantle/openai.gpt-5.6-terra": {
+    "inputPerMillion": 2.75,
+    "outputPerMillion": 16.5,
+    "cacheReadPerMillion": 0.275,
+    "cacheWritePerMillion": 3.4375
+  },
+  "bedrock_mantle/openai.gpt-5.6-luna": {
+    "inputPerMillion": 1.1,
+    "outputPerMillion": 6.6,
+    "cacheReadPerMillion": 0.11,
+    "cacheWritePerMillion": 1.375
+  },
+  "bedrock_mantle/openai.gpt-5.5": {
+    "inputPerMillion": 5.5,
+    "outputPerMillion": 33,
+    "cacheReadPerMillion": 0.55,
+    "cacheWritePerMillion": 0
+  },
+  "bedrock_mantle/openai.gpt-5.4": {
+    "inputPerMillion": 2.75,
+    "outputPerMillion": 16.5,
+    "cacheReadPerMillion": 0.275,
+    "cacheWritePerMillion": 0
+  },
+  "bedrock_mantle/google.gemma-4-31b": {
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.4,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "bedrock_mantle/google.gemma-4-26b-a4b": {
+    "inputPerMillion": 0.13,
+    "outputPerMillion": 0.4,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "bedrock_mantle/google.gemma-4-e2b": {
+    "inputPerMillion": 0.04,
+    "outputPerMillion": 0.08,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "bedrock_mantle/xai.grok-4.3": {
+    "inputPerMillion": 1.25,
+    "outputPerMillion": 2.5,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 0
+  },
   "bedrock/us-east-1/zai.glm-5": {
     "inputPerMillion": 1,
     "outputPerMillion": 3.2,
@@ -14186,6 +15400,228 @@
     "cacheReadPerMillion": 0.12,
     "cacheWritePerMillion": 1.5
   },
+  "snowflake/claude-sonnet-4-5": {
+    "inputPerMillion": 3,
+    "outputPerMillion": 15,
+    "cacheReadPerMillion": 0.3,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/claude-sonnet-4-6": {
+    "inputPerMillion": 3,
+    "outputPerMillion": 15,
+    "cacheReadPerMillion": 0.3,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/claude-4-sonnet": {
+    "inputPerMillion": 3,
+    "outputPerMillion": 15,
+    "cacheReadPerMillion": 0.3,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/claude-4-opus": {
+    "inputPerMillion": 5,
+    "outputPerMillion": 25,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/claude-haiku-4-5": {
+    "inputPerMillion": 1,
+    "outputPerMillion": 5,
+    "cacheReadPerMillion": 0.1,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/claude-3-7-sonnet": {
+    "inputPerMillion": 3,
+    "outputPerMillion": 15,
+    "cacheReadPerMillion": 0.3,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/openai-gpt-4.1": {
+    "inputPerMillion": 2,
+    "outputPerMillion": 8,
+    "cacheReadPerMillion": 0.5,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/openai-gpt-5": {
+    "inputPerMillion": 1.25,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.125,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/openai-gpt-5-mini": {
+    "inputPerMillion": 0.3,
+    "outputPerMillion": 1.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/openai-gpt-5-nano": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.6,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/llama4-maverick": {
+    "inputPerMillion": 0.24,
+    "outputPerMillion": 0.97,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/snowflake-arctic-embed-l-v2.0": {
+    "inputPerMillion": 0.07,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "snowflake/snowflake-arctic-embed-m-v2.0": {
+    "inputPerMillion": 0.07,
+    "outputPerMillion": 0,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "tensormesh/Qwen/Qwen3.5-397B-A17B-FP8": {
+    "inputPerMillion": 0.6,
+    "outputPerMillion": 3.6,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "tensormesh/Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8": {
+    "inputPerMillion": 0.45,
+    "outputPerMillion": 1.8,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "tensormesh/Qwen/Qwen3.6-27B-FP8": {
+    "inputPerMillion": 0.32,
+    "outputPerMillion": 3.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "tensormesh/lukealonso/GLM-5.1-NVFP4-MTP": {
+    "inputPerMillion": 1.4,
+    "outputPerMillion": 4.4,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "tensormesh/deepseek-ai/DeepSeek-V4-Flash": {
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.28,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "tensormesh/moonshotai/Kimi-K2.6": {
+    "inputPerMillion": 0.96,
+    "outputPerMillion": 4,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "tensormesh/MiniMaxAI/MiniMax-M2.5": {
+    "inputPerMillion": 0.3,
+    "outputPerMillion": 1.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "tensormesh/google/gemma-4-31B-it": {
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.56,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "tensormesh/openai/gpt-oss-120b": {
+    "inputPerMillion": 0.15,
+    "outputPerMillion": 0.6,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "tensormesh/openai/gpt-oss-20b": {
+    "inputPerMillion": 0.07,
+    "outputPerMillion": 0.28,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "deepseek-v4-flash": {
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.28,
+    "cacheReadPerMillion": 0.0028,
+    "cacheWritePerMillion": 0
+  },
+  "deepseek-v4-pro": {
+    "inputPerMillion": 0.435,
+    "outputPerMillion": 0.87,
+    "cacheReadPerMillion": 0.003625,
+    "cacheWritePerMillion": 0
+  },
+  "deepseek/deepseek-v4-flash": {
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.28,
+    "cacheReadPerMillion": 0.0028,
+    "cacheWritePerMillion": 0
+  },
+  "deepseek/deepseek-v4-pro": {
+    "inputPerMillion": 0.435,
+    "outputPerMillion": 0.87,
+    "cacheReadPerMillion": 0.003625,
+    "cacheWritePerMillion": 0
+  },
+  "tencent/deepseek-v4-pro": {
+    "inputPerMillion": 0.435,
+    "outputPerMillion": 0.87,
+    "cacheReadPerMillion": 0.003625,
+    "cacheWritePerMillion": 0
+  },
+  "tencent/deepseek-v4-flash": {
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.28,
+    "cacheReadPerMillion": 0.0028,
+    "cacheWritePerMillion": 0
+  },
+  "pinstripes/ps/glm-4.5-air": {
+    "inputPerMillion": 0.125,
+    "outputPerMillion": 0.45,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "pinstripes/ps/qwen3.6-35b-a3b": {
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.45,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "pinstripes/ps/qwen3-30b-a3b": {
+    "inputPerMillion": 0.09,
+    "outputPerMillion": 0.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "pinstripes/ps/qwen3-coder-30b-a3b": {
+    "inputPerMillion": 0.3,
+    "outputPerMillion": 0.6,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "pinstripes/ps/deepseek-v4-flash": {
+    "inputPerMillion": 0.1,
+    "outputPerMillion": 0.2,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "pinstripes/ps/minimax-m2.7": {
+    "inputPerMillion": 0.255,
+    "outputPerMillion": 0.55,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "darkbloom/gemma-4-26b": {
+    "inputPerMillion": 0.03,
+    "outputPerMillion": 0.165,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
+  "darkbloom/gpt-oss-20b": {
+    "inputPerMillion": 0.0145,
+    "outputPerMillion": 0.07,
+    "cacheReadPerMillion": 0,
+    "cacheWritePerMillion": 0
+  },
   "opus": {
     "inputPerMillion": 5,
     "outputPerMillion": 25,
@@ -14193,10 +15629,10 @@
     "cacheWritePerMillion": 6.25
   },
   "sonnet": {
-    "inputPerMillion": 3,
-    "outputPerMillion": 15,
-    "cacheReadPerMillion": 0.3,
-    "cacheWritePerMillion": 3.75
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.2,
+    "cacheWritePerMillion": 2.5
   },
   "haiku": {
     "inputPerMillion": 1,

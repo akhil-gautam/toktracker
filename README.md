@@ -49,7 +49,7 @@ build from the latest GitHub Release.
 
 ### Mac app — direct download
 
-1. Grab `Tokscale-<version>.zip` from the [latest release](https://github.com/akhil-gautam/toktracker/releases).
+1. Grab `Toktracker-<version>.zip` from the [latest release](https://github.com/akhil-gautam/toktracker/releases).
 2. Unzip and drag `Tokscale.app` to `/Applications`.
 3. Launch from Spotlight or `open -a Tokscale`.
 

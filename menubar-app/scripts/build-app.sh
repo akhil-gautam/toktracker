@@ -43,11 +43,17 @@ for bundle in "$BIN_DIR"/*.bundle; do
     name="$(basename "$bundle")"
     case "$name" in
         *Tests.bundle) continue ;;
+        Tokscale_*.bundle) continue ;;
     esac
     cp -R "$bundle" "$CONTENTS/Resources/"
     # Flatten everything inside the bundle so Bundle.main sees the files.
     find "$bundle" -type f -exec cp -n {} "$CONTENTS/Resources/" \;
 done
+
+# Make the runtime resources deterministic even when SwiftPM's build directory
+# contains stale bundles left behind by a previous package name.
+cp -f "$ROOT/Sources/Core/Resources/pricing.json" "$CONTENTS/Resources/pricing.json"
+cp -f "$ROOT/Sources/Storage/Resources/schema.sql" "$CONTENTS/Resources/schema.sql"
 
 # Ad-hoc sign so the launcher accepts it locally
 codesign --force --deep --sign - "$APP_DIR"

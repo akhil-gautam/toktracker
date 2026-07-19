@@ -9,7 +9,7 @@ import { createHash } from 'node:crypto'
 // optional runtime refresh (src/services/pricing-cache.ts) is what tracks newer
 // models between releases — see its anti-corruption guard.
 const SOURCE_REPO = 'BerriAI/litellm'
-const SOURCE_COMMIT = 'a021a5be86b00397c8c705e63fb7117f0850c036'
+const SOURCE_COMMIT = '5d4c4d0fce45c73c4b56b48e46dfc4e56e8b0aa5'
 const SOURCE_FILE = 'model_prices_and_context_window.json'
 const SOURCE = `https://raw.githubusercontent.com/${SOURCE_REPO}/${SOURCE_COMMIT}/${SOURCE_FILE}`
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -20,9 +20,9 @@ const PROVENANCE = join(__dirname, '..', 'src', 'data', 'pricing-source.json')
 const MAC_OUT = join(__dirname, '..', '..', 'menubar-app', 'Sources', 'Core', 'Resources', 'pricing.json')
 
 const ALIAS_PATTERNS = {
-  opus:   /^claude-opus-(\d{1,2})-(\d{1,2})$/,
-  sonnet: /^claude-sonnet-(\d{1,2})-(\d{1,2})$/,
-  haiku:  /^claude-haiku-(\d{1,2})-(\d{1,2})$/,
+  opus:   /^claude-opus-(\d{1,2})(?:-(\d{1,2}))?$/,
+  sonnet: /^claude-sonnet-(\d{1,2})(?:-(\d{1,2}))?$/,
+  haiku:  /^claude-haiku-(\d{1,2})(?:-(\d{1,2}))?$/,
 }
 
 const perM = (v) => +(v * 1_000_000).toFixed(6)
@@ -58,7 +58,7 @@ function pickLatest(out, pattern) {
   for (const [key, rates] of Object.entries(out)) {
     const m = key.match(pattern)
     if (!m) continue
-    const version = [parseInt(m[1], 10), parseInt(m[2], 10)]
+    const version = [parseInt(m[1], 10), parseInt(m[2] ?? '0', 10)]
     if (!best || version[0] > best[0] || (version[0] === best[0] && version[1] > best[1])) {
       best = version
       bestKey = key

@@ -124,6 +124,25 @@ describe('priority service-tier pricing', () => {
 })
 
 describe('lookup normalization + unpriced sentinel', () => {
+  it.each([
+    ['gpt-5.6', 5, 30, 0.5],
+    ['gpt-5.6-terra', 2.5, 15, 0.25],
+    ['gpt-5.6-luna', 1, 6, 0.1],
+    ['claude-opus-4-8', 5, 25, 0.5],
+    ['claude-sonnet-5', 2, 10, 0.2],
+    ['gemini-3.5-flash', 1.5, 9, 0.15],
+  ])('uses current base pricing for %s', (model, input, output, cacheRead) => {
+    const result = lookupPricing(model)
+    expect(result.priced).toBe(true)
+    expect(result.pricing.inputPerMillion).toBe(input)
+    expect(result.pricing.outputPerMillion).toBe(output)
+    expect(result.pricing.cacheReadPerMillion).toBe(cacheRead)
+  })
+
+  it('points the sonnet alias at Claude Sonnet 5', () => {
+    expect(lookupPricing('sonnet').pricing).toEqual(lookupPricing('claude-sonnet-5').pricing)
+  })
+
   it('marks a brand-new model as unpriced instead of guessing a neighbor', () => {
     // 'gemini-3-pro' has no exact key; the old fuzzy fallback mis-matched it to
     // 'gemini-3-pro-image-preview'. It must now be unpriced with $0, not a guess.

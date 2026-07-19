@@ -21,6 +21,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Refresh model pricing
+        run: node ../cli/scripts/sync-pricing.mjs
+
       - name: Pick Xcode
         run: |
           set -euo pipefail

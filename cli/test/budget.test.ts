@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { checkBudgets } from '../src/hooks/useBudget.js'
 import type { Budget, Session } from '../src/types.js'
 
@@ -40,10 +40,16 @@ describe('checkBudgets', () => {
   })
 
   it('handles weekly period', () => {
-    const budgets: Budget[] = [{ id: 'b1', scope: 'global', period: 'weekly', limitCents: 1000, alertAtPct: 80 }]
-    const now = new Date()
-    const twoDaysAgo = new Date(now); twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
-    const sessions = [makeSession({ costMillicents: 300_000, startedAt: now }), makeSession({ costMillicents: 200_000, startedAt: twoDaysAgo })]
-    expect(checkBudgets(budgets, sessions)[0].spentCents).toBe(500)
+    vi.useFakeTimers()
+    try {
+      vi.setSystemTime(new Date('2026-07-15T12:00:00'))
+      const budgets: Budget[] = [{ id: 'b1', scope: 'global', period: 'weekly', limitCents: 1000, alertAtPct: 80 }]
+      const now = new Date()
+      const twoDaysAgo = new Date(now); twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
+      const sessions = [makeSession({ costMillicents: 300_000, startedAt: now }), makeSession({ costMillicents: 200_000, startedAt: twoDaysAgo })]
+      expect(checkBudgets(budgets, sessions)[0].spentCents).toBe(500)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
