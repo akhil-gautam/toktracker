@@ -64,6 +64,23 @@ export function formatTokens(tokens: number): string {
   return `${tokens}`
 }
 
+/**
+ * Human-readable short model name, e.g. `claude-opus-4-8` → "Opus 4.8",
+ * `gpt-5.1-codex` → "5.1.codex". Used wherever a raw model id would be cryptic.
+ */
+export function shortModel(m: string | null | undefined): string {
+  if (!m) return '—'
+  if (m.startsWith('<')) return m // synthetic markers like <synthetic>
+  const trimmed = m.replace(/^claude-/, '').replace(/^gpt-/, '')
+  const parts = trimmed.split('-')
+  if (parts.length >= 2) {
+    const head = parts[0]!
+    const rest = parts.slice(1, 3).join('.')
+    return `${head.charAt(0).toUpperCase()}${head.slice(1)} ${rest}`
+  }
+  return trimmed
+}
+
 export const SPARKLINE_CHARS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█']
 
 export function sparkline(values: number[]): string {

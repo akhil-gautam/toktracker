@@ -81,9 +81,45 @@ tokscale daemon status
 tokscale privacy audit
 tokscale privacy wipe
 
-# Export
+# Export / automation
 tokscale export
+tokscale serve              # JSON API on 127.0.0.1 for dashboards/CI
+
+# Provider status (opt-in)
+tokscale status check       # one-shot
+tokscale status enable      # background polling in the daemon
 ```
+
+## Budgets & pace
+
+Budgets show a forward-looking **pace projection** — at your current run rate it
+tells you whether you're on track or *when* you'll cross the limit (e.g. "on pace
+to hit the $50 limit Thursday"). Pure local computation over your existing spend
+data; no network.
+
+## Dashboards & CI (`serve`)
+
+`tokscale serve` starts a **loopback-only** (`127.0.0.1`) JSON server — opt-in,
+never auto-started, never bound beyond your machine — exposing your usage data for
+custom dashboards or CI gates:
+
+```bash
+tokscale serve --port 4317
+# GET /stats /models /repos /daily?days=30 /sessions?limit=100 /budgets /projection
+# append ?fresh=1 to re-scan logs
+```
+
+Because it surfaces toktracker's per-repo/per-model attribution as JSON, you can
+fail a CI build when today's spend exceeds a threshold, or feed Grafana.
+
+## Provider status (optional)
+
+`tokscale status enable` lets the daemon poll public provider status pages
+(Anthropic, OpenAI — no auth, no data sent) every ~5 minutes and show an incident
+badge in the dashboard, so anomalous spend/failures can be explained by a vendor
+outage rather than your code. **Off by default** (it's the only feature besides
+the pricing refresh that touches the network); disclosed in `tokscale privacy
+audit` and cleared by `tokscale privacy wipe`.
 
 ## Privacy
 

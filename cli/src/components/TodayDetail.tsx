@@ -7,6 +7,7 @@ import type { TodayDetailStats } from '../types.js'
 
 interface TodayDetailProps {
   detail: TodayDetailStats
+  columns?: number
 }
 
 const COL_WIDTH = 14
@@ -16,13 +17,13 @@ function MetricCol({ label, value, color }: { label: string; value: string; colo
   const val = value.length > COL_WIDTH - 1 ? value.slice(0, COL_WIDTH - 1) : value
   return (
     <Box flexDirection="column" width={COL_WIDTH}>
-      <Text color="gray" dimColor>{lbl.padEnd(COL_WIDTH)}</Text>
-      <Text color={color}>{val.padEnd(COL_WIDTH)}</Text>
+      <Text color="#6B7280">{lbl.padEnd(COL_WIDTH)}</Text>
+      <Text color={color} bold>{val.padEnd(COL_WIDTH)}</Text>
     </Box>
   )
 }
 
-export function TodayDetail({ detail }: TodayDetailProps) {
+export function TodayDetail({ detail, columns = 80 }: TodayDetailProps) {
   if (detail.sessionCount === 0) {
     return (
       <Box flexDirection="column" paddingX={1} marginTop={1}>
@@ -32,7 +33,7 @@ export function TodayDetail({ detail }: TodayDetailProps) {
   }
 
   const totalTokens = detail.inputTokens + detail.outputTokens
-  const sep = '\u2500'.repeat(120)
+  const sep = '\u2500'.repeat(Math.max(20, columns - 4))
   const maxModelCost = detail.models[0]?.costMillicents ?? 1
   const maxToolCost = detail.tools[0]?.costMillicents ?? 1
 
@@ -77,7 +78,7 @@ export function TodayDetail({ detail }: TodayDetailProps) {
         <Text color="gray" dimColor>Hourly activity (24h):</Text>
         <VBarChart
           values={detail.hourly}
-          height={7}
+          height={5}
           stretch={4}
           colorScale
           labels={Array.from({ length: 24 }, (_, h) => (h % 3 === 0 ? String(h).padStart(2, '0') : ''))}

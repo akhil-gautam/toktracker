@@ -9,7 +9,7 @@ interface TabBarProps { activeTab: TabName; unreadDetections?: number }
 export function TabBar({ activeTab, unreadDetections = 0 }: TabBarProps) {
   return (
     <Box marginBottom={1}>
-      <Gradient name="vice"><Text bold>{'\u25C6 tokscale'}</Text></Gradient>
+      <Gradient name="vice"><Text bold>{'\u25C6 toktracker'}</Text></Gradient>
       <Text color="gray"> {'\u2502'} </Text>
       {TABS.map((tab, i) => {
         const baseLabel = TAB_LABELS[tab]

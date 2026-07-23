@@ -3,7 +3,7 @@ import { Box, Text } from 'ink'
 import { Sparkline } from './Sparkline.js'
 import { LineChart } from './LineChart.js'
 import { useAnimatedValue } from '../hooks/useAnimatedValue.js'
-import { formatCost, BAR_FULL, BAR_EMPTY, getModelColor } from '../theme.js'
+import { formatCost, BAR_FULL, BAR_EMPTY, getModelColor, shortModel } from '../theme.js'
 import type { SessionStore } from '../services/session-store.js'
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -79,7 +79,7 @@ export function DailyTab({ store }: DailyTabProps) {
       <Box gap={3}>
         {Object.entries(trends).slice(0, 4).map(([model, values]) => (
           <Box key={model}>
-            <Text color={getModelColor(model)}>{model.split('-').slice(-2).join('-').slice(0, 10).padEnd(10)} </Text>
+            <Text color={getModelColor(model)}>{shortModel(model).slice(0, 12).padEnd(12)} </Text>
             <Sparkline values={values} color={getModelColor(model)} />
           </Box>
         ))}

@@ -1,10 +1,11 @@
 import type { Command } from 'commander'
 import { bootDb } from '../db/boot.js'
 import { rmSync } from 'node:fs'
-import { dbPath, configDir, pricingCachePath } from '../db/paths.js'
+import { dbPath, configDir, pricingCachePath, statusCachePath } from '../db/paths.js'
 import { closeDb } from '../db/connection.js'
 import { FeatureFlagsRepo } from '../db/repository.js'
 import { getPricingCacheInfo } from '../services/pricing-cache.js'
+import { loadStatusCache } from '../services/status-probe.js'
 import { createInterface } from 'node:readline/promises'
 
 export function registerPrivacyCommands(program: Command): void {
@@ -27,7 +28,16 @@ export function registerPrivacyCommands(program: Command): void {
       cacheAgeHours: cache.ageMs != null ? +(cache.ageMs / 3_600_000).toFixed(1) : undefined,
       cachedModels: cache.modelCount,
     }
-    process.stdout.write(JSON.stringify({ ...counts, pricingRefresh }, null, 2) + '\n')
+    // Disclose the optional status-polling network behavior, if any.
+    const statusFlag = new FeatureFlagsRepo(db).get('status_polling')
+    const statusCache = loadStatusCache()
+    const statusPolling = {
+      enabled: !!statusFlag?.enabled,
+      cacheFile: statusCachePath(),
+      endpoints: ['anthropic.statuspage.io', 'status.openai.com'],
+      lastCheckedAt: statusCache ? new Date(statusCache.checkedAt).toISOString() : undefined,
+    }
+    process.stdout.write(JSON.stringify({ ...counts, pricingRefresh, statusPolling }, null, 2) + '\n')
   })
   program.command('wipe').action(async () => {
     const rl = createInterface({ input: process.stdin, output: process.stdout })
@@ -38,6 +48,7 @@ export function registerPrivacyCommands(program: Command): void {
     try { rmSync(dbPath()) } catch {}
     for (const suffix of ['-wal', '-shm']) { try { rmSync(dbPath() + suffix) } catch {} }
     try { rmSync(pricingCachePath()) } catch {}
+    try { rmSync(statusCachePath()) } catch {}
     process.stdout.write(`wiped contents under ${configDir()}\n`)
   })
 }

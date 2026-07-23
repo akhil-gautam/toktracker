@@ -21,11 +21,13 @@ function formatUSD(millicents: number): string {
 }
 
 export function LineChart({ values, labels, height = 12, color, title, subtitle, xStretch = 3 }: LineChartProps) {
-  if (values.length === 0) {
+  // Empty OR all-zero series: asciichart degenerates (min===max → flat/NaN line
+  // that reads as "broken"). Show an explicit empty state instead.
+  if (values.length === 0 || Math.max(...values) <= 0) {
     return (
       <Box flexDirection="column">
         {title && <Text color="cyan" bold>{title}</Text>}
-        <Text color="gray">No data</Text>
+        <Text color="gray" dimColor>No spend in this range</Text>
       </Box>
     )
   }

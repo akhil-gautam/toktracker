@@ -16,11 +16,14 @@ import { RulesTab } from './components/RulesTab.js'
 import { AttributionTab } from './components/AttributionTab.js'
 import { HooksTab } from './components/HooksTab.js'
 import { ContextHud } from './components/ContextHud.js'
+import { IncidentBadge } from './components/IncidentBadge.js'
+import { SlashSuggestions } from './components/SlashSuggestions.js'
 import { ClaudeMdOverlay } from './components/ClaudeMdOverlay.js'
 import { SavedCommandOverlay } from './components/SavedCommandOverlay.js'
-import { useTabNavigation } from './hooks/useTabNavigation.js'
+import { useTabNavigation, TABS, type TabName } from './hooks/useTabNavigation.js'
 import { useSessions } from './hooks/useSessions.js'
 import { bootDb } from './db/boot.js'
+import type { Budget } from './types.js'
 
 function useTerminalSize() {
   const [size, setSize] = useState({
@@ -39,8 +42,8 @@ interface AppProps { onExit: () => void }
 
 export function App({ onExit }: AppProps) {
   const { rows, columns } = useTerminalSize()
-  const { store, budgetResults, loading, error, serverMode } = useSessions()
-  const { activeTab, commandMode, commandInput, showHelp, handleInput } = useTabNavigation()
+  const { store, budgetResults, loading, error, serverMode, saveBudget, clearBudgets } = useSessions()
+  const { activeTab, setActiveTab, commandMode, commandInput, commandSuggestions, commandSelected, showHelp, setShowHelp, handleInput } = useTabNavigation()
   const db = React.useMemo(() => bootDb(), [])
   const [overlay, setOverlay] = React.useState<'claude_md' | 'saved_cmd' | null>(null)
 
@@ -52,11 +55,29 @@ export function App({ onExit }: AppProps) {
     }
   }, [db, activeTab])
 
+  // Slash-command handler. Currently: /budget set <amount> [daily|weekly|monthly], /budget clear.
+  const onCommand = React.useCallback((cmd: string) => {
+    const parts = cmd.replace(/^\//, '').trim().split(/\s+/)
+    const head = parts[0]
+    if (head === 'help') { setShowHelp(true); return }
+    if ((TABS as readonly string[]).includes(head)) { setActiveTab(head as TabName); return }
+    if (head !== 'budget') return
+    if (parts[1] === 'clear') { clearBudgets(); setActiveTab('budget'); return }
+    if (parts[1] === 'set') {
+      const amount = parseFloat(parts[2] ?? '')
+      if (!isFinite(amount) || amount <= 0) return
+      const period: Budget['period'] =
+        parts[3] === 'daily' || parts[3] === 'weekly' || parts[3] === 'monthly' ? parts[3] : 'monthly'
+      saveBudget({ id: `global-${period}`, scope: 'global', period, limitCents: Math.round(amount * 100), alertAtPct: 80 })
+      setActiveTab('budget')
+    }
+  }, [saveBudget, clearBudgets, setActiveTab, setShowHelp])
+
   useInput((input, key) => {
     if (overlay) return
     if (input === '!') { setOverlay('claude_md'); return }
     if (input === '@') { setOverlay('saved_cmd'); return }
-    handleInput(input, key, onExit)
+    handleInput(input, key, onExit, onCommand)
   })
 
   if (loading) return (
@@ -100,7 +121,7 @@ export function App({ onExit }: AppProps) {
 
   function renderTab() {
     switch (activeTab) {
-      case 'overview': return <OverviewTab store={store} budgetResults={budgetResults} db={db} />
+      case 'overview': return <OverviewTab store={store} budgetResults={budgetResults} db={db} columns={columns} />
       case 'models': return <ModelsTab store={store} />
       case 'daily': return <DailyTab store={store} />
       case 'repos': return <ReposTab store={store} />
@@ -115,14 +136,18 @@ export function App({ onExit }: AppProps) {
 
   return (
     <Box flexDirection="column" height={rows} width={columns}>
-      <Box justifyContent="space-between">
+      <Box justifyContent="space-between" width={columns}>
         <TabBar activeTab={activeTab} unreadDetections={unread} />
-        <ContextHud db={db} sessionId={undefined} />
+        <Box>
+          <IncidentBadge />
+          <ContextHud store={store} />
+        </Box>
       </Box>
       {alerts.map(r => <BudgetAlert key={r.budget.id} result={r} />)}
       <Box flexGrow={1} flexDirection="column">
         {renderTab()}
       </Box>
+      {commandMode && <SlashSuggestions commands={commandSuggestions} selected={commandSelected} />}
       <StatusBar tab={activeTab} commandMode={commandMode} commandInput={commandInput} />
     </Box>
   )

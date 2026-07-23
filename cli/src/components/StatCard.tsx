@@ -48,6 +48,11 @@ export function StatCard({
     )
   }
 
+  // Compact 3-line card: label / value / (delta or caption). No padding rows.
+  const footer = deltaEl
+    ?? (captionLine
+      ? <Text backgroundColor={backgroundColor} color="#6B7280">{captionLine}</Text>
+      : <Text backgroundColor={backgroundColor}>{blankLine}</Text>)
   return (
     <Box
       borderStyle="round"
@@ -55,14 +60,9 @@ export function StatCard({
       width={width}
       flexDirection="column"
     >
-      <Text backgroundColor={backgroundColor}>{blankLine}</Text>
       <Text backgroundColor={backgroundColor} color="#6B7280" bold>{labelLine}</Text>
       <Text backgroundColor={backgroundColor} color={valueColor} bold>{valueLine}</Text>
-      {deltaEl ?? <Text backgroundColor={backgroundColor}>{blankLine}</Text>}
-      {captionLine
-        ? <Text backgroundColor={backgroundColor} color="#6B7280">{captionLine}</Text>
-        : <Text backgroundColor={backgroundColor}>{blankLine}</Text>}
-      <Text backgroundColor={backgroundColor}>{blankLine}</Text>
+      {footer}
     </Box>
   )
 }

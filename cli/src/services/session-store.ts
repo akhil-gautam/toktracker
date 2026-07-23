@@ -8,6 +8,36 @@ function daysAgo(n: number): Date {
   const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - n); return d
 }
 
+export type ActivityRange = 'ALL' | '30D' | '7D'
+export interface YearCell { value: number; isFuture: boolean }
+export interface ActivityStats {
+  sessions: number
+  totalTokens: number
+  activeDays: number
+  currentStreak: number
+  longestStreak: number
+  peakHour: number | null
+  favoriteModel: string | null
+  yearCells: YearCell[]
+}
+
+function currentStreakOf(daily: number[]): number {
+  let count = 0
+  for (let i = daily.length - 1; i >= 0; i--) {
+    if ((daily[i] ?? 0) > 0) count++
+    else break
+  }
+  return count
+}
+
+function longestStreakOf(daily: number[]): number {
+  let best = 0, cur = 0
+  for (const v of daily) {
+    if (v > 0) { cur++; best = Math.max(best, cur) } else cur = 0
+  }
+  return best
+}
+
 interface CachedStats {
   todayStats: DayStats
   weekTotal: number
@@ -448,5 +478,69 @@ export class SessionStore {
     if (!range) return this.getDailyStats(7)
     const diffDays = Math.ceil((range.latest.getTime() - range.earliest.getTime()) / (1000 * 60 * 60 * 24)) + 1
     return this.getDailyStats(Math.max(diffDays, 7))
+  }
+
+  /**
+   * Activity stats for the Overview hero, computed from the in-memory sessions
+   * (NOT the SQLite DB, which the CLI never writes to). `range` filters the
+   * headline counts; streaks and the heatmap always span the current calendar year.
+   */
+  getActivity(range: ActivityRange): ActivityStats {
+    const now = new Date()
+    const year = now.getFullYear()
+    const cutoff = range === 'ALL' ? 0 : now.getTime() - (range === '30D' ? 30 : 7) * 86_400_000
+
+    let sessions = 0
+    let totalTokens = 0
+    const activeDaySet = new Set<string>()
+    const hourCost = new Map<number, number>()
+    const modelCost = new Map<string, number>()
+    const yearDayCost = new Map<string, number>()
+
+    for (const s of this.sessions.values()) {
+      const t = s.startedAt.getTime()
+      if (s.startedAt.getFullYear() === year) {
+        yearDayCost.set(dateKey(s.startedAt), (yearDayCost.get(dateKey(s.startedAt)) ?? 0) + s.costMillicents)
+      }
+      if (t < cutoff) continue
+      sessions++
+      totalTokens += s.inputTokens + s.outputTokens + s.cacheReadTokens + s.cacheWriteTokens
+      activeDaySet.add(dateKey(s.startedAt))
+      const h = s.startedAt.getHours()
+      hourCost.set(h, (hourCost.get(h) ?? 0) + s.costMillicents)
+      modelCost.set(s.model, (modelCost.get(s.model) ?? 0) + s.costMillicents)
+    }
+
+    // Year heatmap cells (Jan 1 → Dec 31), future days flagged.
+    const jan1 = new Date(year, 0, 1)
+    const nextJan1 = new Date(year + 1, 0, 1)
+    const todayMidnight = new Date(year, now.getMonth(), now.getDate())
+    const yearCells: YearCell[] = []
+    const cursor = new Date(jan1)
+    while (cursor < nextJan1) {
+      const isFuture = cursor.getTime() > todayMidnight.getTime()
+      yearCells.push({ value: isFuture ? 0 : (yearDayCost.get(dateKey(cursor)) ?? 0), isFuture })
+      cursor.setDate(cursor.getDate() + 1)
+    }
+    const pastValues = yearCells.filter(c => !c.isFuture).map(c => c.value)
+
+    let peakHour: number | null = null
+    let peakHourCost = -1
+    for (const [h, c] of hourCost) if (c > peakHourCost) { peakHourCost = c; peakHour = h }
+
+    let favoriteModel: string | null = null
+    let favCost = -1
+    for (const [m, c] of modelCost) if (c > favCost) { favCost = c; favoriteModel = m }
+
+    return {
+      sessions,
+      totalTokens,
+      activeDays: activeDaySet.size,
+      currentStreak: currentStreakOf(pastValues),
+      longestStreak: longestStreakOf(yearCells.map(c => c.value)),
+      peakHour,
+      favoriteModel,
+      yearCells,
+    }
   }
 }
